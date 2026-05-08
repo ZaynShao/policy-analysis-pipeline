@@ -354,6 +354,8 @@ Canonical 注册在 `_meta/entities/registry.yaml`(或 vault 内等价位置,以
 - `regional-coverage.md` — 区域覆盖矩阵 + 空白发现
 - `opinions-summary.md` — 同主题舆论元分析
 
+**`2_crystallized/_reports/`(月报渲染产物)**:本阶段**不再维护**。既存 March 月报作为历史数据保留,不删但不更新。
+
 ---
 
 ## C. Raw 不可变的边界例外(白名单)

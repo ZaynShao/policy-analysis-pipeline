@@ -25,3 +25,14 @@ C 路径切换:从原 vault 单仓拆出工程层,本仓为新生工程层。
 - 写第一条 pipeline 管道脚本(L2 关系抽取)验证 schema 契约
 - 写状态自动生成脚本 `scripts/audit/dump_status.py`
 - 补 64 篇 P_1900_* 政策的 business_view(date 抽不到)
+
+## 0.2 — 2026-05-08(范围调整)
+
+- **删 L3 月报范围**:本阶段聚焦 L1 + L2,不出月报
+  - OPERATIONS.md:删月报章节,新增 §7 L1 重建任务
+  - SCHEMA.md:`2_crystallized/_reports/` 标"暂不维护"
+  - README.md:架构层表格 L3 标"暂不维护"
+  - 删 `scripts/l3_render/` 空目录
+- **明确 L1 重建主目标**:市级政策从 ~10 重点城市扩到 ~330 全地级市 + 京沪津渝下辖区
+- **新 session 启动 brief 模板**:`docs/NEW_SESSION_BRIEF.md`,用户开新 session 时直接贴
+- **STATUS 重写**:本阶段范围 / L1 覆盖现状(分级别)/ 优先级 P0-P2 待办
