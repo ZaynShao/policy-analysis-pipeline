@@ -1,0 +1,177 @@
+---
+title: 政策分析 · 运营手册(OPERATIONS)
+status: v0.1 骨架(待逐步填实)
+last_updated: 2026-05-08
+---
+
+# 运营手册
+
+> 本手册描述**当前生效**的运营流程。历史决策、推导过程、设计思考见 `docs/`。
+>
+> 所有"上次更新"的数字、覆盖率、批次状态由 `scripts/audit/dump_status.py` 自动生成,**不在本文档手写数字**。
+
+---
+
+## 0. 项目身份
+
+- 服务对象:决策层政策简报(月报 / 主题结晶页 / 决策卡片)
+- 数据流:L1 raw → L2 派生 → L3 渲染
+- 工具栈:Tavily / Firecrawl / trafilatura / Claude / wewe-rss / Obsidian
+
+详细背景见 vault 内 `00 背景资料/滴滴能源-政策分析背景.md`(数据/配置类文档,留 vault)。
+
+---
+
+## 1. 当前生效流程总图
+
+```
+┌──────────────────────────────────────────────────────┐
+│ L1 采集(scripts/l1_collect/)                       │
+│  ├─ 渠道扫描        Step 2: 渠道目录 + 关键词遍历      │
+│  ├─ 标题过滤        Step 3: 规则过滤 + 时间窗校验       │
+│  ├─ 三维查重        Step 3.5: URL + 文号 + 标题哈希     │
+│  ├─ 抓取暂存        Step 4: Firecrawl/trafilatura 兜底 │
+│  ├─ 元数据抽取      Step 4.5: 客观字段 deterministic    │
+│  └─ L1 入库         Step 5: 写 vault 0_raw/policies/    │
+└──────────────────────────────────────────────────────┘
+                     │
+                     ▼
+┌──────────────────────────────────────────────────────┐
+│ L1 评论(scripts/l1_collect/)                       │
+│  ├─ wewe-rss push   持续涌入,自动入库 commentaries     │
+│  ├─ 评论反向匹配    B1 文号 / B2 模糊 / B3 LLM         │
+│  └─ Tavily 兜底     按分配额未达成时启动               │
+└──────────────────────────────────────────────────────┘
+                     │
+                     ▼
+┌──────────────────────────────────────────────────────┐
+│ L2 派生(scripts/l2_derive/)                        │
+│  ├─ business_view   Step 5C: LLM 派生评分+影响分析      │
+│  ├─ 实体抽取        canonical 匹配                     │
+│  ├─ 关系抽取        regex(supersedes/references) +     │
+│  │                  启发式(iterates/clarifies/...)+    │
+│  │                  LLM(conflicts/cites_basis)        │
+│  ├─ derives_from    Step 5C 副产物                     │
+│  └─ 主题结晶        2_crystallized/themes/             │
+└──────────────────────────────────────────────────────┘
+                     │
+                     ▼
+┌──────────────────────────────────────────────────────┐
+│ L3 渲染(scripts/l3_render/)                        │
+│  ├─ 月报数据准备    prep_docx_data                     │
+│  ├─ 月报渲染        render_docx + render_html          │
+│  └─ 决策卡片        (后续)                            │
+└──────────────────────────────────────────────────────┘
+
+【全程】audit:scripts/audit/ 跑 lint / dedup / status dump
+```
+
+---
+
+## 2. SOP 详细步骤
+
+> 此章为骨架,**待从历史 SOP 蒸馏后填实**。
+>
+> 蒸馏原则:每个 step 用 5-10 行说清"输入 / 动作 / 输出 / 异常"。详细推导和设计思考下沉 `docs/`。
+
+### Step 1 · 去重基线建立
+TODO
+
+### Step 2 · 按渠道增量扫描
+TODO
+
+### Step 3 · 标题规则过滤 + 查重
+TODO
+
+### Step 3.5 · URL 维度查重
+TODO
+
+### Step 4 · 抓取正文到暂存区
+TODO
+
+### Step 4.5 · 客观元数据抽取
+TODO(关键约束:不做 LLM 业务判断,见 SCHEMA §2 + LESSONS B1)
+
+### Step 5 · L1 入库
+TODO(关键约束:frontmatter 白名单,见 SCHEMA §2)
+
+### Step 5C · 业务侧派生
+TODO(异步,可缺失,split 写 3 处)
+
+### Step 6 · 评论达成度评估
+TODO(Push 主 / Pull 兜底)
+
+### Step 6.5 · 评论→政策反向匹配
+TODO(B1/B2/B3 三路)
+
+### Step 7 · 优质公众号识别 + 订阅扩容
+TODO
+
+### Step 8 · 缺口分析 + 反哺渠道目录
+TODO
+
+---
+
+## 3. 执行节奏
+
+### 维护期(目标态)
+| 模式 | 触发 | 跑哪几步 |
+|---|---|---|
+| 每日 cron | 9:00 | Step 1-5 增量 + Step 6 仅 ≥3 分 |
+| 每周 cron | 周日 10:00 | Step 7-8 |
+| 频道推送 | 用户贴 URL | Step 4-5 |
+
+### 当前状态
+- 维护期 cron 未启用
+- 各 step 由人工触发 pipeline 脚本
+
+---
+
+## 4. 关键参数
+
+| 参数 | 维护期默认 | 说明 |
+|---|---|---|
+| 时间窗 | 24h | Step 2 增量 |
+| 翻页硬上限 | 5 页 | Step 2 兜底 |
+| 边际效益阈值 | 连续 3 页新增 <10% 停 | Step 2 |
+| Jaccard 去重阈值 | 0.85 | Step 2 |
+| 评论触发阈值 | ≥3 分 | Step 6 |
+| 决策推送阈值 | ≥4 分 | 维护期 |
+
+---
+
+## 5. 兜底链路
+
+```
+Step 4 抓取(政策正文):
+  Firecrawl 首选(质量高 + PDF 支持)
+    └─ 失败/无额度 → Tavily search 找 URL
+                       └─ Python requests + trafilatura 提取
+                            └─ trafilatura 抽不到 → BeautifulSoup 兜底全文清洗
+                                 └─ 仍失败 → 标 fetch_error,人工
+
+Step 6 抓取(评论正文): 同上链路
+```
+
+实测对比与具体配置详见 `LESSONS.md` B3 + `docs/tooling/`。
+
+---
+
+## 6. 常见异常与应对
+
+| 情况 | 应对 |
+|---|---|
+| Tavily / Firecrawl 超限 | 跑到哪断到哪,写断点 JSON,下轮 resume |
+| 正文是摘要而非原文 | 标 `confidence: 0.6`,Step 5 降档 |
+| 一个政策多渠道首发 | 取发布日期最早者为主,其他作 `sources` 数组存 |
+| 打分争议大(2 次差 ≥2) | 落人工审核清单,暂不入库 |
+| PDF 解析失败 | `pdftotext` 兜底;仍失败标 `fetch_error` |
+
+---
+
+## Changelog
+
+### v0.1 — 2026-05-08
+- 骨架建立,各 step 详细内容待填
+- 总图 + 执行节奏 + 兜底链路 + 异常应对从历史 SOP 抽出
+- 详细 SOP 蒸馏作为下一阶段任务

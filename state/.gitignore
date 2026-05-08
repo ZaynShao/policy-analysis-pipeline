@@ -1,0 +1,6 @@
+# 默认 state/ 子目录内容不进 git
+# 各子目录可以单独配 .gitignore 例外保留(如 STATUS.md / last_run.json)
+*
+!.gitignore
+!STATUS.md
+!last_run.json
