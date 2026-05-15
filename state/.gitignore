@@ -1,6 +1,10 @@
 # 默认 state/ 子目录内容不进 git
 # 各子目录可以单独配 .gitignore 例外保留(如 STATUS.md / last_run.json)
+# 子目录被放行后,内部仍需各自的 .gitignore 控制(否则全部进 git)
 *
 !.gitignore
 !STATUS.md
 !last_run.json
+# 任务子目录放行(内部用各自 .gitignore 白名单)
+!T2/
+!T3/

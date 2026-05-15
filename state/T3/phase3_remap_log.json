@@ -1,0 +1,351 @@
+{
+  "applied_at": "2026-05-12T15:13:21+08:00",
+  "remap_count": 83,
+  "archived_count": 28,
+  "actions": {
+    "business_view_rename": [
+      [
+        "P_1900_GO_4d012393.yaml",
+        "P_2026_GO_4d012393.yaml"
+      ],
+      [
+        "P_1900_GO_dae672c9.yaml",
+        "P_2022_GO_dae672c9.yaml"
+      ],
+      [
+        "P_1900_GO_9802552e.yaml",
+        "P_2021_GO_9802552e.yaml"
+      ],
+      [
+        "P_1900_GO_d5bc4c87.yaml",
+        "P_2017_GO_d5bc4c87.yaml"
+      ],
+      [
+        "P_1900_GO_e6f6f834.yaml",
+        "P_2017_GO_e6f6f834.yaml"
+      ],
+      [
+        "P_1900_SN_5f4dd35d.yaml",
+        "P_2025_SN_5f4dd35d.yaml"
+      ],
+      [
+        "P_1900_QH_d184b5cf.yaml",
+        "P_2023_QH_d184b5cf.yaml"
+      ],
+      [
+        "P_1900_SX_b696f814.yaml",
+        "P_2026_SX_b696f814.yaml"
+      ],
+      [
+        "P_1900_GO_70875d73.yaml",
+        "P_2017_GO_70875d73.yaml"
+      ],
+      [
+        "P_1900_BJ_30979cba.yaml",
+        "P_2024_BJ_30979cba.yaml"
+      ],
+      [
+        "P_1900_BJ_feef808f.yaml",
+        "P_2025_BJ_feef808f.yaml"
+      ],
+      [
+        "P_1900_AH_cb4b09a2.yaml",
+        "P_2026_AH_cb4b09a2.yaml"
+      ],
+      [
+        "P_1900_HN_70420f94.yaml",
+        "P_2022_HN_70420f94.yaml"
+      ],
+      [
+        "P_1900_SX_dfb899b7.yaml",
+        "P_2026_SX_dfb899b7.yaml"
+      ],
+      [
+        "P_1900_GZ_2dad70b3.yaml",
+        "P_2026_GZ_2dad70b3.yaml"
+      ],
+      [
+        "P_1900_SN_928ea799.yaml",
+        "P_2025_SN_928ea799.yaml"
+      ],
+      [
+        "P_1900_BJ_f3da0370.yaml",
+        "P_2024_BJ_f3da0370.yaml"
+      ],
+      [
+        "P_1900_TJ_96d7cc03.yaml",
+        "P_2022_TJ_96d7cc03.yaml"
+      ],
+      [
+        "P_1900_JX_91234f69.yaml",
+        "P_2035_JX_91234f69.yaml"
+      ],
+      [
+        "P_1900_HI_45faa5f8.yaml",
+        "P_2025_HI_45faa5f8.yaml"
+      ],
+      [
+        "P_1900_JX_dd27cf9b.yaml",
+        "P_2026_JX_dd27cf9b.yaml"
+      ],
+      [
+        "P_1900_SX_8bdfd02b.yaml",
+        "P_2017_SX_8bdfd02b.yaml"
+      ],
+      [
+        "P_1900_QH_ab4dcbb6.yaml",
+        "P_2026_QH_ab4dcbb6.yaml"
+      ],
+      [
+        "P_1900_CQ_734bd346.yaml",
+        "P_2025_CQ_734bd346.yaml"
+      ],
+      [
+        "P_1900_GO_572b0ea8.yaml",
+        "P_2027_GO_572b0ea8.yaml"
+      ],
+      [
+        "P_1900_JX_b6890180.yaml",
+        "P_2025_JX_b6890180.yaml"
+      ],
+      [
+        "P_1900_HN_8fa9634d.yaml",
+        "P_2024_HN_8fa9634d.yaml"
+      ],
+      [
+        "P_1900_SX_b8cbd968.yaml",
+        "P_2021_SX_b8cbd968.yaml"
+      ],
+      [
+        "P_1900_TJ_9dbe2db1.yaml",
+        "P_2025_TJ_9dbe2db1.yaml"
+      ],
+      [
+        "P_1900_GX_29e0189e.yaml",
+        "P_2021_GX_29e0189e.yaml"
+      ],
+      [
+        "P_1900_TJ_82ee75cd.yaml",
+        "P_2024_TJ_82ee75cd.yaml"
+      ],
+      [
+        "P_1900_TJ_968c0a38.yaml",
+        "P_2024_TJ_968c0a38.yaml"
+      ],
+      [
+        "P_1900_GO_26f7dd68.yaml",
+        "P_2025_GO_26f7dd68.yaml"
+      ],
+      [
+        "P_1900_GO_4c4555f6.yaml",
+        "P_2048_GO_4c4555f6.yaml"
+      ],
+      [
+        "P_1900_HN_dc498608.yaml",
+        "P_2023_HN_dc498608.yaml"
+      ],
+      [
+        "P_1900_YN_9eb91215.yaml",
+        "P_2025_YN_9eb91215.yaml"
+      ],
+      [
+        "P_1900_QH_2457693a.yaml",
+        "P_2024_QH_2457693a.yaml"
+      ],
+      [
+        "P_1900_HN_7de5ab8e.yaml",
+        "P_2020_HN_7de5ab8e.yaml"
+      ],
+      [
+        "P_1900_GX_4c39e941.yaml",
+        "P_2019_GX_4c39e941.yaml"
+      ],
+      [
+        "P_1900_CQ_f8a0db61.yaml",
+        "P_2020_CQ_f8a0db61.yaml"
+      ],
+      [
+        "P_1900_LN_f1e981bf.yaml",
+        "P_2017_LN_f1e981bf.yaml"
+      ],
+      [
+        "P_1900_QH_af736607.yaml",
+        "P_2024_QH_af736607.yaml"
+      ],
+      [
+        "P_1900_NX_448b672e.yaml",
+        "P_2023_NX_448b672e.yaml"
+      ],
+      [
+        "P_1900_LN_54de50fa.yaml",
+        "P_2017_LN_54de50fa.yaml"
+      ],
+      [
+        "P_1900_SX_5d4f1dba.yaml",
+        "P_2025_SX_5d4f1dba.yaml"
+      ],
+      [
+        "P_1900_GO_e062e74d.yaml",
+        "P_2025_GO_e062e74d.yaml"
+      ],
+      [
+        "P_1900_GO_e3d626ae.yaml",
+        "P_2025_GO_e3d626ae.yaml"
+      ],
+      [
+        "P_1900_CQ_e7997102.yaml",
+        "P_2024_CQ_e7997102.yaml"
+      ],
+      [
+        "P_1900_GO_44cbdc92.yaml",
+        "P_2024_GO_44cbdc92.yaml"
+      ],
+      [
+        "P_1900_JX_4e08a81b.yaml",
+        "P_2025_JX_4e08a81b.yaml"
+      ],
+      [
+        "P_1900_GZ_64193177.yaml",
+        "P_2019_GZ_64193177.yaml"
+      ],
+      [
+        "P_1900_QH_28f7d0d8.yaml",
+        "P_2022_QH_28f7d0d8.yaml"
+      ],
+      [
+        "P_1900_CQ_683486a9.yaml",
+        "P_2025_CQ_683486a9.yaml"
+      ],
+      [
+        "P_1900_SX_6f26eb5b.yaml",
+        "P_2026_SX_6f26eb5b.yaml"
+      ],
+      [
+        "P_1900_GO_9ba3131a.yaml",
+        "P_2025_GO_9ba3131a.yaml"
+      ],
+      [
+        "P_1900_BJ_3701c968.yaml",
+        "P_2025_BJ_3701c968.yaml"
+      ],
+      [
+        "P_1900_AH_ae5294fd.yaml",
+        "P_2016_AH_ae5294fd.yaml"
+      ],
+      [
+        "P_1900_QH_a53ba53f.yaml",
+        "P_2025_QH_a53ba53f.yaml"
+      ],
+      [
+        "P_1900_GX_352aeb29.yaml",
+        "P_2026_GX_352aeb29.yaml"
+      ],
+      [
+        "P_1900_AH_7bfde159.yaml",
+        "P_2023_AH_7bfde159.yaml"
+      ],
+      [
+        "P_1900_QH_d24ac57d.yaml",
+        "P_2023_QH_d24ac57d.yaml"
+      ],
+      [
+        "P_1900_TJ_95daac5a.yaml",
+        "P_2020_TJ_95daac5a.yaml"
+      ],
+      [
+        "P_1900_GO_b783427a.yaml",
+        "P_2026_GO_b783427a.yaml"
+      ],
+      [
+        "P_1900_GO_2664d44e.yaml",
+        "P_2026_GO_2664d44e.yaml"
+      ],
+      [
+        "P_1900_CQ_d4e84b6f.yaml",
+        "P_2025_CQ_d4e84b6f.yaml"
+      ],
+      [
+        "P_1900_HN_5a70e3f4.yaml",
+        "P_2022_HN_5a70e3f4.yaml"
+      ],
+      [
+        "P_1900_GZ_98d4b413.yaml",
+        "P_2025_GZ_98d4b413.yaml"
+      ],
+      [
+        "P_1900_QH_5906e70d.yaml",
+        "P_2025_QH_5906e70d.yaml"
+      ],
+      [
+        "P_1900_JX_33d58f3b.yaml",
+        "P_2026_JX_33d58f3b.yaml"
+      ],
+      [
+        "P_1900_JX_d35b0ffb.yaml",
+        "P_2025_JX_d35b0ffb.yaml"
+      ],
+      [
+        "P_1900_JX_e3afc116.yaml",
+        "P_2021_JX_e3afc116.yaml"
+      ],
+      [
+        "P_1900_SN_fad607e4.yaml",
+        "P_2025_SN_fad607e4.yaml"
+      ]
+    ],
+    "business_view_archive": [
+      "P_1900_JX_2449ab7d.yaml",
+      "P_1900_HE_e745fde4.yaml",
+      "P_1900_GO_5dff3182.yaml",
+      "P_1900_GO_3872f513.yaml",
+      "P_1900_GO_565c42a6.yaml",
+      "P_1900_GZ_8c89d2d9.yaml",
+      "P_1900_SN_43aa16d7.yaml",
+      "P_1900_GO_6a44403f.yaml",
+      "P_1900_GO_78454068.yaml",
+      "P_1900_BJ_f1388b92.yaml",
+      "P_1900_CQ_82e7213b.yaml",
+      "P_1900_GO_4b5155f5.yaml",
+      "P_1900_TJ_f6097cc8.yaml",
+      "P_1900_TJ_2473efef.yaml",
+      "P_1900_GO_e7ac5f2c.yaml",
+      "P_1900_GO_d1101dae.yaml",
+      "P_1900_NX_ffe6eeec.yaml",
+      "P_1900_GO_d589270a.yaml",
+      "P_1900_CQ_965d30b5.yaml",
+      "P_1900_AH_365ee7cf.yaml",
+      "P_1900_GX_42d84277.yaml",
+      "P_1900_SN_41cca677.yaml"
+    ],
+    "summaries_jsonl_remap": 72,
+    "summaries_jsonl_archive": 22,
+    "relations_remap": {
+      "derives_from.jsonl": 45,
+      "aligns_with.jsonl": 19,
+      "cites_basis.jsonl": 50,
+      "_archive_aligns_v3_below_0.78.jsonl": 0,
+      "extends.jsonl": 9,
+      "_archive_iterates_dedup_v3.jsonl": 0,
+      "clarifies.jsonl": 13,
+      "_archive_a_commentary_migration.jsonl": 0,
+      "references.jsonl": 69,
+      "iterates.jsonl": 5,
+      "supersedes.jsonl": 0,
+      "_archive_aligns_v3_migrated_to_clarifies.jsonl": 0
+    },
+    "relations_archive": {
+      "derives_from.jsonl": 0,
+      "aligns_with.jsonl": 1,
+      "cites_basis.jsonl": 0,
+      "_archive_aligns_v3_below_0.78.jsonl": 0,
+      "extends.jsonl": 0,
+      "_archive_iterates_dedup_v3.jsonl": 0,
+      "clarifies.jsonl": 0,
+      "_archive_a_commentary_migration.jsonl": 0,
+      "references.jsonl": 2,
+      "iterates.jsonl": 0,
+      "supersedes.jsonl": 0,
+      "_archive_aligns_v3_migrated_to_clarifies.jsonl": 0
+    }
+  }
+}

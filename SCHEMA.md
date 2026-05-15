@@ -368,9 +368,32 @@ Canonical 注册在 `_meta/entities/registry.yaml`(或 vault 内等价位置,以
 - `not_policy_related`(无政策可关联标记)
 - `commentary_type`(枚举分类)
 
+### Deterministic 身份字段重算(v1.1 新增)
+
+允许 pipeline 重算并就地更新以下身份字段,**仅当新值由确定性规则从已有 metadata 计算得出**(非 LLM 自由生成):
+
+- `id`(由 `date.year` + `issuer_short` + `num/hash` 计算)
+- `aliases`(随 `id` 同步更新,**旧 id 必须保留在 aliases 数组中**以保持 Obsidian 反链可解)
+- `date`(从 URL path / 正文 / H1 等结构化位置抽取)
+- `region.level` / `region.code` / `region.name`(由 `issuer_canonical` 或 URL 域名 lookup)
+- `issuer` / `issuer_canonical`(由 URL 域名 / 正文 H1 抽取后查 canonical 表)
+
+每次重算必须在 `provenance` 中记录审计字段:
+
+- `<field>_fixed_at`(ISO 时间戳)
+- `<field>_fixed_method`(枚举:`url_path_pattern` / `url_path_month_only` / `url_year_only` / `body_publish_time` / `body_chinese_date` / `title_extract` / `domain_lookup` / `id_recompute_from_metadata` / `combined`)
+- `<field>_fixed_from`(原值)
+- `<field>_fix_confidence`(0–1,可选)
+
+对 `id` 字段额外要求:
+
+- 重算后 `aliases` 数组**必须**同时包含旧 id 和新 id(Obsidian 反链兼容)
+- 文件名保留不变(vault 文件名是中文标题哈希,与 id 解耦)
+- 派生层引用旧 id 的位置由专用 oneshot 同步重指,**不与 raw 改动同 commit**
+
 ### 判定标准
 允许写入 raw frontmatter 的字段必须**同时**满足:
-1. 是「指向 vault 已有文档的链接」或「枚举型分类标签」
+1. 是「指向 vault 已有文档的链接」、「枚举型分类标签」或「deterministic 派生的身份字段」
 2. **不是** LLM 生成的自由文本(摘要 / 影响分析 / 语义标签)
 
 凡 LLM 生成的自由文本一律落派生层。
@@ -441,6 +464,13 @@ vault 当前内含一些字段,与"理想 schema"有出入,但是真实存在的
 ---
 
 ## Changelog
+
+### v1.1 — 2026-05-12(身份字段重算白名单)
+
+- §C 新增 "Deterministic 身份字段重算" 子节,显式授权 `id` / `aliases` / `date` / `region` / `issuer` 在确定性规则下就地重算
+- §C 判定标准第 1 条扩展为接受 "deterministic 派生的身份字段"
+- driver: T3 P_1900 id drift 修复任务,proposal 与执行细节见 `docs/proposals/schema-c-id-recompute.md` 和 `state/T3/`
+- §F 未变(vault 中已存在的 `date_fixed_*` / `region_fixed_*` / `issuer_fixed_*` 字段从未在 §F 显式登记,本次合并后归位到新白名单,§F 不需删除条目)
 
 ### v1.0 — 2026-05-08(C 路径切换)
 

@@ -1,0 +1,6 @@
+# 继承 state/ 全忽略,白名单 .md 和 各类 log
+*
+!.gitignore
+!*.md
+!*_log.jsonl
+!*_log.json

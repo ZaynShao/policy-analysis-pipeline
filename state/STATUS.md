@@ -1,8 +1,8 @@
 ---
 title: 政策分析 · 当前状态
-generated_at: 2026-05-08(C 路径切换初次)
-generated_by: scripts/audit/validate_schema.py + 手工补
-note: 本文件目标态由脚本自动生成,首版为切换时手工记录
+generated_at: 2026-05-12(T2 + T3 完成后)
+generated_by: scripts/audit/validate_schema.py + scripts/audit/dump_*_inventory.py + 手工补
+note: 数字以 dump_*_inventory.py 为准,本文仍部分手写,T6 待自动化
 ---
 
 # 当前状态(STATUS)
@@ -14,15 +14,18 @@ note: 本文件目标态由脚本自动生成,首版为切换时手工记录
 
 ---
 
-## Vault 数据规模
+## Vault 数据规模(2026-05-12 后)
 
-| 维度 | 数字 |
-|---|---:|
-| L1 政策(`0_raw/policies/`)| **1020** |
-| L1 评论(`0_raw/commentaries/`)| 283 |
-| L2 business_view 覆盖 | **956 / 1020 (93.7%)** |
-| L2 关系边(active,9 类)| 1944 |
-| L2 主题结晶页 | 13 主题 |
+| 维度 | 数字 | 备注 |
+|---|---:|---|
+| L1 政策(`0_raw/policies/`)| **992** | T3 archive 28 篇低质后,从 1020 → 992 |
+| L1 政策 `_archive/`(T3 批次)| 28 | `_archive/policies/t3_a1_classifier_drops_2026-05-08/` |
+| L1 评论(`0_raw/commentaries/`)| 283 | T2b 补 title 53 / T2c 清 14 |
+| L1 政策仍为 `P_1900_*` | **1** | D 类山西(date 真空,留人工/单独处理) |
+| L2 business_view 覆盖 | 待重跑 | T3 Phase 3 rename 72 / archive 22 后需要重跑 coverage |
+| L2 关系边 P_1900 from/to | **0** | T3 Phase 3 后归零(evidence/reason 文本残留 19 行不计) |
+| L2 主题结晶页 | 13 主题 | 未变动 |
+| L2 政策 classification 派生层 | **51 行**(新)| `1_extracted/policy_classification.jsonl`,T2a 迁出 |
 
 ## L2 关系细分
 
@@ -63,15 +66,20 @@ note: 本文件目标态由脚本自动生成,首版为切换时手工记录
 
 ## 已知数据问题
 
-### Legacy drift(148 条,SCHEMA §F 记录)
-- Policy `tags` + `classification` 倒灌:81 条
-- Commentary 缺 `title`:67 条
-- Commentary 含 reclassified-from-policy 字段:14 条
+### Legacy drift — 2026-05-12 后状态
+
+| 项 | STATUS 旧值 | 实际侦察值 | 清理后 |
+|---|---:|---:|---:|
+| Policy `tags` + `classification` 倒灌 | 81 | 79(其中 28 已 T3 archive,实际 T2a 处理 51)| **0** ✓ |
+| Commentary 缺 `title` | 67 | 53 | **0** ✓ |
+| Commentary 含 reclassified-from-policy 字段 | 14 | 14 | **0** ✓ |
+| Policy `P_1900_*` id drift | 64 | 112(28 archive + 21 仅 id / 62 date+id / 1 真空)| **1**(D 类待人工) |
 
 ### 其他缺口
-- 64 篇政策(`P_1900_*`)缺 business_view(date 抽不到)
-- 6.3% business_view 覆盖缺口(同上)
-- B2 标题模糊匹配 ~130 条精度未校验就入 raw frontmatter
+- 1 篇 D 类山西政策 date 真空,P_1900 残留(`P_1900_SX_caf8e7eb`)→ `state/T3/upstream_backlog.md` §5
+- B2 标题模糊匹配 ~130 条精度未校验就入 raw frontmatter(未变动)
+- relations `evidence`/`reason` 文本字段含 19 处旧 `P_1900_*` 字符串残留 → 下次 L2 relations 重跑时自然消失(LLM 字段不机械改)
+- business_view 12 篇 P_1900 系新算 id 但没派生 yaml(可能 classifier 筛过)→ 待重跑 business_view 时补
 
 ---
 
@@ -98,15 +106,21 @@ note: 本文件目标态由脚本自动生成,首版为切换时手工记录
 - 不强求一次跑完,要**有完整渠道清单 + 优先级机制**就算交付
 - 时间预算:2-3 天
 
-#### T2 · Legacy drift 三类清理
-- T2a · Policy `tags` + `classification` 倒灌(81 篇)→ 迁出到派生层
-- T2b · Commentary 缺 `title`(67 篇)→ 从文件名抽 title 补回
-- T2c · Commentary reclassified 残留(14 篇)→ 删 policy-only 字段
-- 时间预算:每类 1-2 小时,共半天
+#### T2 · Legacy drift 三类清理 — **完成** (2026-05-12)
+- ✅ T2a 51 篇 → `1_extracted/policy_classification.jsonl` 派生层
+- ✅ T2b 53 篇 → 文件名补 title
+- ✅ T2c 14 篇 → 删 policy-only 字段
+- 详见 `state/T2/t2_inventory.md`,oneshot 在 `scripts/_oneshot/t2{a,b,c}_*.py`
 
-#### T3 · 64 篇 P_1900_* 缺 date 修复
-- 从正文/URL/H1 重抽 date,补 business_view
-- 时间预算:1-2 小时
+#### T3 · P_1900_* id drift 修复 — **完成** (2026-05-12)
+- 总数实际是 112 篇(非 STATUS 旧值 64);分 4 类处置:
+  - A 类 28 篇被 classifier 标 news_or_press/index_page → archive 到 `_archive/policies/t3_a1_classifier_drops_2026-05-08/`
+  - B 类 62 篇 date 是 placeholder → URL/正文重抽 date + id 重算
+  - C 类 21 篇 date OK 只 id 漂 → 仅 id 重算
+  - D 类 1 篇 date 真空 → backlog
+- 派生层同步:business_view 72 rename / 22 archive,policy_summaries 72 remap / 22 archive,relations 7 类共 210 remap / 3 archive
+- SCHEMA v1.1 引入"deterministic 身份字段重算"白名单(§C),aliases 保留旧 id 保 Obsidian 反链
+- 详见 `state/T3/`,oneshot 在 `scripts/_oneshot/t3_phase{1,2a,2b,3}_*.py`
 
 ### 优先级 P1 — L2 质量评估
 
