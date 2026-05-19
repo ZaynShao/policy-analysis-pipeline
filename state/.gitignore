@@ -5,13 +5,22 @@
 !.gitignore
 !STATUS.md
 !last_run.json
-# 任务子目录放行(内部用各自 .gitignore 白名单)
+# 任务子目录放行 + 内容放行(由各子目录自己的 .gitignore 控制具体内容)
 !T2/
+!T2/**
 !T3/
+!T3/**
 !T1_channels/
+!T1_channels/**
 !T1_scan_raw/
+!T1_scan_raw/**
 !T1_candidate/
+!T1_candidate/**
 !T1_fetched/
+!T1_fetched/**
 !T1_extracted/
+!T1_extracted/**
 !T1_quarantine/
+!T1_quarantine/**
 !T1_ingest_log/
+!T1_ingest_log/**
