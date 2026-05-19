@@ -1,0 +1,246 @@
+version: '2026-05-19'
+batches:
+  P0:
+  - city: 上海市
+    reasons:
+    - 充电_一线
+    priority_score: 6.0
+    verified_channels: 5
+  - city: 北京市
+    reasons:
+    - 充电_一线
+    priority_score: 6.0
+    verified_channels: 1
+  - city: 重庆市
+    reasons:
+    - 充电_新一线
+    priority_score: 6.0
+    verified_channels: 2
+  - city: 天津市
+    reasons:
+    - 充电_新一线
+    priority_score: 5.0
+    verified_channels: 2
+  - city: 南京市
+    reasons:
+    - 充电_新一线
+    priority_score: 4.0
+    verified_channels: 1
+  - city: 广州市
+    reasons:
+    - 充电_一线
+    priority_score: 4.0
+    verified_channels: 3
+  - city: 成都市
+    reasons:
+    - 充电_新一线
+    priority_score: 4.0
+    verified_channels: 0
+  - city: 杭州市
+    reasons:
+    - 充电_新一线
+    priority_score: 4.0
+    verified_channels: 2
+  - city: 武汉市
+    reasons:
+    - 充电_新一线
+    priority_score: 4.0
+    verified_channels: 1
+  - city: 深圳市
+    reasons:
+    - 充电_一线
+    priority_score: 4.0
+    verified_channels: 4
+  - city: 苏州市
+    reasons:
+    - 充电_新一线
+    priority_score: 4.0
+    verified_channels: 2
+  - city: 东莞市
+    reasons:
+    - 加油_top50_增量
+    priority_score: 3.0
+    verified_channels: 3
+  - city: 乌鲁木齐市
+    reasons:
+    - 电力_省会(去重后)
+    priority_score: 3.0
+    verified_channels: 1
+  - city: 佛山市
+    reasons:
+    - 加油_top50_增量
+    priority_score: 3.0
+    verified_channels: 0
+  - city: 兰州市
+    reasons:
+    - 电力_省会(去重后)
+    priority_score: 3.0
+    verified_channels: 2
+  - city: 南宁市
+    reasons:
+    - 电力_省会(去重后)
+    priority_score: 3.0
+    verified_channels: 2
+  - city: 南昌市
+    reasons:
+    - 电力_省会(去重后)
+    priority_score: 3.0
+    verified_channels: 2
+  - city: 南通市
+    reasons:
+    - 加油_top50_增量
+    priority_score: 3.0
+    verified_channels: 1
+  - city: 厦门市
+    reasons:
+    - 充电_新一线
+    priority_score: 3.0
+    verified_channels: 2
+  - city: 合肥市
+    reasons:
+    - 充电_新一线
+    priority_score: 3.0
+    verified_channels: 0
+  - city: 呼和浩特市
+    reasons:
+    - 电力_省会(去重后)
+    priority_score: 3.0
+    verified_channels: 2
+  - city: 哈尔滨市
+    reasons:
+    - 电力_省会(去重后)
+    priority_score: 3.0
+    verified_channels: 0
+  - city: 嘉兴市
+    reasons:
+    - 加油_top50_增量
+    priority_score: 3.0
+    verified_channels: 1
+  - city: 大连市
+    reasons:
+    - 电力_计划单列
+    priority_score: 3.0
+    verified_channels: 2
+  - city: 太原市
+    reasons:
+    - 电力_省会(去重后)
+    priority_score: 3.0
+    verified_channels: 2
+  - city: 宁波市
+    reasons:
+    - 充电_新一线
+    priority_score: 3.0
+    verified_channels: 1
+  - city: 常州市
+    reasons:
+    - 加油_top50_增量
+    priority_score: 3.0
+    verified_channels: 1
+  - city: 惠州市
+    reasons:
+    - 加油_top50_增量
+    priority_score: 3.0
+    verified_channels: 1
+  - city: 拉萨市
+    reasons:
+    - 电力_省会(去重后)
+    priority_score: 3.0
+    verified_channels: 0
+  - city: 无锡市
+    reasons:
+    - 充电_新一线
+    priority_score: 3.0
+    verified_channels: 2
+  - city: 昆明市
+    reasons:
+    - 充电_新一线
+    priority_score: 3.0
+    verified_channels: 3
+  - city: 沈阳市
+    reasons:
+    - 充电_新一线
+    priority_score: 3.0
+    verified_channels: 2
+  - city: 泉州市
+    reasons:
+    - 加油_top50_增量
+    priority_score: 3.0
+    verified_channels: 2
+  - city: 济南市
+    reasons:
+    - 充电_新一线
+    priority_score: 3.0
+    verified_channels: 2
+  - city: 海口市
+    reasons:
+    - 电力_省会(去重后)
+    priority_score: 3.0
+    verified_channels: 1
+  - city: 温州市
+    reasons:
+    - 加油_top50_增量
+    priority_score: 3.0
+    verified_channels: 2
+  - city: 潍坊市
+    reasons:
+    - 加油_top50_增量
+    priority_score: 3.0
+    verified_channels: 1
+  - city: 烟台市
+    reasons:
+    - 加油_top50_增量
+    priority_score: 3.0
+    verified_channels: 1
+  - city: 石家庄市
+    reasons:
+    - 电力_省会(去重后)
+    priority_score: 3.0
+    verified_channels: 1
+  - city: 福州市
+    reasons:
+    - 充电_新一线
+    priority_score: 3.0
+    verified_channels: 2
+  - city: 西宁市
+    reasons:
+    - 电力_省会(去重后)
+    priority_score: 3.0
+    verified_channels: 2
+  - city: 西安市
+    reasons:
+    - 充电_新一线
+    priority_score: 3.0
+    verified_channels: 1
+  - city: 贵阳市
+    reasons:
+    - 电力_省会(去重后)
+    priority_score: 3.0
+    verified_channels: 4
+  - city: 郑州市
+    reasons:
+    - 充电_新一线
+    priority_score: 3.0
+    verified_channels: 2
+  - city: 银川市
+    reasons:
+    - 电力_省会(去重后)
+    priority_score: 3.0
+    verified_channels: 1
+  - city: 长春市
+    reasons:
+    - 电力_省会(去重后)
+    priority_score: 3.0
+    verified_channels: 1
+  - city: 长沙市
+    reasons:
+    - 充电_新一线
+    priority_score: 3.0
+    verified_channels: 2
+  - city: 青岛市
+    reasons:
+    - 充电_新一线
+    priority_score: 3.0
+    verified_channels: 1
+  P1: []
+  P2: []
+notes: P1 待 admin codes 补京沪津渝下辖区数据后填

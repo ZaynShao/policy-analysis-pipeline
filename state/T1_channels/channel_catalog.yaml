@@ -9298,3 +9298,111 @@
   last_probed_at: '2026-05-19T17:14:56+08:00'
   probe_result: ok
   notes: template={p}.gov.cn pinyin=dl
+- city: 成都市
+  province: 四川省
+  level: 市
+  city_code: '510100'
+  channel_type: 发改委
+  root_domain: cddrc.chengdu.gov.cn
+  list_url: https://cddrc.chengdu.gov.cn/
+  source: manual
+  status: 候选
+  last_probed_at: '2026-05-19T18:02:33+08:00'
+  probe_result: http_error
+  notes: manual补救:6城零渠道修复 2026-05-19
+- city: 合肥市
+  province: 安徽省
+  level: 市
+  city_code: '340100'
+  channel_type: 发改委
+  root_domain: hfdrc.hefei.gov.cn
+  list_url: https://hfdrc.hefei.gov.cn/
+  source: manual
+  status: 候选
+  last_probed_at: '2026-05-19T18:02:34+08:00'
+  probe_result: http_error
+  notes: manual补救:6城零渠道修复 2026-05-19
+- city: 哈尔滨市
+  province: 黑龙江省
+  level: 市
+  city_code: '230100'
+  channel_type: 发改委
+  root_domain: hrbdrc.harbin.gov.cn
+  list_url: https://hrbdrc.harbin.gov.cn/
+  source: manual
+  status: 候选
+  last_probed_at: '2026-05-19T18:02:34+08:00'
+  probe_result: http_error
+  notes: manual补救:6城零渠道修复 2026-05-19
+- city: 佛山市
+  province: 广东省
+  level: 市
+  city_code: '440600'
+  channel_type: 发改委
+  root_domain: fgj.foshan.gov.cn
+  list_url: https://fgj.foshan.gov.cn/
+  source: manual
+  status: 候选
+  last_probed_at: '2026-05-19T18:02:34+08:00'
+  probe_result: http_error
+  notes: manual补救:6城零渠道修复 2026-05-19
+- city: 佛山市
+  province: 广东省
+  level: 市
+  city_code: '440600'
+  channel_type: 发改委
+  root_domain: fsdrc.foshan.gov.cn
+  list_url: https://fsdrc.foshan.gov.cn/
+  source: manual
+  status: 候选
+  last_probed_at: '2026-05-19T18:02:34+08:00'
+  probe_result: http_error
+  notes: manual补救:6城零渠道修复 2026-05-19
+- city: 乌鲁木齐市
+  province: 新疆维吾尔自治区
+  level: 市
+  city_code: '650100'
+  channel_type: 政府网
+  root_domain: www.wlmq.gov.cn
+  list_url: https://www.wlmq.gov.cn/
+  source: manual
+  status: 验证
+  last_probed_at: '2026-05-19T18:02:34+08:00'
+  probe_result: ok
+  notes: manual补救:6城零渠道修复 2026-05-19
+- city: 乌鲁木齐市
+  province: 新疆维吾尔自治区
+  level: 市
+  city_code: '650100'
+  channel_type: 发改委
+  root_domain: fgw.wlmq.gov.cn
+  list_url: https://fgw.wlmq.gov.cn/
+  source: manual
+  status: 候选
+  last_probed_at: '2026-05-19T18:02:34+08:00'
+  probe_result: http_error
+  notes: manual补救:6城零渠道修复 2026-05-19
+- city: 拉萨市
+  province: 西藏自治区
+  level: 市
+  city_code: '540100'
+  channel_type: 政府网
+  root_domain: www.xizang.gov.cn
+  list_url: https://www.xizang.gov.cn/
+  source: manual
+  status: 候选
+  last_probed_at: '2026-05-19T18:02:35+08:00'
+  probe_result: http_error
+  notes: manual补救:6城零渠道修复 2026-05-19
+- city: 拉萨市
+  province: 西藏自治区
+  level: 市
+  city_code: '540100'
+  channel_type: 发改委
+  root_domain: fgw.xizang.gov.cn
+  list_url: https://fgw.xizang.gov.cn/
+  source: manual
+  status: 候选
+  last_probed_at: '2026-05-19T18:02:35+08:00'
+  probe_result: http_error
+  notes: manual补救:6城零渠道修复 2026-05-19
