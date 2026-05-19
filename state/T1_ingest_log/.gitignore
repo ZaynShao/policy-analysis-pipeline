@@ -1,0 +1,6 @@
+# 入库日志保留(P0.jsonl 等审计产物进 git)
+*
+!.gitignore
+!.gitkeep
+!*.jsonl
+!*.log

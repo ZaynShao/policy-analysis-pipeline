@@ -1,0 +1,6 @@
+# T1_channels:配置 yaml + README 进 git;日志和中间文件不进
+channel_probe_log.jsonl
+_llm_gen_input.jsonl
+_llm_gen_output.jsonl
+_admin_codes.csv
+_vault_backfill_proposal.md

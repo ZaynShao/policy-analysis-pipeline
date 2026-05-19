@@ -8,3 +8,10 @@
 # 任务子目录放行(内部用各自 .gitignore 白名单)
 !T2/
 !T3/
+!T1_channels/
+!T1_scan_raw/
+!T1_candidate/
+!T1_fetched/
+!T1_extracted/
+!T1_quarantine/
+!T1_ingest_log/
