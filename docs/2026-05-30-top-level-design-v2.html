@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>政策分析项目 · 顶层设计 v2（2026-05-30）</title>
+<style>
+  :root{
+    --ink:#1a1a1a; --muted:#5f6b76; --line:#e4e8ec; --bg:#fbfcfd;
+    --src:#1565c0; --src-bg:#e9f1fb; --view:#7b1fa2; --view-bg:#f3e9f7;
+    --keep:#2E7D32; --keep-bg:#e8f3e9; --kill:#C62828; --kill-bg:#fbeaea;
+    --warn:#F57C00; --warn-bg:#fdf1e3; --card:#ffffff;
+  }
+  *{box-sizing:border-box}
+  body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",-apple-system,sans-serif;
+    color:var(--ink); background:var(--bg); line-height:1.72; margin:0;}
+  .wrap{max-width:940px; margin:0 auto; padding:48px 28px 96px;}
+  h1{font-size:27px; line-height:1.34; margin:0 0 6px;}
+  .sub{color:var(--muted); font-size:14px; margin-bottom:26px;}
+  h2{font-size:20px; margin:50px 0 12px; padding-bottom:8px; border-bottom:2px solid var(--line);}
+  h2 .n{color:var(--src); font-weight:800; margin-right:8px;}
+  h3{font-size:16px; margin:24px 0 6px;}
+  p{margin:10px 0;}
+  code{background:#eef1f4; padding:1px 6px; border-radius:4px; font-size:12.5px;
+    font-family:"SF Mono",Menlo,Consolas,monospace;}
+  .charter{background:linear-gradient(180deg,#eef4fc,#e9f1fb); border:1px solid #c5dbf5;
+    border-left:5px solid var(--src); border-radius:10px; padding:22px 24px; margin:14px 0;}
+  .charter .one{font-size:18.5px; font-weight:800; line-height:1.55; margin:0;}
+  .charter .two{font-size:14px; color:#33506e; margin:10px 0 0;}
+  .charter code{background:#dceafb;}
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:13.5px;}
+  th,td{text-align:left; padding:9px 11px; border-bottom:1px solid var(--line); vertical-align:top;}
+  th{background:#f3f6f9; font-weight:600; color:#33414e;}
+  .pill{font-size:11px; font-weight:700; padding:1px 8px; border-radius:5px; white-space:nowrap;}
+  .p-src{background:var(--src-bg); color:var(--src);}
+  .p-view{background:var(--view-bg); color:var(--view);}
+  .p-keep{background:var(--keep-bg); color:var(--keep);}
+  .p-kill{background:var(--kill-bg); color:var(--kill);}
+  .p-warn{background:var(--warn-bg); color:var(--warn);}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:16px 0;}
+  @media(max-width:700px){.grid2{grid-template-columns:1fr}}
+  .panel{border:1px solid var(--line); border-radius:9px; padding:16px 18px; background:var(--card);}
+  .panel.src{border-top:3px solid var(--src);}
+  .panel.view{border-top:3px solid var(--view);}
+  .panel h4{margin:0 0 8px; font-size:14.5px;}
+  .panel.src h4{color:var(--src);} .panel.view h4{color:var(--view);}
+  .panel ul{font-size:13.5px; padding-left:18px; margin:6px 0;}
+  .callout{border-radius:9px; padding:14px 18px; margin:16px 0; font-size:14px;}
+  .c-key{background:#fff8e1; border:1px solid #ffe082;}
+  .c-rule{background:var(--kill-bg); border:1px solid #f0c4c4;}
+  .c-ok{background:var(--keep-bg); border:1px solid #bfe0c4;}
+  .c-note{background:#f4f7fa; border:1px solid #dde5ec;}
+  .flow{display:flex; align-items:center; flex-wrap:wrap; gap:8px; font-size:12.5px;
+    background:#f4f7fa; border:1px solid #dde5ec; border-radius:9px; padding:14px 16px; margin:14px 0;}
+  .flow .box{background:#fff; border:1px solid #cdd7e0; border-radius:6px; padding:6px 10px; text-align:center;}
+  .flow .arr{color:var(--muted); font-weight:700;}
+  ul,ol{margin:10px 0; padding-left:22px;} li{margin:5px 0;}
+  .muted{color:var(--muted);}
+  .yes{color:var(--keep); font-weight:700;} .no{color:var(--kill); font-weight:700;}
+  .steps{counter-reset:step;}
+  .step{counter-increment:step; position:relative; padding-left:40px; margin:16px 0;}
+  .step::before{content:counter(step); position:absolute; left:0; top:0; width:27px; height:27px;
+    background:var(--src); color:#fff; border-radius:50%; text-align:center; line-height:27px; font-weight:700;}
+  .step h4{margin:0 0 4px; font-size:15px;}
+  .tag{display:inline-block; font-size:11px; font-weight:700; padding:1px 8px; border-radius:20px; margin-left:6px; vertical-align:middle;}
+  .t-now{background:var(--keep-bg);color:var(--keep);} .t-after{background:var(--warn-bg);color:var(--warn);}
+  footer{margin-top:56px; padding-top:16px; border-top:1px solid var(--line); font-size:12.5px; color:var(--muted);}
+  .axis{display:inline-block; background:var(--src-bg); color:var(--src); font-weight:700;
+    padding:1px 9px; border-radius:5px; font-size:13px; margin:2px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>政策分析项目 · 顶层设计 v2</h1>
+<p class="sub">2026-05-30 · 作为后续所有 session 的纲领 · 替换旧的「重型 ETL 知识图谱」心智<br>
+配套：诊断与裁决见 <code>docs/reviews/2026-05-30-meta-design-assessment.html</code>。元目标权威：<code>OPERATIONS.md §0</code> + vault <code>00 背景资料/滴滴能源-政策分析背景.md</code>。</p>
+
+<div class="charter">
+  <p class="one">采集只追加 · 派生按"受影响文件"整文件重生 · 定期全量重建做 GC · 产出按需出 · 文件为源，Obsidian 与 API 双视图。</p>
+  <p class="two">一句话：项目不推倒重来，换的是<strong>重心</strong>——把"用管道预先物化并长期维护一张知识图谱"降级为"按需/可重生的视图"，把"干净的源 + canonical 词表 + 分析框架"升级为唯一需要持久维护的脊柱。LLM-wiki 方向没错，错的是它 2024 式的实现。</p>
+</div>
+
+<!-- §0 -->
+<h2><span class="n">§0</span>这份文档替换了什么</h2>
+<table>
+  <tr><th>维度</th><th>旧心智（要退役）</th><th>新心智（本文档）</th></tr>
+  <tr><td>知识图谱</td><td>管道<strong>预先物化</strong> 9 类 typed 关系并长期维护，当作"真理"持久化</td><td>关系/结晶/反链是<strong>视图</strong>，按需或重生时由 LLM 语义生成</td></tr>
+  <tr><td>更新方式</td><td>新批次<strong>增量抽 + 出错就地打补丁</strong>（→ 孤岛 + 迁移废料）</td><td>采集追加；派生<strong>整文件重生，零补丁</strong></td></tr>
+  <tr><td>连边方法</td><td>regex 文号 / 启发式（中文政策隐式关系 → 大量漏连）</td><td>LLM 读语义做连边（确定性高精度边做锚点）</td></tr>
+  <tr><td>消费面</td><td>Obsidian = 事实上的系统（本地）</td><td>文件 = 真相源；Obsidian 与 API 都只是它的<strong>视图</strong></td></tr>
+</table>
+
+<!-- §1 -->
+<h2><span class="n">§1</span>地基：源（source） vs 视图（view）</h2>
+<p>这是整套设计的<strong>根原则</strong>。项目里所有"孤岛 + 改来改去出废料"的病，根因都是把一个<em>视图</em>当成了<em>源</em>来维护。先把每样东西归类：</p>
+<div class="grid2">
+  <div class="panel src">
+    <h4>源 · SOURCE <span class="pill p-src">持久 · 手编辑或确定性 · 唯一真理</span></h4>
+    <ul>
+      <li><strong>L1 语料</strong>：政策/评论 raw + provenance（不可重抓，唯一不可逆资产）</li>
+      <li><strong>canonical 词表</strong>：entities / themes / issuers registry</li>
+      <li><strong>分析框架（皇冠珠宝）</strong>：月报原型 · fact-check 规则 · 四维决策框架 · 打分体系 · LESSONS</li>
+      <li><strong>高精度确定性事实</strong>：supersedes / clarifies / cites_basis（504 边 ~100%）、date / region / issuer / 文号</li>
+    </ul>
+  </div>
+  <div class="panel view">
+    <h4>视图 · VIEW <span class="pill p-view">可重生 · 永不手修 · 永不打补丁</span></h4>
+    <ul>
+      <li><strong>推断关系图</strong>：derives_from / aligns_with / extends（语义判断）</li>
+      <li><strong>结晶页</strong>：themes 4 件套 / regions 区域页</li>
+      <li><strong>反链页</strong>：<code>_index_by_policy/*</code></li>
+      <li><strong>查询索引</strong>：服务器侧 date×region×theme 结构化库 + 检索索引（见 §7）</li>
+      <li><strong>L3 产出</strong>：月报 / 决策卡片（落盘 = 缓存，非真理）</li>
+    </ul>
+  </div>
+</div>
+<div class="callout c-key"><strong>铁律一：</strong>人只编辑"源"；"视图"一律由程序重生。出错时只能<strong>改源 / 改生成器 → 重生视图</strong>，永远不允许"手改视图 / 给视图打补丁"。这一条同时解决了：孤岛、迁移废料、以及本地↔服务器同步冲突（见 §7）。</div>
+
+<!-- §2 -->
+<h2><span class="n">§2</span>两层骨架：归属层 / 分析层</h2>
+<p>同样是"源"，对每篇政策的处理要分两层——这决定了市级政策"存在但不进庞杂分析"，也决定了 API 的查询契约。</p>
+<table>
+  <tr><th>层</th><th>对谁做</th><th>内容</th><th>成本</th></tr>
+  <tr>
+    <td><strong>归属层</strong><br><span class="muted">universal</span></td>
+    <td><span class="pill p-keep">每篇必做（含市级）</span></td>
+    <td>挂 theme(s) + region(国/省/市) + date + 重要性。即政策"挂"在哪些主题、哪个区域下。<strong>这是 wiki 的链接骨架，也是 §7 API 的查询轴。</strong></td>
+    <td>便宜</td>
+  </tr>
+  <tr>
+    <td><strong>分析层</strong><br><span class="muted">selective</span></td>
+    <td><span class="pill p-warn">分级选择性做</span></td>
+    <td>关系网 / 业务影响 / 深度综合。只给值得的（国家级 / 省级 / 高重要性）。市级默认只"挂着"当成员，不强制吃这套。</td>
+    <td>贵</td>
+  </tr>
+</table>
+<div class="callout c-note"><strong>市级政策的归宿（你的点1）：</strong>一篇市级"虚拟电厂"政策，以<strong>成员</strong>身份出现在「虚拟电厂主题页」+「所属省页」的清单里——<span class="yes">存在、可被检索、可被 API 查到</span>，但<span class="no">不</span>强制生成关系网/业务深析。顶层 schema 把"归属"设为必填、"分析"设为可选/分级，就框定了。</div>
+
+<!-- §3 -->
+<h2><span class="n">§3</span>三条数据纪律</h2>
+
+<h3>纪律 A · 采集只追加（L1）</h3>
+<p>L1 = append-only。多采城市 = 往库加不可变 raw 文件，<strong>永远不产生孤岛、不产生废料</strong>（入库时三维去重 + 新闻稿过滤就够健康）。所以 L1 的增量、持续滚动是<strong>对的、健康的</strong>——孤岛/废料从来不是采集的病。</p>
+
+<h3>纪律 B · 派生按"受影响文件"整文件重生（L2/L3）</h3>
+<p>新政策进来时：</p>
+<div class="callout c-ok"><span class="yes">✅ 正确：</span>算出<strong>完整的受影响文件集</strong>（它挂的主题/区域页 + 它与已有政策产生关系的那些页），把这一集<strong>逐个整文件重生</strong>——某主题从 45 篇变 46 篇，就按 46 篇重渲染整页。</div>
+<div class="callout c-rule"><span class="no">❌ 禁止：</span>在旧文件里改个计数、append 一行、或跑个脚本去 remap 旧产物。这就是老路，会攒废料、留孤岛。<strong>"更新" ≡ "整文件重生"，不是 "edit in place"。</strong></div>
+<p><strong>两个易错点（漏了会出现"漂移"——孤岛的弱化版）：</strong></p>
+<ul>
+  <li>一篇新政策不只影响它自己挂的页，还可能改变<strong>已有政策</strong>的页（如新政废止老政 → 老政页也要重生）。受影响集要算全。</li>
+  <li>连边用 <strong>LLM 读语义</strong>，不是 regex 抓文号——这才是"明显相关但没明引文号"的 A-B / A-C 被连上、孤岛被解决的地方。</li>
+</ul>
+
+<h3>纪律 C · 定期全量重建做 GC</h3>
+<p>你有最高优先级 + 无限算力，正好用在这：按节奏（每月、或每次出月报前）<strong>全量重建一次</strong>派生层。即使周增量偶尔漏算了某个受影响文件，全量重跑会把漂移整体抹平。于是：<strong>周增量按文件重生（快）＋ 周期全量重建兜底（净）。</strong></p>
+
+<!-- §4 -->
+<h2><span class="n">§4</span>L2 的「零补丁」承诺（你的点2，写成物理形态）</h2>
+<p>对"L2 不达预期"，<strong>唯一合法的处置回路</strong>是：</p>
+<div class="flow">
+  <span class="box">改生成器 / 改源</span><span class="arr">→</span>
+  <span class="box">整体重跑</span><span class="arr">→</span>
+  <span class="box">过验收门？</span><span class="arr">→</span>
+  <span class="box" style="border-color:var(--keep)">通过 = 接受</span>
+  <span class="arr" style="margin-left:14px">不过 ↺</span>
+  <span class="box" style="border-color:var(--kill)">回到第一步再重跑</span>
+</div>
+<p><strong class="no">绝不允许：发现错误 → 跑个小工具打补丁 → 补丁不奏效 → 原地继续打补丁。</strong></p>
+<p>让这个承诺<strong>可兑现而非靠自律</strong>，靠三个结构保证：</p>
+<table>
+  <tr><th>机制</th><th>怎么保证</th></tr>
+  <tr><td><strong>重建比补丁更便宜</strong></td><td>L2 做成一条幂等命令（temperature 0，输入=当前 L1，输出=整批受影响文件全替换）。无限算力下重跑很便宜 → "重跑"永远是最省选择，补丁诱惑从根上消失。</td></tr>
+  <tr><td><strong>验收门先定、再建</strong></td><td>跑 L2 <em>之前</em>先定死客观判据：关系精度抽样 + 孤岛数 + <strong>你给几对"明显该连"的政策做点检</strong>。重做循环对着这个门跑，不靠"感觉够不够好"。</td></tr>
+  <tr><td><strong>硬规矩</strong></td><td>仓库里<strong>不允许出现任何针对 L2 输出的 oneshot / migration 脚本</strong>。一旦出现，即违约信号。</td></tr>
+</table>
+<p class="muted">承诺的是这套<strong>纪律</strong>（整体重建·验收门·零补丁），不是"零错误"。但纪律到位，残余错误只会在下次重建里被整体修掉，永远不沉淀成废料。</p>
+
+<!-- §5 -->
+<h2><span class="n">§5</span>为什么旧流程会"孤岛 + 废料"（给未来 session 看根因）</h2>
+<p>C 路径拆分后，干净 pipeline 只重写了 L1 采集 + audit + 清理 oneshot，<strong>L2 关系/结晶抽取器一个都没重建</strong>。后果：</p>
+<ul>
+  <li>vault 里那张图是<strong>化石</strong>——由拆分前的老脚本（<code>_meta/scripts/oneshot_*</code>）一次性产出，现工具链不能干净重生它。</li>
+  <li>没有"活的连边器" → <strong>每篇新政策天生是孤岛</strong>；A-B、A-C 没有任何工具去连。</li>
+  <li>拆分后唯一动过关系的是给 id 漂移做的老边 remap = 搬化石 → 掉一地迁移废料，<strong>新增链接 = 0</strong>，孤岛全留着。</li>
+</ul>
+<p>所以本设计的纪律 B（整文件重生 + LLM 语义连边）不是洁癖，是直接针对这个根因。</p>
+
+<!-- §6 -->
+<h2><span class="n">§6</span>L1 覆盖策略</h2>
+<p>公司要求<strong>真覆盖</strong>，市级广度要做（推翻上一份评估里"停掉市级"的说法——那用了"市级=噪声"的论证，但业务约束优先）。落地节奏：</p>
+<ul>
+  <li><span class="tag t-now">现在批量</span> 1-2 线城市 + 你标记的重点城市，批量做完。</li>
+  <li><span class="tag t-after">尾部 backlog</span> 其余城市列成 todo，by 小时 / by 天 持续补——但<strong>必须做完</strong>，不是放弃。</li>
+  <li>市级只走 §2 的<strong>归属层</strong>（挂主题+区域），不强制进分析层。既覆盖到、又不让庞杂分析膨胀。</li>
+</ul>
+
+<!-- §7 -->
+<h2><span class="n">§7</span>消费架构：文件为源，Obsidian + API 双视图</h2>
+<div class="callout c-key"><strong>心智转换：</strong>Obsidian 不是你的系统，<strong>文件才是</strong>。Obsidian 只是本地的"人类视图"。于是"迁移"不是"把 OB 搬上服务器"，而是"给同一批文件再开一个消费面（API）"。这正是 §1 source/view 纪律的延伸——几乎白送。</div>
+
+<h3>服务器侧三层</h3>
+<div class="flow">
+  <span class="box" style="border-color:var(--src)"><strong>① 真相源</strong><br>git 仓：markdown+jsonl 语料<br>+ pipeline cron（采集/派生）</span>
+  <span class="arr">→</span>
+  <span class="box" style="border-color:var(--view)"><strong>② 索引/查询层（视图）</strong><br>解析 frontmatter+派生<br>→ date×region×theme×重要性<br>结构化库 + 检索/向量索引</span>
+  <span class="arr">→</span>
+  <span class="box" style="border-color:var(--src)"><strong>③ API</strong><br>(时间, 地点, 主题) →<br>政策集 + 评估</span>
+</div>
+<p>查询接口示例正是你要的：<span class="axis">时间范围</span> × <span class="axis">地点范围</span> × <span class="axis">政策主题</span> → 命中政策集 + <strong>评估</strong>。评估两档：有预算好的分析直接返回；任意 query 则让 LLM 现读这个切片 + 你的分析框架当场合成。</p>
+
+<h3>为什么几乎白送（复用已定的东西）</h3>
+<ul>
+  <li>查询轴 <code>时间×地点×主题</code> = <strong>§2 的归属层</strong>。框一次，同时喂人类浏览 + 下游 API。这就是归属层要在顶层框死的原因——它是所有下游系统的接口契约。</li>
+  <li>索引是<strong>视图</strong> → 服从纪律 B/C，服务器侧零漂移、零废料。</li>
+  <li>source/view 分离让<strong>本地↔服务器同步变干净</strong>：人只编辑源（语料/词表/框架，git 同步），视图全由服务器重生，人手永不碰视图 → 永远不会有"人改"和"重生"打架的冲突。</li>
+  <li>已有的 <code>SCHEMA.md</code> 顺势成为 API 数据契约，又是白赚。</li>
+</ul>
+
+<h3>迁移前后 · git 即总线</h3>
+<table>
+  <tr><th></th><th>之前（全本地）</th><th>之后</th></tr>
+  <tr><td>真相源</td><td>OB vault 在笔记本</td><td>git 仓在服务器</td></tr>
+  <tr><td>pipeline</td><td>本地手跑</td><td>服务器 cron</td></tr>
+  <tr><td>索引 + API</td><td>无</td><td>服务器（视图 + 薄服务）</td></tr>
+  <tr><td>Obsidian</td><td>事实上的"系统"</td><td>笔记本 clone 同一 git 仓，纯人类浏览/编辑面，改完 push</td></tr>
+  <tr><td>下游 LLM 系统</td><td>—</td><td>调 API</td></tr>
+</table>
+<p class="muted">同步：人本地改源 → push → 服务器 pull → 重建索引/视图；服务器 cron 追加 L1 / 重生视图 → commit → 笔记本 pull 浏览。规模 999 篇 + 周增量对任何索引都是毫无压力的小数据。</p>
+
+<!-- §8 -->
+<h2><span class="n">§8</span>落地顺序</h2>
+<div class="steps">
+  <div class="step"><h4>清债（与设计无关，先减负）</h4><p>删 <code>~/policy-analycsis</code> 37MB 孤儿堆 + vault <code>relations/_archive_*.jsonl</code> 迁移残留；数据移出 git（LFS/外置）瘦身 159MB 历史；老 L2 图谱发生器 + 11 个 oneshot 归档、不复活。</p></div>
+  <div class="step"><h4>把"源"固化为服务器上的真相源</h4><p>L1 语料 + 504 确定性边 + canonical 词表 + 把分析框架（月报原型/fact-check/四维/打分）<strong>结构化成 agent 可调用的提示词/规则库</strong>。这是唯一要新"建"的脊柱。</p></div>
+  <div class="step"><h4>L2 = 幂等重建命令 + 验收门<span class="tag t-now">点2 承诺的物理形态</span></h4><p>先写验收门（精度抽样 + 孤岛数 + 你的点检对），再写"全局 LLM 语义连边 + 整文件重生"的幂等命令。这是第一块，因为它就是"零补丁"承诺的落地。</p></div>
+  <div class="step"><h4>加索引 + API（§7 的 ②③）</h4><p>解析归属层 → date×region×theme 结构化库 + 检索索引；薄 API 暴露查询。索引按纪律 B/C 重生。</p></div>
+  <div class="step"><h4>L3 按需读最新 L2 + 框架产出</h4><p>不系统化"依赖化石图的 L3"；做"LLM-over-语料、查询时连边"的产出。你已手验证过它能出活。</p></div>
+</div>
+
+<footer>
+本文档为政策分析项目 2026-05-30 收敛后的顶层设计纲领，取代旧的「重型 ETL 知识图谱」心智。后续任何 session 动手前先读本文 + <code>SCHEMA.md</code>。诊断与证据见 <code>docs/reviews/2026-05-30-meta-design-assessment.html</code>。<br>
+四个收敛维度：① 源/视图分层（§1）② 归属/分析两层骨架（§2）③ 三条数据纪律 + 零补丁承诺（§3/§4）④ 文件为源·OB+API 双视图的消费架构（§7）。
+</footer>
+
+</div>
+</body>
+</html>
