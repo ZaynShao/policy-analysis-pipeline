@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>政策分析项目 · 顶层设计审视（2026-05-30）</title>
+<style>
+  :root{
+    --ink:#1a1a1a; --muted:#5f6b76; --line:#e4e8ec; --bg:#fbfcfd;
+    --keep:#2E7D32; --keep-bg:#e8f3e9; --demote:#C62828; --demote-bg:#fbeaea;
+    --shift:#F57C00; --shift-bg:#fdf1e3; --accent:#1565c0; --accent-bg:#e9f1fb;
+    --card:#ffffff;
+  }
+  *{box-sizing:border-box}
+  body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",-apple-system,sans-serif;
+    color:var(--ink); background:var(--bg); line-height:1.72; margin:0; padding:0;}
+  .wrap{max-width:920px; margin:0 auto; padding:48px 28px 96px;}
+  h1{font-size:27px; line-height:1.35; margin:0 0 6px;}
+  .sub{color:var(--muted); font-size:14px; margin-bottom:34px;}
+  h2{font-size:21px; margin:52px 0 14px; padding-bottom:8px; border-bottom:2px solid var(--line);}
+  h3{font-size:16.5px; margin:28px 0 8px;}
+  p{margin:10px 0;}
+  .lead{font-size:15.5px;}
+  code{background:#eef1f4; padding:1px 6px; border-radius:4px; font-size:13px;
+    font-family:"SF Mono",Menlo,Consolas,monospace;}
+  .verdict{background:var(--accent-bg); border:1px solid #c5dbf5; border-left:5px solid var(--accent);
+    border-radius:10px; padding:22px 24px; margin:14px 0 8px;}
+  .verdict .big{font-size:19px; font-weight:700; line-height:1.5; margin:0 0 6px;}
+  .verdict .small{font-size:14px; color:#33506e; margin:0;}
+  .qcard{background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:18px 22px; margin:16px 0; box-shadow:0 1px 2px rgba(0,0,0,.03);}
+  .qcard .q{font-weight:700; font-size:16px; margin:0 0 8px;}
+  .tag{display:inline-block; font-size:12px; font-weight:700; padding:2px 10px; border-radius:20px; vertical-align:middle; margin-left:8px;}
+  .t-no{background:var(--keep-bg); color:var(--keep);}
+  .t-yes{background:var(--demote-bg); color:var(--demote);}
+  .t-part{background:var(--shift-bg); color:var(--shift);}
+  table{width:100%; border-collapse:collapse; margin:16px 0; font-size:13.5px;}
+  th,td{text-align:left; padding:9px 11px; border-bottom:1px solid var(--line); vertical-align:top;}
+  th{background:#f3f6f9; font-weight:600; color:#33414e;}
+  td.num{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap;}
+  .pill{font-size:11.5px; font-weight:700; padding:1px 8px; border-radius:5px; white-space:nowrap;}
+  .p-keep{background:var(--keep-bg); color:var(--keep);}
+  .p-demote{background:var(--demote-bg); color:var(--demote);}
+  .p-shift{background:var(--shift-bg); color:var(--shift);}
+  .callout{border-radius:9px; padding:14px 18px; margin:16px 0; font-size:14px;}
+  .c-key{background:#fff8e1; border:1px solid #ffe082;}
+  .c-evi{background:#f4f7fa; border:1px solid #dde5ec;}
+  .c-dis{background:var(--demote-bg); border:1px solid #f0c4c4;}
+  ul,ol{margin:10px 0; padding-left:22px;}
+  li{margin:5px 0;}
+  .flow{display:flex; align-items:center; flex-wrap:wrap; gap:8px; font-size:13px;
+    background:#f4f7fa; border:1px solid #dde5ec; border-radius:9px; padding:14px 16px; margin:14px 0;}
+  .flow .box{background:#fff; border:1px solid #cdd7e0; border-radius:6px; padding:6px 10px;}
+  .flow .arr{color:var(--muted); font-weight:700;}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:16px 0;}
+  @media(max-width:680px){.grid2{grid-template-columns:1fr}}
+  .panel{border:1px solid var(--line); border-radius:9px; padding:16px 18px; background:var(--card);}
+  .panel.keep{border-top:3px solid var(--keep);}
+  .panel.demote{border-top:3px solid var(--demote);}
+  .panel h4{margin:0 0 8px; font-size:14.5px;}
+  .panel.keep h4{color:var(--keep);}
+  .panel.demote h4{color:var(--demote);}
+  .panel ul{font-size:13.5px; padding-left:18px;}
+  .muted{color:var(--muted);}
+  .num-strip{display:flex; flex-wrap:wrap; gap:10px; margin:14px 0;}
+  .stat{flex:1; min-width:150px; background:var(--card); border:1px solid var(--line);
+    border-radius:9px; padding:12px 14px;}
+  .stat .v{font-size:23px; font-weight:700; line-height:1.1;}
+  .stat .l{font-size:12.5px; color:var(--muted); margin-top:3px;}
+  .stat.warn .v{color:var(--demote);}
+  footer{margin-top:60px; padding-top:16px; border-top:1px solid var(--line);
+    font-size:12.5px; color:var(--muted);}
+  .step{counter-increment:step; position:relative; padding-left:38px; margin:18px 0;}
+  .step::before{content:counter(step); position:absolute; left:0; top:0;
+    width:26px; height:26px; background:var(--accent); color:#fff; border-radius:50%;
+    text-align:center; line-height:26px; font-weight:700; font-size:14px;}
+  .steps{counter-reset:step;}
+  .step h4{margin:0 0 4px; font-size:15px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>政策分析项目 · 顶层设计审视</h1>
+<p class="sub">独立对抗式评判 · 2026-05-30 · 范围：整个项目的顶层设计是否健康，是否该推倒重来<br>
+读取来源：vault 实际数据 + pipeline <code>SCHEMA / OPERATIONS / LESSONS / STATUS</code> + 2026-05-18 关系精度实测 + 2026-05-19 reviewer brief + 三仓磁盘量化。未读 legacy-archive；未改任何数据。</p>
+
+<!-- ============ 一句话裁决 ============ -->
+<div class="verdict">
+  <p class="big">不要推倒重来。该被推翻的不是"项目"，是<strong>重心</strong>——把"用 pipeline 预先物化一张知识图谱"降级，把"干净语料 + canonical 词表 + 分析框架 + LLM 按需合成"升级。</p>
+  <p class="small">你的"LLM wiki"方向<strong>没错，而且是你最初就对的方向</strong>；错的是它的 2024 式实现（预先物化 typed 知识图谱并用管道长期维护）。项目确实"庞杂"，但庞杂分两种：一种是建设期垃圾（删了就好），一种是"过度物化的派生层"（这才是真正要动的设计问题）。真资产（L1 语料 / canonical 词表 / 分析框架）必须保留——它们恰恰是"按需对话产出"所依赖的底座。</p>
+</div>
+
+<!-- ============ 你的三个问题，逐题裁决 ============ -->
+<h2>一 · 你的三个问题，逐题裁决</h2>
+
+<div class="qcard">
+  <p class="q">Q1 · 顶层设计有必要重建吗？<span class="tag t-no">不必 — 但要换重心</span></p>
+  <p>你已经做过一次大重构了（5-08 的"C 路径"：把工程层迁出 vault，拆成 vault + pipeline 双仓）。那次是<strong>对的</strong>。现在的"推倒重来"冲动若真执行，会一并烧掉三类不可替代的资产：</p>
+  <ul>
+    <li><strong>L1 语料</strong>（999 政策 + 283 评论）——OPERATIONS 自己写明"老 raw 是资产，不可重抓"。重来 = 把唯一不可逆的东西扔掉。</li>
+    <li><strong>canonical 词表 + 分析框架</strong>——<code>月报需求原型</code> 里的 fact-check 规则（"比较级论断核查""国家级→省级 6-12 月起草周期，同月不画因果链"）、四维决策框架、打分体系、<code>LESSONS.md</code>。这是<strong>真正的皇冠珠宝</strong>，是你区别于"普通研究院"的领域判断，重来一次也写不回来。</li>
+    <li><strong>高精度确定性事实</strong>——<code>supersedes / clarifies / cites_basis</code> 共 504 边，实测 ~100% 精度。</li>
+  </ul>
+  <p>真正该"重建"的只有一层：把<strong>重型 LLM 推断图谱 + 结晶页</strong>从"管道长期维护的持久产物"降级为"按需生成/可缓存的产出"。这是换脊柱重心，不是拆地基。</p>
+</div>
+
+<div class="qcard">
+  <p class="q">Q2 · 现在是不是非常庞杂？<span class="tag t-yes">是，可量化</span></p>
+  <div class="num-strip">
+    <div class="stat warn"><div class="v">159 / 304&nbsp;MB</div><div class="l">vault 一半体积是 <code>.git</code> 历史膨胀（把数据 + 频繁 churn 提交进 git）</div></div>
+    <div class="stat warn"><div class="v">647 vs 999</div><div class="l"><code>_archive</code> 政策数 vs 在库政策数 ≈ 65% churn（采集/派生反复推翻重做）</div></div>
+    <div class="stat warn"><div class="v">37 + 91&nbsp;MB</div><div class="l">孤儿建设垃圾（<code>~/policy-analycsis</code> 16 个 _5c/_l1/_p5 目录）+ legacy-archive</div></div>
+    <div class="stat"><div class="v">~2,400</div><div class="l">派生文件：721 反链页 + 736 关系文件 + 956 business_view + 60 结晶 + 31 区域页</div></div>
+  </div>
+  <p>但要分清两种"庞杂"：</p>
+  <ul>
+    <li><span class="pill p-keep">良性</span> 双仓拆分、SCHEMA 契约、反污染纪律、可追溯——这些是<strong>纪律</strong>，不是病。保留。</li>
+    <li><span class="pill p-demote">病灶 A·垃圾</span> 孤儿建设目录、git 历史膨胀、archive churn——纯清理，与设计无关，删/瘦身即可。</li>
+    <li><span class="pill p-shift">病灶 B·过度物化</span> ~2,400 个派生文件中，很大比例是"预先算好、会过期、精度存疑"的 LLM 推断产物。这才是顶层设计要回答的问题。</li>
+  </ul>
+</div>
+
+<div class="qcard">
+  <p class="q">Q3 · "LLM wiki 作为政策知识库"是不是根本就错了？<span class="tag t-part">方向对，实现过时</span></p>
+  <p>你在 <code>策略-L2建设思路</code> 里把 L2 明确标注为 <strong>"Karpathy LLM Wiki v2 落地"</strong>。要分清两层：</p>
+  <table>
+    <tr><th>层面</th><th>判定</th><th>依据</th></tr>
+    <tr>
+      <td><strong>LLM-wiki 的<em>精神</em></strong><br>（互联、LLM 可导航的知识库，喂给 LLM 产出决策综合）</td>
+      <td><span class="pill p-keep">完全正确</span></td>
+      <td>这就是你 2026-04-10 最初的设想（<code>调研背景 → LLM 决定方向 → 产出</code>），也正是你今天说的目标 #3。你的结晶页（如绿电交易综述）证明：LLM 对语料做综合，是这个项目<strong>最强</strong>的能力。</td>
+    </tr>
+    <tr>
+      <td><strong>它的 2024 式<em>实现</em></strong><br>（预先物化 canonical 实体 + 9 类 typed 关系 + 结晶页，由确定性管道长期维护）</td>
+      <td><span class="pill p-demote">已过时 + 逆纹理</span></td>
+      <td>你自己的洞察 1 写明："中文政策不爱明说关系，规则抽取上限 ~30%"。实测（见下）：占近半边数的 3 类关系精度 20–40%。你在用重型管道去<strong>持久化一张本质上需要 LLM 读全文才建得准的图</strong>——而 LLM 现在可以在查询时实时建。</td>
+    </tr>
+  </table>
+  <p class="lead">所以反讽在于：<strong>你不是"LLM-wiki 做错了"，而是这一年里在<em>偏离</em> LLM-wiki，滑向了更重、更脆的"确定性 ETL 知识图谱"范式。</strong>目标 #3（按需对话产出）其实是 LLM-wiki 理念的<strong>现代正解</strong>——别预先建图，让有能力的 agent 在查询时遍历语料 + 词表 + 框架，当场合成。</p>
+</div>
+
+<!-- ============ 漂移叙事 ============ -->
+<h2>二 · 诊断：项目是怎么漂移的</h2>
+<p>这不是"从一开始就歪"。是一条由<strong>正确工程本能</strong>（可复现、反污染、可追溯、schema 纪律）驱动、却把投资压在了<strong>错误的层</strong>上的漂移线：</p>
+
+<div class="flow">
+  <span class="box">2026-04-10 最初设想<br><span class="muted">背景→LLM定方向→产出（轻、对）</span></span>
+  <span class="arr">→</span>
+  <span class="box">L2 = "Karpathy LLM Wiki v2"<br><span class="muted">织网：实体/关系/结晶</span></span>
+  <span class="arr">→</span>
+  <span class="box">重型 ETL 管道<br><span class="muted">9 类关系 + 956 评分 + 结晶</span></span>
+  <span class="arr">→</span>
+  <span class="box">本阶段把 L3 产出划出范围<br><span class="muted">"先把底层做完美"</span></span>
+  <span class="arr">⇒</span>
+  <span class="box" style="border-color:var(--demote)">决策层至今 0 个可用产品<br><span class="muted" style="color:var(--demote)">完美主义拖延</span></span>
+</div>
+
+<div class="callout c-key">
+<strong>核心错位：</strong>元目标说"决策层消费的是 L2 综合 / L3 产品，不是 L1 raw"。但近一年的投入压在了 <strong>(a) L1 广度</strong>（T1 要把市级从 9% 拉到 330 城——而对决策层，300 个地级市的补贴公示多半是<strong>噪声而非信号</strong>）和 <strong>(b) 中间图谱的物化</strong>（精度存疑、会过期、决策层根本不直接读）。<br>
+真正离产出最近的两件事——<strong>分析框架</strong>和 <strong>L3 综合产品</strong>——一个被当"素材底座"埋在 L2 下游，一个被明确划出了范围。</div>
+
+<!-- ============ 证据 ============ -->
+<h2>三 · 证据：把"过度物化"钉死在数字上</h2>
+
+<h3>3.1 关系图谱实测（2026-05-18，40 条随机抽样，种子 20260518）</h3>
+<table>
+  <tr><th>关系类</th><th class="num">边数</th><th class="num">实测精度</th><th>抽取方式</th><th>性质判定</th></tr>
+  <tr><td>supersedes</td><td class="num">7</td><td class="num">~100%</td><td>regex 文号 + 人工补</td><td><span class="pill p-keep">确定性事实，留</span></td></tr>
+  <tr><td>clarifies</td><td class="num">113</td><td class="num">~100%</td><td>标题正则 + LLM</td><td><span class="pill p-keep">确定性事实，留</span></td></tr>
+  <tr><td>cites_basis</td><td class="num">384</td><td class="num">~100%</td><td>位置过滤 + LLM 语义</td><td><span class="pill p-keep">确定性事实，留</span></td></tr>
+  <tr><td>iterates</td><td class="num">58</td><td class="num">~60%</td><td>版本启发式</td><td><span class="pill p-shift">混杂，按需重判</span></td></tr>
+  <tr><td>references</td><td class="num">444</td><td class="num">~60%</td><td>文号 regex（多匹配易错连）</td><td><span class="pill p-shift">混杂，按需重判</span></td></tr>
+  <tr><td>aligns_with</td><td class="num">191</td><td class="num">~40%</td><td>LLM + 主题相似</td><td><span class="pill p-demote">逆纹理，降级</span></td></tr>
+  <tr><td>extends</td><td class="num">37</td><td class="num">~20%</td><td>LLM + region 跳变</td><td><span class="pill p-demote">逆纹理，降级</span></td></tr>
+  <tr><td><strong>derives_from</strong></td><td class="num"><strong>677</strong></td><td class="num"><strong>~20%</strong></td><td>5C LLM 副产物</td><td><span class="pill p-demote">最大类 + 最不准，降级</span></td></tr>
+  <tr style="background:#f3f6f9"><td><strong>边权重加权</strong></td><td class="num"><strong>1,911</strong></td><td class="num"><strong>≈65%</strong></td><td colspan="2">主要拖累项：677 条 <code>derives_from</code></td></tr>
+</table>
+
+<div class="callout c-evi">
+<strong>读法：</strong>504 条高精度边（supersedes/clarifies/cites_basis）是<strong>确定性事实</strong>——值得持久化，LLM 不需要每次重算。但占 <strong>47%</strong> 的三类（derives_from + aligns_with + extends，~905 边）是<strong>语义推断</strong>，精度 20–40%。<br>
+我抽看 <code>derives_from</code> 原始记录证实了"混杂"本质：同一类里，"<em>直接落地</em>"（正文明引文号，如山东→NDRC 357）质量很高；"<em>主题对应</em>"（"正文未明确引用…仅称为提升我区…"）纯属 LLM 猜测。<strong>把这两种货混在一个持久化 jsonl 里按类报数，本身就是误导。</strong></div>
+
+<h3>3.2 结晶页：恰恰证明"按需合成"才是强项</h3>
+<p>我读了 <code>themes/GREEN_POWER_TRADING_THEME/overview.md</code>——它<strong>非常好</strong>：政策谱系准确、子领域划分清晰、领域判断到位。但请注意三件事：</p>
+<ul>
+  <li>它是 <code>last_updated: 2026-04-28</code> 的<strong>快照</strong>，<code>policies_count: 45</code> 写死在 frontmatter 里——新政策进来它就过期；</li>
+  <li>它是 <strong>LLM 一次性合成</strong>的产物，不是确定性派生；</li>
+  <li>13 个主题 × ~5 文件 = 60 个这样的快照，都在<strong>静默老化</strong>。</li>
+</ul>
+<p class="lead">这正是论点：结晶页好，说明 <strong>LLM-over-语料的合成</strong> 是你最强的能力——<strong>这是支持"按需生成"的证据，不是支持"管道持久化"的证据</strong>。一个能写出这种综述的 agent，在你查询时现做一份只会更新、更贴合当下问题。</p>
+
+<h3>3.3 五个横向 bug 都指向同一根因</h3>
+<p>实测报告列的 5 个横向问题——<code>from==to</code> 自环、L1 混入新闻稿、id issuer 错标、doc_num 多匹配错连、关系类型语义糊——<strong>不是孤立 bug，是同一个范式压力的症状</strong>：用确定性 + 启发式管道，去抽一种本质上抗拒被确定性抽取的材料（中文政策的隐式关系）。修这些 bug 是在给一个方向可疑的引擎打补丁——这正是你说的"修修补补"。</p>
+
+<!-- ============ 资产 vs 退役 ============ -->
+<h2>四 · 该留的真资产 vs 该退役的过度物化</h2>
+<div class="grid2">
+  <div class="panel keep">
+    <h4>✓ 真资产（持久化、是按需产出的底座）</h4>
+    <ul>
+      <li><strong>L1 语料</strong>：999 政策 + 283 评论 + provenance。不可重抓，唯一不可逆资产。</li>
+      <li><strong>canonical 词表</strong>：entities / themes / issuers registry。便宜、稳定、消歧必需——检索与一致性的脚手架。</li>
+      <li><strong>分析框架（皇冠珠宝）</strong>：月报原型 + fact-check 规则 + 四维决策框架 + 打分体系 + LESSONS。这是"分析提示词库"。</li>
+      <li><strong>504 条高精度确定性边</strong>：supersedes / clarifies / cites_basis。</li>
+      <li><strong>确定性身份/元数据</strong>：date / region / issuer / 文号。</li>
+      <li><strong>双仓 + SCHEMA 契约 + 反污染纪律</strong>：组织纪律，保留。</li>
+    </ul>
+  </div>
+  <div class="panel demote">
+    <h4>✕ 过度物化（从"持久产物"降为"按需/可缓存"）</h4>
+    <ul>
+      <li><strong>905 条 LLM 推断边</strong>（derives_from / aligns_with / extends，20–40%）：停止当事实持久化。需要时让 agent 现读现判。</li>
+      <li><strong>60 个结晶页快照</strong>：从"管道维护"改为"查询时生成 / 长缓存 + 失效重建"。</li>
+      <li><strong>721 反链页</strong>：仅对高精度边保留有意义；基于 65% 图的反链页会误导 Obsidian graph view。</li>
+      <li><strong>T1 市级 330 城广度推进</strong>：对决策层多为噪声。reviewer brief 自己已把它列为"最该被推翻的决策"。</li>
+      <li><strong>956 business_view 全量重跑焦虑</strong>：评分本身有价值（保留为索引/过滤），但别再围绕"全量重跑"组织工作。</li>
+      <li><strong>git 里的数据 + archive churn</strong>：数据移出 git LFS 或不入 git；瘦身历史。</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============ 目标架构 ============ -->
+<h2>五 · 对你最有利的目标架构</h2>
+<p>给定元目标（决策层态势把握）+ 目标 #3（按需对话产出）+ 你的约束（最高优先级、无限算力）：<strong>把算力从"维护一张过期的图"转投到"查询时合成"——后者直接产生决策价值，前者 47% 是噪声。</strong></p>
+
+<div class="flow">
+  <span class="box"><strong>① 干净语料层</strong><br><span class="muted">L1 raw + 高精度元数据<br>+ 504 确定性边</span></span>
+  <span class="arr">+</span>
+  <span class="box"><strong>② canonical 脚手架</strong><br><span class="muted">实体/主题/机构词表<br>消歧 + 检索锚点</span></span>
+  <span class="arr">+</span>
+  <span class="box"><strong>③ 框架即提示词</strong><br><span class="muted">月报原型/fact-check/<br>四维/打分（结构化）</span></span>
+  <span class="arr">→</span>
+  <span class="box" style="border-color:var(--accent)"><strong>④ LLM agent 按需合成</strong><br><span class="muted">检索 ①②，套 ③，<br>当场产月报/卡片/专题</span></span>
+  <span class="arr">→</span>
+  <span class="box" style="border-color:var(--keep)"><strong>⑤ 可缓存产出</strong><br><span class="muted">结晶/月报落盘=缓存<br>非真理来源</span></span>
+</div>
+
+<p>关键心智转变：<strong>"派生层"从"必须预先算全、算准、长期维护的真理"，变成"agent 在查询时按需生成、用完即缓存的视图"。</strong>持久化的只有①②③这些<em>稳定、便宜、不会因模型升级而过期</em>的东西。一切"会过期 / 精度存疑 / 模型一升级就该重跑"的 LLM 产物，都不再是"库的状态"，而是"产出的副本"。</p>
+
+<div class="callout c-key">
+<strong>这同时解决了你的"修修补补"痛感：</strong>你之所以一直在补补，是因为你在维护一个"必须保持新鲜与准确"的重型派生层——而它天然会随每篇新政策、每次模型升级而失效。一旦派生层变成"按需生成"，就没有"维护图谱新鲜度"这件永远做不完的事了。库只维护①②③，它们本就稳定。</div>
+
+<!-- ============ 迁移路径 ============ -->
+<h2>六 · 迁移路径（不是推倒，是"换重心"的有序动作）</h2>
+<div class="steps">
+  <div class="step">
+    <h4>清债（与设计无关，先做掉，立刻减负）</h4>
+    <p>删/归档 <code>~/policy-analycsis</code> 37MB 孤儿堆；数据移出 git（LFS 或外置）瘦身 159MB 历史；archive churn 收口。<span class="muted">——这一步就能消掉你"庞杂"体感的一大半。</span></p>
+  </div>
+  <div class="step">
+    <h4>冻结广度推进，回到产出</h4>
+    <p>停 T1 全 330 城（brief 已自我否定该优先级）。国家级 + 省级已覆盖，对决策层足够。把省下的精力投向"先给决策层一个能用的东西"。</p>
+  </div>
+  <div class="step">
+    <h4>固化①②③为"持久脊柱"</h4>
+    <p>语料 + 504 确定性边 + canonical 词表 + 把<code>月报原型/fact-check/四维/打分</code>从散落文档<strong>结构化成 agent 可直接调用的提示词/规则库</strong>。这是唯一需要"建"的新东西，且是高杠杆的。</p>
+  </div>
+  <div class="step">
+    <h4>把 905 条推断边 + 结晶页降级为"按需视图"</h4>
+    <p>不再用管道维护其新鲜度。建一个能检索①②、套用③、当场合成月报/决策卡片/专题的 <strong>LLM agent / 对话工作流</strong>。结晶页若保留，标注为"缓存快照 + 生成时间"，不当真理。</p>
+  </div>
+  <div class="step">
+    <h4>用一份"现在就能出"的月报验证闭环</h4>
+    <p>这正是你最初进来想做、却被劝退的事。它会立刻暴露①②③够不够用——这是比"把市级拉到全量"高得多的杠杆，且直接对元目标交付。</p>
+  </div>
+</div>
+
+<!-- ============ 分歧 ============ -->
+<h2>七 · 我和你"推倒重来"直觉的分歧（明说）</h2>
+<div class="callout c-dis">
+<p style="margin-top:0"><strong>你的直觉里对的部分：</strong>确实有东西该被推翻——重型 LLM 推断图谱 + 结晶页的"持久化维护"范式、市级广度推进、建设期垃圾。你感到的"庞杂"和"修修补补"是<strong>真实信号</strong>，不是错觉。</p>
+<p><strong>我不同意的部分：</strong>"推倒重来"作为<em>动作</em>是错的——因为它会连同三类不可替代资产（语料 / 分析框架 / 高精度事实）一起烧掉，而这些恰恰是"按需对话产出"的底座。重来一次，你会重新踩一遍 LESSONS 里那些"已经付出过代价"的坑，并再次花数周重建语料和框架，却仍然在<strong>第四步</strong>（产出）止步。</p>
+<p style="margin-bottom:0"><strong>更危险的一点：</strong>"推倒重来"往往是"完美主义拖延"的另一副面孔——它让你<em>再次推迟</em>面对真正的难题（给决策层一个能用的产品），换成一件"看起来像进展、好施工"的事（重建底层）。你已经这样推迟过一次（月报→T1 的 pivot）。<strong>第二次不要用"重建"的名义再推迟。</strong></p>
+</div>
+
+<footer>
+本报告为只读审视，未改动任何数据 / schema / 代码。结论基于 vault 实际数据 + pipeline 契约文档 + 2026-05-18 关系精度实测 + 三仓磁盘量化 + 抽样核对的派生产物。<br>
+原始证据留 native 格式（jsonl / yaml / md）；本 HTML 为人类可读的决策层。生成于 2026-05-30。
+</footer>
+
+</div>
+</body>
+</html>

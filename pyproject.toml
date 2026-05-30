@@ -3,6 +3,7 @@ name = "zce-pipeline"
 version = "0.1.0"
 description = "政策分析 pipeline 工程仓"
 requires-python = ">=3.9"
+dependencies = ["pyyaml", "anthropic>=0.40"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
