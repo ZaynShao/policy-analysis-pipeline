@@ -7,17 +7,24 @@ from urllib.parse import urlparse, urlunparse
 _URL_TRAILING_SLASH = re.compile(r"/$")
 _TITLE_CLEAN = re.compile(r"[\s　\(\)（）\[\]【】《》\"'：:;；,，.。!！?？\-—_]+")
 _OFFNUM_CLEAN = re.compile(r"[\s\(\)（）\[\]【】〔〕年号]+")
+_TRACKING_PARAMS = {"utm_source", "utm_medium", "utm_campaign", "utm_term",
+                    "utm_content", "spm", "from", "ref", "fromtimestamp"}
 
 
 def normalize_url(url: str) -> str:
-    """去 query / fragment / 末尾斜杠。"""
+    """归一 URL:小写 scheme/host、去 fragment、去末尾斜杠、去已知 tracking 参数。
+    **保留其余 query**——政府 CMS 常把文档 id 放在 query(?id=/?contentId=),
+    砍掉会把不同文档误并。原则:宁可漏并不可错并。"""
     if not url:
         return ""
+    from urllib.parse import parse_qsl, urlencode
     p = urlparse(url)
-    return urlunparse((
-        p.scheme.lower(), p.netloc.lower(),
-        _URL_TRAILING_SLASH.sub("", p.path), "", "", "",
-    ))
+    kept = [(k, v) for k, v in parse_qsl(p.query, keep_blank_values=True)
+            if k.lower() not in _TRACKING_PARAMS]
+    kept.sort()
+    query = urlencode(kept)
+    path = _URL_TRAILING_SLASH.sub("", p.path)
+    return urlunparse((p.scheme.lower(), p.netloc.lower(), path, "", query, ""))
 
 
 def normalize_official_number(s: str) -> str:

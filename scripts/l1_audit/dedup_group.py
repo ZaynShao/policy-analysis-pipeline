@@ -18,11 +18,8 @@ class _UF:  # union-find
 
 def group_duplicates(records: list[PolicyRecord]) -> list[Finding]:
     uf = _UF()
-    for dim, norm, attr in (
-        ("url", normalize_url, "url"),
-        ("off", normalize_official_number, "official_number"),
-        ("title", normalize_title, "title"),
-    ):
+    # 强身份维:URL / 文号 —— 命中即并
+    for norm, attr in ((normalize_url, "url"), (normalize_official_number, "official_number")):
         seen = {}
         for r in records:
             key = norm(getattr(r, attr))
@@ -32,6 +29,20 @@ def group_duplicates(records: list[PolicyRecord]) -> list[Finding]:
                 uf.union(seen[key].pid, r.pid)
             else:
                 seen[key] = r
+    # 弱身份维:标题 —— 命中但"双方文号非空且不同"则不并(版本/supersedes 对)
+    seen = {}
+    for r in records:
+        key = normalize_title(r.title)
+        if not key:
+            continue
+        if key in seen:
+            prev = seen[key]
+            o1, o2 = normalize_official_number(prev.official_number), normalize_official_number(r.official_number)
+            if o1 and o2 and o1 != o2:
+                continue                 # 文号冲突 → 不判重复
+            uf.union(prev.pid, r.pid)
+        else:
+            seen[key] = r
     by_pid = {r.pid: r for r in records}
     groups: dict[str, list[str]] = {}
     for r in records:

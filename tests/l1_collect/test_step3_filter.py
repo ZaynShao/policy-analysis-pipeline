@@ -20,8 +20,8 @@ def test_filter_drops_news_and_dup(tmp_path: Path):
          "date_hint": "", "source_channel": "xinyang.gov.cn",
          "city": "信阳市", "city_code": "411500", "province": "河南省",
          "channel_type": "政府网", "scanned_at": ""},
-        # 与第一条 URL 重复 → 被查重
-        {"title": "重复的通知", "url": "https://www.gov.cn/zhengce/a.html?dup=1",
+        # 与第一条 URL 重复(tracking 参数不影响身份)→ 被查重
+        {"title": "重复的通知", "url": "https://www.gov.cn/zhengce/a.html?utm_source=wx",
          "date_hint": "", "source_channel": "www.gov.cn",
          "city": "国家", "city_code": "000000", "province": "",
          "channel_type": "政府网", "scanned_at": ""},
