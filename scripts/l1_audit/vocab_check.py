@@ -45,7 +45,9 @@ def check(themes_path: str, entities_path: str) -> dict:
     for alias, ids in raw_ent_conf.items():
         types = [(i, "theme" if "theme" in (ent_by_id.get(i, {}).get("type") or []) else "other") for i in ids]
         n_theme = sum(1 for _, t in types if t == "theme")
-        if n_theme >= 2 or (n_theme == 0 and len(ids) >= 2):
+        # §9.1 通则:alias 可跨 theme 共享(语义 LLM 消歧)→ 多 theme 命中记为可接受共享,不报错。
+        # 仅"同词→≥2 个全非 theme 实体"才是真歧义(无 theme 锚点,无从语义消歧)。
+        if n_theme == 0 and len(ids) >= 2:
             ent_conf_real[alias] = ids
         else:
             ent_conf_structural[alias] = ids
@@ -54,7 +56,7 @@ def check(themes_path: str, entities_path: str) -> dict:
         "themes_n": len(themes), "entities_n": len(entities),
         "theme_dup_ids": _dups(theme_ids),
         "entity_dup_ids": _dups(ent_ids),
-        "theme_alias_conflicts": _alias_conflicts(themes, "id"),
+        "theme_alias_shared": _alias_conflicts(themes, "id"),  # §9.1 alias 可跨 theme 共享:记录,不报错
         "entity_alias_conflicts": ent_conf_real,
         "entity_alias_structural_ok": ent_conf_structural,
         # 自洽:每个 theme 需有同 id 的 type=theme entity
@@ -65,7 +67,8 @@ def check(themes_path: str, entities_path: str) -> dict:
         "entities_missing_fields": sorted([e.get("id") or "(no-id)" for e in entities
                                            if not e.get("id") or not e.get("canonical_name") or not e.get("type")]),
     }
-    r["clean"] = not any([r["theme_dup_ids"], r["entity_dup_ids"], r["theme_alias_conflicts"],
+    # theme_alias_shared / entity_alias_structural_ok 是信息项(§9.1 允许),不计入 clean。
+    r["clean"] = not any([r["theme_dup_ids"], r["entity_dup_ids"],
                           r["entity_alias_conflicts"], r["themes_without_entity"],
                           r["theme_entities_without_registry"], r["themes_missing_fields"],
                           r["entities_missing_fields"]])
@@ -88,9 +91,9 @@ def write_report(r: dict, out: str) -> None:
         L.append("")
     sec("theme 重复 id", r["theme_dup_ids"])
     sec("entity 重复 id", r["entity_dup_ids"])
-    sec("theme alias 冲突(同词→多id)", r["theme_alias_conflicts"])
-    sec("entity alias 真冲突(同词→≥2 theme 或 ≥2 非theme)", r["entity_alias_conflicts"])
-    sec("entity alias 结构性重叠(theme+其concept,可接受,仅记录)", r.get("entity_alias_structural_ok", {}))
+    sec("theme alias 跨theme共享(§9.1 允许·语义LLM消歧,仅记录)", r["theme_alias_shared"])
+    sec("entity alias 真冲突(同词→≥2 个全非theme实体,需消歧)", r["entity_alias_conflicts"])
+    sec("entity alias 跨theme/结构性共享(theme间 或 theme+concept,允许,仅记录)", r.get("entity_alias_structural_ok", {}))
     sec("theme 缺对应 type=theme entity(不自洽)", r["themes_without_entity"])
     sec("type=theme entity 缺 themes_registry 条目", r["theme_entities_without_registry"])
     sec("themes 缺必填(id/zh/aliases)", r["themes_missing_fields"])
@@ -109,12 +112,14 @@ def main() -> None:
     r = check(a.themes, a.entities)
     write_report(r, a.out)
     print(f"[vocab] clean={r['clean']} themes={r['themes_n']} entities={r['entities_n']} -> {a.out}")
-    for k in ("theme_dup_ids", "entity_dup_ids", "theme_alias_conflicts", "entity_alias_conflicts",
+    for k in ("theme_dup_ids", "entity_dup_ids", "entity_alias_conflicts",
               "themes_without_entity", "theme_entities_without_registry",
               "themes_missing_fields", "entities_missing_fields"):
         v = r[k]
         if v:
             print(f"  ⚠ {k}: {v}")
+    if r["theme_alias_shared"]:
+        print(f"  ℹ theme_alias_shared(允许·跨theme): {r['theme_alias_shared']}")
 
 
 if __name__ == "__main__":
