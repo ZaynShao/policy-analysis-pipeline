@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>政策分析项目 · 今日进展报告(2026-05-30)</title>
+<style>
+  :root{
+    --ink:#1a1a1a; --muted:#5f6b76; --line:#e4e8ec; --bg:#fbfcfd; --card:#fff;
+    --accent:#1565c0; --accent-bg:#e9f1fb;
+    --done:#2E7D32; --done-bg:#e8f3e9; --prog:#F57C00; --prog-bg:#fdf1e3;
+    --todo:#8a94a0; --todo-bg:#eef1f4; --win:#6a1b9a; --win-bg:#f4e9f8; --risk:#C62828; --risk-bg:#fbeaea;
+  }
+  *{box-sizing:border-box}
+  body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",-apple-system,sans-serif;
+    color:var(--ink); background:var(--bg); line-height:1.7; margin:0;}
+  .wrap{max-width:940px; margin:0 auto; padding:44px 28px 90px;}
+  h1{font-size:26px; margin:0 0 4px;}
+  .sub{color:var(--muted); font-size:13.5px; margin-bottom:28px;}
+  h2{font-size:20px; margin:46px 0 12px; padding-bottom:7px; border-bottom:2px solid var(--line);}
+  h3{font-size:15.5px; margin:22px 0 6px;}
+  p{margin:9px 0;} code{background:#eef1f4; padding:1px 6px; border-radius:4px; font-size:12.5px; font-family:"SF Mono",Menlo,Consolas,monospace;}
+  .headline{background:var(--accent-bg); border:1px solid #c5dbf5; border-left:5px solid var(--accent); border-radius:10px; padding:20px 24px; margin:12px 0;}
+  .headline .b{font-size:18px; font-weight:800; line-height:1.5; margin:0 0 6px;}
+  .headline .s{font-size:14px; color:#33506e; margin:0;}
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:13.5px;}
+  th,td{text-align:left; padding:9px 11px; border-bottom:1px solid var(--line); vertical-align:top;}
+  th{background:#f3f6f9; font-weight:600; color:#33414e;}
+  .pill{font-size:11px; font-weight:700; padding:1px 9px; border-radius:20px; white-space:nowrap;}
+  .p-done{background:var(--done-bg);color:var(--done);} .p-prog{background:var(--prog-bg);color:var(--prog);}
+  .p-todo{background:var(--todo-bg);color:var(--todo);} .p-win{background:var(--win-bg);color:var(--win);} .p-risk{background:var(--risk-bg);color:var(--risk);}
+  ul,ol{margin:8px 0; padding-left:22px;} li{margin:4px 0;}
+  .muted{color:var(--muted);}
+  .node{display:flex; align-items:center; gap:0; margin:18px 0; flex-wrap:wrap;}
+  .nstep{flex:1; min-width:120px; text-align:center; padding:12px 8px; border-radius:9px; border:1px solid var(--line); background:var(--card); margin:3px;}
+  .nstep .t{font-weight:700; font-size:14px;} .nstep .pct{font-size:12px; margin-top:3px;}
+  .nstep.done{border-top:3px solid var(--done);} .nstep.prog{border-top:3px solid var(--prog);} .nstep.todo{border-top:3px solid var(--todo); opacity:.75;}
+  .bar{height:9px; background:var(--todo-bg); border-radius:6px; overflow:hidden; margin-top:6px;}
+  .bar > span{display:block; height:100%;}
+  .callout{border-radius:9px; padding:13px 17px; margin:14px 0; font-size:13.5px;}
+  .c-win{background:var(--win-bg); border:1px solid #d9bce6;}
+  .c-risk{background:var(--risk-bg); border:1px solid #f0c4c4;}
+  .c-note{background:#f4f7fa; border:1px solid #dde5ec;}
+  .stat-row{display:flex; flex-wrap:wrap; gap:10px; margin:14px 0;}
+  .stat{flex:1; min-width:120px; background:var(--card); border:1px solid var(--line); border-radius:9px; padding:11px 13px;}
+  .stat .v{font-size:21px; font-weight:800; line-height:1.1;} .stat .l{font-size:12px; color:var(--muted); margin-top:2px;}
+  .steps{counter-reset:s;} .step{counter-increment:s; position:relative; padding-left:36px; margin:14px 0;}
+  .step::before{content:counter(s); position:absolute; left:0; top:1px; width:25px; height:25px; background:var(--accent); color:#fff; border-radius:50%; text-align:center; line-height:25px; font-weight:700; font-size:13px;}
+  .step.next::before{background:var(--prog);}
+  .step h4{margin:0 0 3px; font-size:14.5px;}
+  footer{margin-top:54px; padding-top:14px; border-top:1px solid var(--line); font-size:12px; color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>政策分析项目 · 今日进展报告</h1>
+<p class="sub">2026-05-30 session 收尾 · 覆盖:顶层设计审视与重建 → ①源到位审计引擎落地 → 真实数据验证 → Phase-2 应用(进行中)</p>
+
+<div class="headline">
+  <p class="b">今天回答了你进来时的那个战略问题(该不该推倒重来),给出了健康的新顶层设计,并把第一块执行(①源到位的"审计"半边)建好、跑通、合入主干——而它一上真实数据,就立刻拦下了一个会销毁真政策的 bug、揪出了一批伪装成政策的赌博 spam。</p>
+  <p class="s">换句话说:战略不确定性已清零(不推倒、换重心),执行已带着纪律启动,且第一块就证明了"源不到位"是真问题、自己会还本。</p>
+</div>
+
+<!-- ============ 进度总览 ============ -->
+<h2>一 · 离目标还差多少(四节点路线图)</h2>
+<p>你的元目标拆成四个"到位"节点:<b>源 → 归属 → 分析 → 消费</b>。今日位置:</p>
+
+<div class="node">
+  <div class="nstep done"><div class="t">顶层设计</div><div class="pct">✅ 100%</div></div>
+  <div class="nstep prog"><div class="t">①源到位</div><div class="pct">🚧 ~60%</div></div>
+  <div class="nstep todo"><div class="t">②归属</div><div class="pct">0%</div></div>
+  <div class="nstep todo"><div class="t">③分析</div><div class="pct">0%</div></div>
+  <div class="nstep todo"><div class="t">④消费</div><div class="pct">0%</div></div>
+</div>
+
+<table>
+  <tr><th>阶段</th><th>状态</th><th>说明</th></tr>
+  <tr><td><b>顶层设计</b></td><td><span class="pill p-done">完成</span></td><td>原始问题("是否歪了/要不要重建")已裁决:不推倒,换重心。新设计成文(charter v2)。<div class="bar"><span style="width:100%;background:var(--done)"></span></div></td></tr>
+  <tr><td><b>①源到位</b></td><td><span class="pill p-prog">进行中 ~60%</span></td><td><b>审计半边</b>:dry-run 引擎已建/合入/跑通 ✅。<b>应用半边(Phase 2)</b>:apply.py 已建、dedup 根 bug 已修并验证、junk 检测待建,真实 vault 尚未改动。<div class="bar"><span style="width:60%;background:var(--prog)"></span></div></td></tr>
+  <tr><td><b>②归属层</b></td><td><span class="pill p-todo">未开始</span></td><td>每篇政策(含市级)挂 theme+region+date+重要性 = wiki 骨架 + API 查询轴。</td></tr>
+  <tr><td><b>③分析层</b></td><td><span class="pill p-todo">未开始</span></td><td>全局 LLM 语义重连(<b>消灭孤岛——你最初的痛点</b>)+ business_view + 按需结晶。这是价值最高的一块。</td></tr>
+  <tr><td><b>④消费层</b></td><td><span class="pill p-todo">未开始</span></td><td>index + API(时间×地点×主题→评估)+ L3 按需产出。</td></tr>
+</table>
+
+<div class="c-note callout"><b>对你三个元目标的映射</b>:① <b>健康收集</b>——今天揭示了收集层的真实问题(spam/搜索页混入、URL 去重 bug),并把修复做在了采集也共用的根上,健康度在抬升。② <b>LLM-wiki 知识库管理</b>——方法论已彻底厘清+重设计(从重型 ETL 图谱 → 干净源+按需视图),这一项今天交付最多。③ <b>对话得产出</b>——依赖 ②③④,尚未触及。<br><b>诚实结论</b>:整体执行完成度约 25–30%(设计 100%、①约 60%、②③④ 为 0),但你进来时最大的不确定性(方向对不对、要不要重来)已 100% 消解。</div>
+
+<!-- ============ 今天做了什么 ============ -->
+<h2>二 · 今天做了什么</h2>
+
+<h3>A. 顶层审视 + 重设计(交付 2 份 HTML)</h3>
+<ul>
+  <li><b>裁决报告</b> <code>docs/reviews/2026-05-30-meta-design-assessment.html</code>:不推倒重来;LLM-wiki 方向对、但 2024 式"预物化知识图谱"实现过时;量化了庞杂(vault .git 159/304MB、647 archive vs 999 在库、关系图边权重精度仅 65%)。</li>
+  <li><b>顶层设计 v2 纲领</b> <code>docs/2026-05-30-top-level-design-v2.html</code>:源/视图分层 + 归属/分析两层骨架 + 三纪律(采集追加·派生整文件重生·定期GC)+ L2 零补丁承诺 + 文件为源/OB+API 双视图。</li>
+  <li>识别出 <b>第三源「市场行情 market_intel」</b>,认可方向但完整建设<b>推后</b>(登记 <code>docs/BACKLOG.md</code> B1,并设了"到可行时点主动提醒"机制)。</li>
+</ul>
+
+<h3>B. ①源到位 · dry-run 审计引擎(已合入 main,17 测试绿)</h3>
+<ul>
+  <li>spec→plan→subagent-driven TDD 建成 8 个模块(corpus / 最小 LLM client / 新闻稿分类 / id-issuer 检查 / 重复分组 / P_1900 扫描 / 报告 / 编排 CLI)+ 终审修复(id_issuer 接入 issuer_canonical,假阳性从 219→1 高置信)。</li>
+  <li><b>只读</b>,经独立终审确认零文件改写;已 merge 到 <code>main</code>。</li>
+</ul>
+
+<h3>C. 跑真 dry-run(999 篇)+ 启动 Phase-2 应用</h3>
+<ul>
+  <li>真实 999 篇出报告:27 新闻稿候选(我作为 LLM 判:其中 <b>12 篇是被误杀的真政策</b>含《十五五规划纲要》、12 篇市场行情、2 噪声、1 评论)、id_issuer 190(GO 兜底 177)、dedup、p1900=1。</li>
+  <li>建 <code>apply.py</code>(archive+dedup,全程 git mv 可逆);分支 <code>feat/source-apply</code>。</li>
+</ul>
+
+<!-- ============ 关键发现 ============ -->
+<h2>三 · 今天审计揪出的真问题(这就是"源不到位"的实证)</h2>
+<div class="stat-row">
+  <div class="stat"><div class="v" style="color:var(--win)">5+</div><div class="l">差点被去重<b>销毁的真政策</b>(含 ⭐5《电力中长期市场基本规则》1656号)被验真拦下</div></div>
+  <div class="stat"><div class="v" style="color:var(--risk)">~12</div><div class="l">伪装成政策的<b>安徽搜索页 + 注入赌博 spam</b>("pg电子【问:Bet…】")</div></div>
+  <div class="stat"><div class="v" style="color:var(--prog)">177</div><div class="l"><code>GO</code> 兜底前缀 → <b>机构码不可信</b>的政策(待 Phase-2 重算 id)</div></div>
+  <div class="stat"><div class="v" style="color:var(--accent)">1</div><div class="l">《十五五规划纲要》差点被当新闻稿丢掉,被救回</div></div>
+</div>
+
+<div class="c-win callout"><b>最大的一次"先验后改"救场</b>:dedup 的 <code>normalize_url</code> 砍掉了 URL query,而政府 CMS 把文档 id 放在 query(<code>iteminfo.jsp?id=</code>)——导致 6 篇不同政策被并成"一组重复",盲目应用会销毁 5 篇真政策(含 1656号 ⭐5)。<b>在动任何文件前的逐组验真拦下了它。</b>已在共享 <code>dedup.py</code> 做<b>根修(非补丁)</b>:保留标识性 query + 文号冲突不并 + LESSONS B7;61 测试绿;真实语料重验证后假阳性全消失(12 组→8 组干净真重复)。</div>
+
+<div class="c-risk callout"><b>另一类"先验后改":</b>朴素的"URL 含 search 即垃圾"判据会误杀 5 篇真政策(上海松江区十五五规划、上海碳达峰工作安排等)。所以 junk/spam 检测器必须精确(靠"智能搜索标题/spam 模式/纯导航词",不靠 url)——同一个教训:<b>检测必须 bias 到不误杀真内容</b>。</div>
+
+<!-- ============ 下一步 ============ -->
+<h2>四 · 接下来要处理的(按顺序)</h2>
+<div class="steps">
+  <div class="step next"><h4>root-fix-3:精确 junk/spam 检测器 <span class="pill p-prog">下次第一件</span></h4><p>在共享 <code>news_filter</code> 加(采集期也受益)+ TDD。抓那 ~12 篇安徽搜索页/赌博 spam,放过 5 篇 SH 真政策。</p></div>
+  <div class="step"><h4>apply 2a(第一次真改 vault,可逆)</h4><p>先给 vault 打 <code>pre-source-apply</code> checkpoint tag → dedup 8 组(移 8 篇到 <code>_duplicates</code>)+ archive 2 噪声 + ~12 junk 到 <code>_archive</code>。全程 git mv,可一键回退。</p></div>
+  <div class="step"><h4>apply 2b(大头:GO/SC id 重算)</h4><p>我(4.8)逐批读 ~190 篇 GO/SC,判 policy/market_intel/noise + 解析真 issuer+region;只给 policy 的按 §C 重算 id;market_intel 进 manifest(留第三源);noise archive。抽样校 ≥95% 才落。完成后 id-issuer 高置信 mismatch 归零 → ①源到位 收口。</p></div>
+  <div class="step"><h4>②归属层</h4><p>每篇(含市级)挂 theme+region+date+重要性。立起 wiki 骨架 + API 查询轴。</p></div>
+  <div class="step"><h4>③分析层(价值最高)</h4><p>全局 LLM 语义重连——<b>解决你最初说的"孤岛"痛点</b>;business_view 重建;结晶按需生成。这才是决策层真正消费的综合。</p></div>
+  <div class="step"><h4>④消费层</h4><p>index + API(时间×地点×主题→评估)+ L3 按需产出 → 直达元目标#3(对话得产出)。</p></div>
+</div>
+<p class="muted">推后(已登记 BACKLOG,到可行时点我会主动提醒):市场行情 market_intel 第三源的完整建设。</p>
+
+<!-- ============ 资产 ============ -->
+<h2>五 · 今天的产物落点(便于下次接续)</h2>
+<table>
+  <tr><th>类型</th><th>位置</th></tr>
+  <tr><td>裁决 + 顶层设计 + 进度报告(3 份 HTML)</td><td><code>pipeline/docs/</code>、<code>pipeline/docs/reviews/</code></td></tr>
+  <tr><td>①源到位 spec(审计 + Phase-2 应用)</td><td><code>pipeline/docs/superpowers/specs/2026-05-30-*.md</code></td></tr>
+  <tr><td>dry-run 引擎(已合 main)</td><td><code>pipeline/scripts/l1_audit/</code> + <code>scripts/common/llm.py</code></td></tr>
+  <tr><td>Phase-2 应用代码(分支)</td><td>分支 <code>feat/source-apply</code>:<code>apply.py</code> + dedup 根修</td></tr>
+  <tr><td>真实 dry-run 产物 + 27 篇判定</td><td><code>pipeline/state/source_ready/</code>(report / proposed_changes / news_review_27)</td></tr>
+  <tr><td>推后清单</td><td><code>pipeline/docs/BACKLOG.md</code></td></tr>
+  <tr><td>跨 session 记忆</td><td>已写:顶层设计裁决、三仓布局、用户画像、审视风格、推后提醒</td></tr>
+</table>
+<p><b>下次怎么接</b>:从 <code>feat/source-apply</code> 分支继续 → root-fix-3 → apply 2a(记得先打 vault checkpoint tag)。设计与决策依据看 charter v2 + 本报告。</p>
+
+<footer>
+本报告为今日 session 收尾的进度快照(自包含 HTML)。所有代码改动均在 git,真实 vault <b>今天未被改动</b>(Phase-2 应用尚未执行)。生成于 2026-05-30。
+</footer>
+
+</div>
+</body>
+</html>

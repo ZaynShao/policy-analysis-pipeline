@@ -26,4 +26,38 @@
 **捡起时的第一步**:决定市场行情的表示(文档 vs 时序结构化)+ 采集源清单,再走 spec→plan→build。
 
 ---
-_登记于 2026-05-30。新增推后项往下追加,不删旧项;做掉的标 ✅ done 并注日期。_
+
+## B2 · ②归属必须消费「2b 归属台账」 — 推后到 ②(强约束)
+
+**状态**:① 阶段(2b)用 LLM 判出了 ~115 篇 policy 的**真实 issuer / region**,但按 SCHEMA §C(LLM 判定不写 raw,落派生层),**未写回 raw**,raw 的 id 一个没动(仍是 GO/SC 前缀)。判定结果存为台账。
+
+**台账在哪**:`state/source_ready/go_sc_review/phase2_2b_decisions.json` 的 `remint` 段(115 条:pid + true_issuer + true_region + suggested_issuer_short);运行 2b 安全子集时另落 `state/source_ready/attribution_ledger_2b.jsonl`。
+
+**为什么不能忘**:raw 里这 115 篇的发文机关/地区是错的(GO 万能前缀)。②归属若不消费这份台账,会照着错的 issuer/region 建关系→又一地孤岛(正是最初的痛)。
+
+**触发条件**:②归属 一开工。
+
+**捡起时的第一步**:② 的 spec **把此台账列为必需输入**,done-gate 写明"每篇 policy 的 issuer/region 依台账落实";若要顺带把 raw 的 id 也修正,**必须用确定性查表**(文号前缀 + gov 域名 → issuer_short/region),§C 合规,不可用 LLM 自由值。
+
+## B3 · commentary reclassify(误入 policies 的解读/学习文章) — 推后
+
+**是什么**:4 篇本质是**政策解读 / 学习文章**(非规范性政策)被收进了 `0_raw/policies/`,应迁 `commentaries/`:
+- `P_2025_OTHER94DD_0718bc02`(习近平经济思想研究中心 学习文章,2a 发现)
+- `P_2024_GO_6258c339`(安徽新型储能实施方案【文字解读】)
+- `P_2024_GO_ecd2931e`(济南市中区 设备更新方案【政策解读】)
+- `P_2025_GO_87ca9043`(广州花都 新能源十条【音频解读】)
+
+**为什么推后**:跨语料 reclassify(评论 id 体系不同 + `_migrated_from` 标记),不在 ① 范围。
+
+**触发条件**:② 或专门 cleanup pass。
+
+## B4 · 残留 date 损坏 P_2027 — 推后到确定性身份字段修正
+
+**是什么**:`P_2027_GO_572b0ea8`(《电力现货市场基本规则(试行)》)正文是 2023 年 9 月,date/id 年份被错成 2027。(另一例 `P_2048_..._4c4555f6` 已在 2b 作为重复迁 `_duplicates`,无需单列。)
+
+**为什么推后**:date 修正应走 §C 确定性方法(`body_chinese_date`),与 ② 的确定性身份字段修正子步一起做,不在本次安全子集。
+
+**触发条件**:② 确定性身份字段修正子步。
+
+---
+_登记于 2026-05-30。新增推后项往下追加,不删旧项;做掉的标 ✅ done 并注日期。B2–B4 登记于 2026-05-31。_
