@@ -106,5 +106,7 @@
 
 **触发条件**:立即可做(curate 40 域名重跑)/ 或并入 ②-B。**捡起第一步**:读 `channel_registry_needs_manual.jsonl`,把可识别区县补 refdata → 重跑 `seed_channel_registry` + `run_2a apply`(幂等)。
 
+**②-A 进展(2026-05-31,大头已收)**:加 `refdata.DOMAIN_OVERRIDE`(35 个区县/省级域名,用 sample_file 真机关名定省)→ 幂等重跑补修 **20 篇**(vault commit `2190d637`,累计 ②-A 修 148)。registry 164 域名,needs_manual 40→**5**。**残留入队 ~45**:5 个未识别域名的政策(pds/hnzy/lswz/tsgxq/wnd,多为国家级中继/信息不足)+ **9 与 ledger 矛盾**(待人工/②-B issuer 规范化)+ 2 date(B4)。这些是真长尾,可并入 ②-B 或专门小 pass。
+
 ---
 _登记于 2026-05-30。新增推后项往下追加,不删旧项;做掉的标 ✅ done 并注日期。B2–B5 登记于 2026-05-31。B6–B7 登记于 2026-05-31(用户提出:采集未补齐 + 2线可操作 + 盲区反馈环)。B8 登记于 2026-05-31(②-A apply 后 71 入队残留)。_
