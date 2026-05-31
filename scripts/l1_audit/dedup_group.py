@@ -51,7 +51,11 @@ def group_duplicates(records: list[PolicyRecord]) -> list[Finding]:
     for members in groups.values():
         if len(members) < 2:
             continue
-        members.sort(key=lambda p: (by_pid[p].date or "9999", p))  # 最早在前
+        members.sort(key=lambda p: (
+            0 if (by_pid[p].official_number or "").strip() else 1,  # 带文号者优先做 canonical(别把文号迁走)
+            by_pid[p].date or "9999",                              # 再 date 最早
+            p,                                                     # 再 pid 稳定
+        ))
         keep, dups = members[0], members[1:]
         out.append(Finding(check="dedup", pid=keep,
                            detail={"keep": keep, "dups": dups},
