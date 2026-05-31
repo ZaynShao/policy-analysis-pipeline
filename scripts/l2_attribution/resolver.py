@@ -14,8 +14,10 @@ _THIS_YEAR = 2026  # 上限年份;跨年时更新(或改 datetime.date.today().y
 
 
 def old_hash_of(pid: str) -> str:
-    """P_YYYY_PREFIX_<hash> -> <hash>(末段)。"""
+    """P_YYYY_PREFIX_<hash...> -> prefix_ 之后的全部(保留 num + 碰撞后缀,不丢段)。"""
     parts = (pid or "").split("_")
+    if len(parts) >= 4:
+        return "_".join(parts[3:])
     return parts[-1] if parts else ""
 
 
@@ -58,12 +60,9 @@ def _region_broken(cur, entry):
     name = str(cur.get("name") or "")
     if name in ("", "未知", "None"):
         return True
-    # 仅当域名指向地方,才把"国家/000000"视为误标需修;域名是national则不动有效local
-    if entry.region.get("level") != "国家":
-        level = str(cur.get("level") or "")
-        code = str(cur.get("code") or "")
-        if level == "国家" or code in ("", "000000", "None"):
-            return True
+    # 名具体即有效(哪怕 code 占位 000000,也不降级覆盖)。仅"域名是地方却标成国家级"=误标需修。
+    if entry.region.get("level") != "国家" and str(cur.get("level") or "") == "国家":
+        return True
     return False
 
 

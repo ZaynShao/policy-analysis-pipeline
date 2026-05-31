@@ -22,6 +22,20 @@ class FakeRec:
 def test_old_hash_of():
     assert old_hash_of("P_2015_GO_af076ca3") == "af076ca3"
     assert old_hash_of("P_2024_NDRC_718") == "718"
+    assert old_hash_of("P_2024_SC_12_a") == "12_a"   # 多段:num+碰撞后缀不丢
+
+
+def test_region_specific_name_placeholder_code_not_overwritten():
+    # 区级名具体但 code 占位 000000 -> 不算破损,不被域名级(市)降级覆盖
+    reg = {"www.shanghai.gov.cn": _entry(domain="www.shanghai.gov.cn", issuer_short="SH",
+            issuer_canonical="上海市人民政府",
+            region={"level": "市", "code": "310000", "name": "上海市"})}
+    rec = FakeRec("P_2024_SH_41", "上海市崇明区关于充电的通知",
+                  "https://www.shanghai.gov.cn/x.html", date="2024-05-01",
+                  raw_fm={"region": {"level": "区", "code": "000000", "name": "上海市崇明区"}},
+                  issuer=["上海市崇明区人民政府"])
+    ri = resolve_identity(rec, reg, body_tail="2024年5月1日", existing_ids=set())
+    assert "region" not in ri.fields
 
 
 def test_resolve_clean_city_writes_region_issuer_id(tmp_path):
