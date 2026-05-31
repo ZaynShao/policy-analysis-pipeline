@@ -37,3 +37,40 @@ def move_duplicate(policies_dir: str, pid: str, keep_pid: str,
     dst.write_text(f"---\n{new_fm}---\n\n{body.lstrip(chr(10))}\n", encoding="utf-8")
     src.unlink()
     return str(dst)
+
+
+def remint_id(policies_dir: str, pid: str, new_id: str,
+              true_issuer: str, true_region: str,
+              fixed_at: str, date_fix: str | None = None) -> str:
+    """就地重算 id/issuer/region(SCHEMA §C deterministic 身份字段),不移文件不改名。
+    旧 id 入 aliases(保 Obsidian 反链),issuer_canonical 不动。"""
+    src = Path(_pid_to_path(policies_dir)[pid])
+    text = src.read_text(encoding="utf-8")
+    m = _FM_RE.search(text)
+    if not m:
+        raise ValueError(f"{src} 无 frontmatter(--- 块),无法 remint")
+    fm = yaml.safe_load(m.group(1)) or {}
+    body = m.group(2) or ""
+
+    old_id = fm.get("id")
+    aliases = fm.get("aliases") or []
+    if not isinstance(aliases, list):
+        aliases = [aliases]
+    if old_id and old_id not in aliases:
+        aliases.append(old_id)
+    fm["aliases"] = aliases
+
+    fm["id"] = new_id
+    fm["issuer"] = [true_issuer]
+    fm["region"] = true_region
+    fm["id_fixed_at"] = fixed_at
+    fm["id_fixed_method"] = "phase2_2b_llm_classify"
+    fm["id_fixed_from"] = old_id
+
+    if date_fix is not None:
+        fm["date_fixed_from"] = str(fm.get("date") or "")
+        fm["date"] = date_fix
+
+    new_fm = yaml.dump(fm, allow_unicode=True, sort_keys=False)
+    src.write_text(f"---\n{new_fm}---\n\n{body.lstrip(chr(10))}\n", encoding="utf-8")
+    return str(src)
