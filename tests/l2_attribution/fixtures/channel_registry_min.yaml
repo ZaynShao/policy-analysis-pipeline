@@ -1,0 +1,8 @@
+- domain: www.jinan.gov.cn
+  issuer_short: SD
+  issuer_canonical: 济南市人民政府
+  region: {level: 市, code: '370100', name: 济南市}
+- domain: www.ndrc.gov.cn
+  issuer_short: NDRC
+  issuer_canonical: 国家发展和改革委员会
+  region: {level: 国家, code: '000000', name: 全国}
