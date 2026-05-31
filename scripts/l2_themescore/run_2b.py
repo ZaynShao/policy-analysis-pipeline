@@ -1,0 +1,105 @@
+import argparse, json
+from pathlib import Path
+from scripts.l1_audit.corpus import load_policies
+from scripts.common.llm import LLMClient
+from .theme_registry import ThemeRegistry
+from .models import BusinessViewDraft, Scores, QueueRecord
+from . import scoring, program_gate, prompts
+from .generator import gen_pass1, gen_pass2
+from .judge import judge_draft
+from .business_view_writer import write_business_view
+from .review_queue import write_queue
+from . import report
+
+DEFAULT_VAULT = str(Path.home() / "Documents" / "Zayn Main" / "政策分析")
+DEFAULT_SCORING = "_meta/framework/scoring.yaml"
+
+def _scoring_text(vault) -> str:
+    return Path(f"{vault}/{DEFAULT_SCORING}").read_text(encoding="utf-8")
+
+def plan(vault, registry_path, scoring_text, gen_client, judge_client, gen_pass2_client=None):
+    gen_pass2_client = gen_pass2_client or gen_client
+    reg = ThemeRegistry.load(registry_path)
+    recs = load_policies(f"{vault}/0_raw/policies")
+    p1_sys = prompts.pass1_system(reg, scoring_text)
+    p2_sys = prompts.pass2_system()
+    to_write, queue = [], []
+    for rec in recs:
+        try:
+            o1 = gen_pass1(gen_client, p1_sys, prompts.pass1_user(rec))
+            draft = BusinessViewDraft(
+                pid=rec.pid, themes=o1.get("themes", []), primary_theme=o1.get("primary_theme",""),
+                scores=Scores.from_dict(o1["scores"]))
+        except Exception as e:
+            queue.append(QueueRecord(pid=rec.pid, stage="generation_error", reason=str(e)[:200]))
+            continue
+        draft.importance = scoring.importance(draft.scores)
+        draft.action_class = scoring.action_class(draft.scores)
+        draft.value_tags = scoring.value_tags(draft.importance, draft.themes)
+        region_level = (rec.raw_fm.get("region") or {}).get("level", "")
+        draft.gate_passed_deep = scoring.gate_passed_deep(draft.importance, region_level)
+        if draft.gate_passed_deep:
+            try:
+                o2 = gen_pass2(gen_pass2_client, p2_sys, prompts.pass2_user(rec, draft))
+                draft.影响分析 = o2.get("影响分析"); draft.行动建议 = o2.get("行动建议", [])
+                draft.didi_impact_one_liner = o2.get("didi_impact_one_liner")
+            except Exception as e:
+                queue.append(QueueRecord(pid=rec.pid, stage="generation_error", reason=f"pass2:{e}"[:200]))
+                continue
+        viol = program_gate.check_draft(draft, reg.ids)
+        if viol:
+            queue.append(QueueRecord(pid=rec.pid, stage="program_gate", reason="; ".join(viol)))
+            continue
+        v = judge_draft(judge_client, rec.title, rec.body_head, draft)
+        if v.verdict != "accept":
+            queue.append(QueueRecord(pid=rec.pid, stage="judge_reject", reason=v.reason,
+                                     detail={"dim": v.dim, "confidence": v.confidence}))
+            continue
+        to_write.append((rec, draft))
+    return to_write, queue
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("mode", choices=["dry-run", "apply", "verify"])
+    ap.add_argument("--vault", default=DEFAULT_VAULT)
+    ap.add_argument("--state", default="state/node2b")
+    ap.add_argument("--gen-model", required=True)
+    ap.add_argument("--judge-model", required=True)
+    args = ap.parse_args()
+    assert args.gen_model != args.judge_model, "judge 模型必须 ≠ generator 模型"
+
+    reg_path = f"{args.vault}/_meta/themes_registry.yaml"
+    sc_text = _scoring_text(args.vault)
+    gen_client = LLMClient(model=args.gen_model, log_path=f"{args.state}/gen_calls.jsonl")
+    judge_client = LLMClient(model=args.judge_model, log_path=f"{args.state}/judge_calls.jsonl")
+
+    to_write, queue = plan(args.vault, reg_path, sc_text, gen_client, judge_client)
+    drafts = [d for _, d in to_write]
+    warns = program_gate.check_distribution(drafts, len(ThemeRegistry.load(reg_path).ids))
+
+    if args.mode == "dry-run":
+        Path(f"{args.state}/proposed_changes").mkdir(parents=True, exist_ok=True)
+        with open(f"{args.state}/proposed_changes/drafts.jsonl", "w", encoding="utf-8") as f:
+            for rec, d in to_write:
+                f.write(json.dumps({"pid": d.pid, "themes": d.themes, "primary": d.primary_theme,
+                                    "重要性": d.importance, "gate": d.gate_passed_deep},
+                                   ensure_ascii=False) + "\n")
+        write_queue(queue, f"{args.state}/review_queue/queue.jsonl")
+        report.render(drafts, queue, warns, None, f"{args.state}/reports/dryrun.html")
+        print(f"dry-run: 待写 {len(to_write)} · 入队 {len(queue)} · 告警 {len(warns)}")
+
+    elif args.mode == "apply":
+        from datetime import date
+        today = date.today().isoformat()
+        for rec, d in to_write:
+            write_business_view(d, args.vault, sanitized_from=rec.path,
+                                extracted_at=today, extracted_model=args.gen_model)
+        write_queue(queue, f"{args.state}/review_queue/queue.jsonl")
+        print(f"apply: 写 business_view {len(to_write)} 篇 · 入队 {len(queue)}")
+
+    elif args.mode == "verify":
+        again_write, again_queue = plan(args.vault, reg_path, sc_text, gen_client, judge_client)
+        print(f"verify: 二跑 待写 {len(again_write)} · 入队 {len(again_queue)}（应与 apply 前一致）")
+
+if __name__ == "__main__":
+    main()
