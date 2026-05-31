@@ -6,7 +6,7 @@ import re
 import json
 from pathlib import Path
 import yaml
-from scripts.l2_attribution.refdata import PROVINCE, MINISTRY, CITY_PROVINCE
+from scripts.l2_attribution.refdata import PROVINCE, MINISTRY, CITY_PROVINCE, PROVINCE_PINYIN, MINISTRY_LABEL, CITY_PINYIN
 from scripts.l2_attribution.channel_registry import host_of
 from scripts.l1_audit.corpus import load_policies
 
@@ -64,6 +64,34 @@ def derive_entry(domain: str, channel_name: str):
     return None
 
 
+def _last_label(host: str) -> str:
+    core = host[:-len(".gov.cn")] if host.endswith(".gov.cn") else host
+    segs = [s for s in core.split(".") if s]
+    return segs[-1] if segs else ""
+
+
+def derive_from_domain(host: str):
+    """域名拼音 -> entry dict;定不了返回 None。"""
+    key = _last_label(host)
+    if key in MINISTRY_LABEL:
+        short, canon = MINISTRY_LABEL[key]
+        return {"domain": host, "issuer_short": short, "issuer_canonical": canon,
+                "region": {"level": "国家", "code": "000000", "name": "全国"}}
+    if key in PROVINCE_PINYIN:
+        prov = PROVINCE_PINYIN[key]
+        p = PROVINCE[prov]
+        muni = prov in ("北京市", "天津市", "上海市", "重庆市")
+        return {"domain": host, "issuer_short": p["issuer_short"], "issuer_canonical": prov,
+                "region": {"level": ("市" if muni else "省"), "code": p["code2"] + "0000", "name": prov}}
+    if key in CITY_PINYIN:
+        city = CITY_PINYIN[key]
+        prov = CITY_PROVINCE[city]
+        p = PROVINCE[prov]
+        return {"domain": host, "issuer_short": p["issuer_short"], "issuer_canonical": city,
+                "region": {"level": "市", "code": p["code2"] + "0000", "name": city, "needs_city_code": True}}
+    return None
+
+
 def seed(channel_md_path: str, policies_dir: str, out_yaml: str, needs_manual_path: str):
     md = Path(channel_md_path).read_text(encoding="utf-8")
     md_pairs = dict(parse_channel_md(md))
@@ -76,6 +104,8 @@ def seed(channel_md_path: str, policies_dir: str, out_yaml: str, needs_manual_pa
     entries, needs_manual = [], []
     for dom, sample_path in sorted(domains.items()):
         e = derive_entry(dom, md_pairs.get(dom, ""))
+        if e is None:
+            e = derive_from_domain(dom)
         if e:
             entries.append(e)
         else:
