@@ -1,3 +1,4 @@
+import yaml
 from scripts.common.llm import LLMClient
 from scripts.l2_themescore.run_2b import plan
 
@@ -56,3 +57,21 @@ def test_plan_judge_reject_goes_to_queue(tmp_path):
     to_write, queue = plan(vault, reg, scoring_text="(略)", gen_client=gen_client, judge_client=judge_client)
     assert len(to_write) == 0 and len(queue) == 1
     assert queue[0].stage == "judge_reject"
+
+
+def test_verify_artifacts_catches_tampered(tmp_path):
+    from scripts.l2_themescore.run_2b import verify_artifacts
+    bv = tmp_path/"_meta"/"business_view"; bv.mkdir(parents=True)
+    reg = tmp_path/"themes_registry.yaml"; reg.write_text(REG, encoding="utf-8")
+    (bv/"P_OK.yaml").write_text(yaml.dump({
+        "pid":"P_OK","themes":["power_market"],"primary_theme":"power_market",
+        "scores":{"D1":5,"D2":4,"D3":4,"D4":4,"D5":4,"D6":5},"重要性":4,"行动分类":"A",
+        "价值标签":["机会"],"影响分析":{"加油":"a","充电":"b","电力_储能_V2G_交易":"c"},
+        "行动建议":["A 趁早:x"],"gate_passed_deep":True}, allow_unicode=True), encoding="utf-8")
+    (bv/"P_BAD.yaml").write_text(yaml.dump({
+        "pid":"P_BAD","themes":["power_market"],"primary_theme":"power_market",
+        "scores":{"D1":5,"D2":4,"D3":4,"D4":4,"D5":4,"D6":5},"重要性":1,"行动分类":"A",
+        "价值标签":["机会"],"gate_passed_deep":False}, allow_unicode=True), encoding="utf-8")
+    failures = verify_artifacts(str(tmp_path), str(reg))
+    bad = [pid for pid, _ in failures]
+    assert "P_BAD" in bad and "P_OK" not in bad

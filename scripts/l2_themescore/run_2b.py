@@ -58,6 +58,33 @@ def plan(vault, registry_path, scoring_text, gen_client, judge_client, gen_pass2
         to_write.append((rec, draft))
     return to_write, queue
 
+def verify_artifacts(vault, registry_path) -> list:
+    """重跑确定性层(scoring+program_gate)against 已写 business_view,断言仍自洽。不调 LLM。
+    返回 list[(pid, violations)];空=全过。"""
+    import yaml as _yaml
+    reg = ThemeRegistry.load(registry_path)
+    bv_dir = Path(vault) / "_meta" / "business_view"
+    failures = []
+    for p in sorted(bv_dir.glob("*.yaml")):
+        doc = _yaml.safe_load(p.read_text(encoding="utf-8")) or {}
+        draft = BusinessViewDraft(
+            pid=doc.get("pid", p.stem),
+            themes=doc.get("themes", []),
+            primary_theme=doc.get("primary_theme", ""),
+            scores=Scores.from_dict(doc["scores"]),
+            importance=doc.get("重要性"),
+            action_class=doc.get("行动分类"),
+            value_tags=doc.get("价值标签", []),
+            gate_passed_deep=bool(doc.get("gate_passed_deep", False)),
+            影响分析=doc.get("影响分析"),
+            行动建议=doc.get("行动建议", []),
+        )
+        viol = program_gate.check_draft(draft, reg.ids)
+        if viol:
+            failures.append((draft.pid, viol))
+    return failures
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("mode", choices=["dry-run", "apply", "verify"])
@@ -92,14 +119,22 @@ def main():
         from datetime import date
         today = date.today().isoformat()
         for rec, d in to_write:
-            write_business_view(d, args.vault, sanitized_from=rec.path,
+            write_business_view(d, args.vault, sanitized_from="0_raw/policies/" + Path(rec.path).name,
                                 extracted_at=today, extracted_model=args.gen_model)
         write_queue(queue, f"{args.state}/review_queue/queue.jsonl")
+        report.render(drafts, queue, warns, None, f"{args.state}/reports/apply.html")
+        for w in warns:
+            print("WARN:", w)
         print(f"apply: 写 business_view {len(to_write)} 篇 · 入队 {len(queue)}")
 
     elif args.mode == "verify":
-        again_write, again_queue = plan(args.vault, reg_path, sc_text, gen_client, judge_client)
-        print(f"verify: 二跑 待写 {len(again_write)} · 入队 {len(again_queue)}（应与 apply 前一致）")
+        failures = verify_artifacts(args.vault, reg_path)
+        if failures:
+            for pid, viol in failures[:20]:
+                print(f"VERIFY FAIL {pid}: {'; '.join(viol)}")
+            raise SystemExit(f"verify: {len(failures)} 篇 business_view 不过确定性门")
+        n = len(list((Path(args.vault) / '_meta' / 'business_view').glob('*.yaml')))
+        print(f"verify: {n} 篇 business_view 全部通过确定性重算门(自洽)")
 
 if __name__ == "__main__":
     main()

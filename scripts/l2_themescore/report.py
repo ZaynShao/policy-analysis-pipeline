@@ -1,3 +1,4 @@
+import html
 from pathlib import Path
 from collections import Counter
 
@@ -5,12 +6,12 @@ def render(drafts, queue, distribution_warns, golden_score, out_path: str) -> st
     theme_count = Counter(t for d in drafts for t in (d.themes or []))
     imp_dist = Counter(d.importance for d in drafts)
     gated = sum(1 for d in drafts if d.gate_passed_deep)
-    theme_rows = "".join(f"<tr><td>{t}</td><td>{c}</td></tr>"
+    theme_rows = "".join(f"<tr><td>{html.escape(str(t))}</td><td>{c}</td></tr>"
                          for t, c in theme_count.most_common())
     imp_rows = "".join(f"<tr><td>重要性 {k}</td><td>{imp_dist[k]}</td></tr>"
                        for k in sorted(imp_dist, reverse=True))
-    warn_html = "".join(f"<li>{w}</li>" for w in distribution_warns) or "<li>无</li>"
-    q_html = "".join(f"<tr><td>{r.pid}</td><td>{r.stage}</td><td>{r.reason}</td></tr>"
+    warn_html = "".join(f"<li>{html.escape(str(w))}</li>" for w in distribution_warns) or "<li>无</li>"
+    q_html = "".join(f"<tr><td>{html.escape(str(r.pid))}</td><td>{html.escape(str(r.stage))}</td><td>{html.escape(str(r.reason))}</td></tr>"
                      for r in queue)
     gs = golden_score or {}
     html = f"""<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8">

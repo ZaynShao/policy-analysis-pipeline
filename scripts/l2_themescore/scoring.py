@@ -19,7 +19,8 @@ def gate_passed_deep(importance_val: int, region_level: str) -> bool:
     return importance_val >= 3 or region_level in ("国家", "省")
 
 _OPPORTUNITY_THEMES = {"power_market","vpp_theme","v2g","green_power_trading_theme",
-                       "energy_storage_theme","aggregator_access","distribution_grid_opening"}
+                       "energy_storage_theme","aggregator_access","distribution_grid_opening",
+                       "equipment_renewal_theme"}
 _COMPLIANCE_THEMES  = {"petroleum_retail_compliance","carbon_market_theme"}
 _MOAT_THEMES        = {"residential_charging","charging_infra","gas_station_transition_theme"}
 

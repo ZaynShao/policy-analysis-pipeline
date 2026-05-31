@@ -17,7 +17,7 @@ def _complete_json(client, system, user, max_tokens=1024) -> dict:
         return parse_json_block(txt)
 
 def gen_pass1(client, system: str, user: str) -> dict:
-    return _complete_json(client, system, user, max_tokens=512)
+    return _complete_json(client, system, user, max_tokens=896)
 
 def gen_pass2(client, system: str, user: str) -> dict:
     return _complete_json(client, system, user, max_tokens=1024)
