@@ -59,5 +59,17 @@
 
 **触发条件**:② 确定性身份字段修正子步。
 
+## B5 · 词表(registry)4 处小不自洽 — 推后到 ②(theme 匹配设计时定)
+
+**是什么**:子项 b 的 lint(`scripts/l1_audit/vocab_check.py`)扫 themes_registry + entities/registry,registry 95% 自洽,余 4 处是 **theme 分类法判断**,交 ② 定:
+1. **2 处真 alias 冲突(同词→2 个 theme)**:`负荷聚合`→{aggregator_access, vpp_theme};`成品油零售`→{gas_station_transition_theme, petroleum_retail_compliance}。需定哪个 theme 拥有该词。
+2. **3 个 theme 的 entity 未标 type=theme**:charging_infra / power_market / v2g(entity 存在但 type 只有 concept)。按 registry 自己的规则应补 theme 类型。
+3. **1 个反向**:`rural_revitalization_theme`(type=theme entity)不在 themes_registry。需定乡村是否为分析 theme(背景文件说乡村=关注方向非业务线)。
+- 结构性重叠(虚拟电厂/新型储能/设备更新 = concept+其theme 共享词)**非冲突**,lint 已正确排除。
+
+**为什么推后**:都是 theme 分类法决策,② 建主题匹配时一并定最自然,现在孤立改 shared 词表是过早判断。报告:`state/source_ready/vocab_check.md`。
+
+**触发条件**:②归属 建 theme 匹配时。
+
 ---
-_登记于 2026-05-30。新增推后项往下追加,不删旧项;做掉的标 ✅ done 并注日期。B2–B4 登记于 2026-05-31。_
+_登记于 2026-05-30。新增推后项往下追加,不删旧项;做掉的标 ✅ done 并注日期。B2–B5 登记于 2026-05-31。_
