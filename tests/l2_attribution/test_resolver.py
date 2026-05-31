@@ -11,9 +11,12 @@ def _entry(**kw):
 
 
 class FakeRec:
-    def __init__(self, pid, title, url, date="", official_number="", path="/tmp/x.md"):
+    def __init__(self, pid, title, url, date="", official_number="", path="/tmp/x.md",
+                 raw_fm=None, issuer=None):
         self.pid, self.title, self.url = pid, title, url
         self.date, self.official_number, self.path = date, official_number, path
+        self.raw_fm = raw_fm or {}
+        self.issuer = issuer
 
 
 def test_old_hash_of():
@@ -67,10 +70,13 @@ def test_resolve_id_collision_suffix():
 
 
 def test_resolve_already_correct_id_is_noop():
-    # pid 已是正确 P_<year>_SD_<hash>,且 existing_ids 含它自己 -> 不应重写 id
+    # pid 已是正确 P_<year>_SD_<hash>,region/issuer/date 均已正确 -> id 不动
     reg = {"www.jinan.gov.cn": _entry()}
     rec = FakeRec("P_2016_SD_af076ca3", "济南市人民政府办公厅关于X的通知",
-                  "https://www.jinan.gov.cn/x.html")
+                  "https://www.jinan.gov.cn/x.html",
+                  date="2016-03-17",
+                  raw_fm={"region": {"level": "市", "code": "370100", "name": "济南市"}},
+                  issuer=["济南市人民政府办公厅"])
     ri = resolve_identity(rec, reg, body_tail="2016年3月17日",
                           existing_ids={"P_2016_SD_af076ca3"})
     assert "id" not in ri.fields
@@ -98,3 +104,53 @@ def test_resolve_title_without_issuer_skips_issuer_silently():
     ri = resolve_identity(rec, reg, body_tail="2016年3月17日", existing_ids=set())
     assert "issuer" not in ri.fields
     assert not any(c.field == "issuer" for c in ri.conflicts)
+
+
+def test_valid_specific_region_not_overwritten():
+    # 已有有效更精确 region(区级)-> 不被域名级(市)覆盖
+    reg = {"www.beijing.gov.cn": _entry(domain="www.beijing.gov.cn", issuer_short="BJ",
+            issuer_canonical="北京市人民政府",
+            region={"level":"市","code":"110000","name":"北京市"})}
+    rec = FakeRec("P_2024_BJ_abc12345", "北京市朝阳区关于充电设施的通知",
+                  "https://www.beijing.gov.cn/x.html", date="2024-05-01",
+                  raw_fm={"region":{"level":"区","code":"110105","name":"北京市朝阳区"}},
+                  issuer=["北京市朝阳区人民政府"])
+    ri = resolve_identity(rec, reg, body_tail="2024年5月1日", existing_ids=set())
+    assert "region" not in ri.fields            # 不覆盖有效精确 region
+    assert "id" not in ri.fields                # 前缀 BJ 好、date 合理 -> id 不动
+    assert "issuer" not in ri.fields            # issuer 已是真机关名 -> 不动
+
+
+def test_national_mirror_does_not_overwrite_valid_local_region():
+    # 政策挂国家级门户镜像(域名->national),但本体是天津 -> 不可降级为全国
+    reg = {"www.gov.cn": _entry(domain="www.gov.cn", issuer_short="GWY",
+            issuer_canonical="国务院",
+            region={"level":"国家","code":"000000","name":"全国"})}
+    rec = FakeRec("P_2024_TJ_01010970", "天津市关于新能源的通知",
+                  "https://www.gov.cn/x.html", date="2024-03-01",
+                  raw_fm={"region":{"level":"省","code":"120000","name":"天津市"}},
+                  issuer=["天津市人民政府"])
+    ri = resolve_identity(rec, reg, body_tail="2024年3月1日", existing_ids=set())
+    assert "region" not in ri.fields            # 有效 local 不被 national 覆盖
+
+
+def test_broken_region_still_fixed():
+    reg = {"www.jinan.gov.cn": _entry()}
+    rec = FakeRec("P_2015_GO_af076ca3", "济南市人民政府办公厅关于X的通知",
+                  "https://www.jinan.gov.cn/x.html", date="2016-03-17",
+                  raw_fm={"region":{"level":"国家","code":"000000","name":"未知"}},
+                  issuer=["政府门户.www.jinan.gov.cn"])
+    ri = resolve_identity(rec, reg, body_tail="2016年3月17日", existing_ids=set())
+    assert ri.fields["region"].value["name"] == "济南市"   # 破损 -> 修
+    assert ri.fields["issuer"].value == ["济南市人民政府办公厅"]  # 垃圾 -> 修
+    assert ri.fields["id"].value == "P_2016_SD_af076ca3"   # GO -> 修
+
+
+def test_valid_date_not_overwritten():
+    reg = {"www.jinan.gov.cn": _entry()}
+    rec = FakeRec("P_2024_SD_x", "济南市人民政府办公厅关于X的通知",
+                  "https://www.jinan.gov.cn/x.html", date="2024-05-01",
+                  raw_fm={"region":{"level":"市","code":"370100","name":"济南市"}},
+                  issuer=["济南市人民政府办公厅"])
+    ri = resolve_identity(rec, reg, body_tail="落款 2016年3月17日", existing_ids=set())
+    assert "date" not in ri.fields              # 合理 date 不被落款覆盖

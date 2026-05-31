@@ -38,10 +38,11 @@ def _setup(tmp_path):
 
 
 def test_plan_clean_doc_goes_to_apply(tmp_path):
+    # date '2015-01-01' は well-formed → broken-fixer keeps it; id year comes from frontmatter
     pol, reg, led = _setup(tmp_path)
     to_apply, queue = plan(pol, reg, led)
     assert len(to_apply) == 1
-    assert to_apply[0].fields["id"].value == "P_2016_SD_af076ca3"
+    assert to_apply[0].fields["id"].value == "P_2015_SD_af076ca3"
     assert queue == []
 
 

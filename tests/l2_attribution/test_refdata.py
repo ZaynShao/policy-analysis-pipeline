@@ -22,3 +22,10 @@ def test_ministry_map_ndrc():
 def test_city_province_lookup():
     assert CITY_PROVINCE["济南市"] == "山东省"
     assert CITY_PROVINCE["苏州市"] == "江苏省"
+
+
+def test_gz_is_guangzhou_not_guizhou():
+    from scripts.l2_attribution.refdata import PROVINCE_PINYIN, CITY_PINYIN, CITY_PROVINCE
+    assert "gz" not in PROVINCE_PINYIN
+    assert CITY_PINYIN["gz"] == "广州市"
+    assert CITY_PROVINCE["广州市"] == "广东省"
