@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>②-B 归属挂载 · 实施计划</title>
+<style>
+  :root{--bg:#0f1115;--card:#171a21;--card2:#1d212b;--ink:#e6e9ef;--dim:#9aa3b2;--line:#2a2f3a;
+    --red:#ff6b6b;--amber:#ffb454;--green:#5fd28b;--blue:#6ab7ff;--purple:#b794f6}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.65 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;padding:0 0 90px}
+  .wrap{max-width:1020px;margin:0 auto;padding:0 24px}
+  header{padding:38px 0 22px;border-bottom:1px solid var(--line)}
+  h1{font-size:25px;margin:0 0 8px}
+  .meta{color:var(--dim);font-size:13px;line-height:1.9}
+  .meta b{color:var(--ink)}
+  h2{font-size:18px;margin:34px 0 12px;padding-left:11px;border-left:3px solid var(--blue);scroll-margin-top:14px}
+  code{background:#0a0c10;border:1px solid var(--line);border-radius:4px;padding:1px 6px;
+    font:12.5px/1.4 "SF Mono",Menlo,Consolas,monospace;color:#cdd6e4}
+  pre{background:#0a0c10;border:1px solid var(--line);border-radius:9px;padding:14px 16px;overflow-x:auto;
+    font:12px/1.55 "SF Mono",Menlo,Consolas,monospace;color:#cdd6e4;margin:10px 0}
+  pre .c{color:#6b7280}.k{color:var(--blue)}.g{color:var(--green)}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
+  th,td{text-align:left;padding:8px 11px;vertical-align:top;border-bottom:1px solid var(--line)}
+  th{color:var(--dim);font-size:12px;text-transform:uppercase;letter-spacing:.4px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin:11px 0}
+  .card h3{margin:0 0 6px;font-size:15px;color:var(--blue)}
+  .card .files{font-size:12px;color:var(--dim);margin:4px 0 8px}
+  .card .files code{font-size:11.5px}
+  .steps{font-size:13px;color:var(--ink);margin:6px 0 0;padding-left:18px}
+  .steps li{margin:3px 0}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;margin-left:8px}
+  .p-code{background:rgba(106,183,255,.14);color:var(--blue);border:1px solid rgba(106,183,255,.4)}
+  .p-data{background:rgba(183,148,246,.14);color:var(--purple);border:1px solid rgba(183,148,246,.4)}
+  .p-stop{background:rgba(255,107,107,.16);color:var(--red);border:1px solid rgba(255,107,107,.5)}
+  .stopcard{border-color:rgba(255,107,107,.4);background:rgba(255,107,107,.05)}
+  .toc{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:12px 18px;margin:16px 0;
+    columns:2;column-gap:28px;font-size:12.5px}
+  .toc a{color:var(--blue);text-decoration:none;display:block;padding:2px 0}
+  @media(max-width:680px){.toc{columns:1}}
+  .tree{font:12px/1.6 "SF Mono",Menlo,monospace;color:#cdd6e4;background:var(--card2);
+    border:1px solid var(--line);border-radius:9px;padding:14px 16px;white-space:pre;overflow-x:auto}
+  .note{background:rgba(255,180,84,.08);border:1px solid rgba(255,180,84,.4);border-radius:9px;padding:12px 16px;margin:12px 0;font-size:13.5px}
+  .ok{background:rgba(95,210,139,.07);border:1px solid rgba(95,210,139,.3);border-radius:9px;padding:12px 16px;margin:12px 0;font-size:13.5px}
+  .foot{color:var(--dim);font-size:12px;margin-top:40px;border-top:1px solid var(--line);padding-top:16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>②-B 归属挂载(theme + 重要性打分)· 实施计划</h1>
+  <div class="meta">
+    <b>Goal</b> 935 篇政策每篇挂 theme(s)+主theme、打六维分,过门篇加 3-key 影响分析,整文件重生 <code>business_view/{pid}.yaml</code>(派生层,绝不碰 raw)<br>
+    <b>架构</b> generator(模型A,temp0)两遍 → 脚本确定性算重要性/门 → 程序门 + 模型B judge 双层验收 → 写出。judge 先用冻结 golden 校准达标才上岗<br>
+    <b>15 个任务</b>:Task 1–10 纯代码 TDD · Task 11–12 数据/doc · Task 13–15 含 ⛔ 人工 STOP 门<br>
+    <span class="meta"><b>spec</b> 2026-06-01-node2b-theme-scoring-design · <b>canonical .md</b> 同名 plan .md</span>
+  </div>
+</header>
+
+<div class="toc">
+  <a href="#reuse">复用基线(探明的真实签名)</a>
+  <a href="#tree">文件结构</a>
+  <a href="#overview">任务总览表</a>
+  <a href="#tasks">任务详情(1–15)</a>
+  <a href="#review">Self-Review(对照 spec)</a>
+  <a href="#handoff">执行方式选择</a>
+</div>
+
+<h2 id="reuse">复用基线 — 探明的真实签名</h2>
+<table>
+  <tr><th>复用</th><th>真实接口</th></tr>
+  <tr><td>LLM</td><td><code>scripts/common/llm.py::LLMClient.complete(system,user,max_tokens)→str</code>;temp=0 硬编码;<b>无 JSON 模式→自己解析+重试</b>;env ANTHROPIC_API_KEY/BASE_URL</td></tr>
+  <tr><td>语料</td><td><code>scripts/l1_audit/corpus.py::load_policies(dir)→list[PolicyRecord]</code>;字段 pid/title/issuer/body_head(前2000字)/raw_fm;<b>region 在 raw_fm["region"]</b></td></tr>
+  <tr><td>CLI 模式</td><td><code>run_2a.py</code> argparse <code>mode∈{dry-run,apply,verify}</code> + <code>--vault/--state</code>;plan()→(to_write,queue)</td></tr>
+  <tr><td>报告/队列</td><td>report 纯 f-string HTML;write_queue 一条一行 JSONL</td></tr>
+  <tr><td>测试</td><td>pytest;<code>_FakeAnthropic</code> 喂 canned JSON(test_llm.py 有范例)</td></tr>
+  <tr><td>business_view 写出</td><td><b>当前无任何写它的代码(net-new)</b>;须过 <code>validate_schema.check_business_view</code></td></tr>
+</table>
+
+<h2 id="tree">文件结构</h2>
+<div class="tree">scripts/l2_themescore/
+  models.py · theme_registry.py · scoring.py · prompts.py · generator.py
+  judge.py · golden.py · program_gate.py · business_view_writer.py
+  review_queue.py · report.py · run_2b.py
+tests/l2_themescore/  (每模块一个 test_*.py)
+state/node2b/golden/golden_v1.jsonl · proposed_changes/ · review_queue/ · reports/</div>
+
+<h2 id="overview">任务总览</h2>
+<table>
+  <tr><th>#</th><th>任务</th><th>产出</th><th>类型</th></tr>
+  <tr><td>1</td><td>models</td><td>Scores/BusinessViewDraft/JudgeVerdict/QueueRecord/GoldenRecord</td><td><span class="pill p-code">代码</span></td></tr>
+  <tr><td>2</td><td>theme_registry</td><td>加载13主题词表 + <b>alias 可跨theme</b>(§9.1)</td><td><span class="pill p-code">代码</span></td></tr>
+  <tr><td>3</td><td>scoring</td><td>重要性/行动分类/门/价值标签(确定性纯函数)</td><td><span class="pill p-code">代码</span></td></tr>
+  <tr><td>4</td><td>program_gate</td><td>结构/公式/registry/影响键/深档/分布(纯函数)</td><td><span class="pill p-code">代码</span></td></tr>
+  <tr><td>5</td><td>prompts + generator</td><td>模型A 两遍 + JSON 解析重试</td><td><span class="pill p-code">代码</span></td></tr>
+  <tr><td>6</td><td>judge</td><td>模型B 语义验收</td><td><span class="pill p-code">代码</span></td></tr>
+  <tr><td>7</td><td>golden</td><td>答案键加载 + judge 召回/精度跑分</td><td><span class="pill p-code">代码</span></td></tr>
+  <tr><td>8</td><td>business_view_writer</td><td>整文件重生 yaml(§C 守卫不写raw)</td><td><span class="pill p-code">代码</span></td></tr>
+  <tr><td>9</td><td>review_queue + report</td><td>入队 + dry-run HTML</td><td><span class="pill p-code">代码</span></td></tr>
+  <tr><td>10</td><td>run_2b</td><td>编排 CLI(plan + dry-run/apply/verify,gen≠judge 断言)</td><td><span class="pill p-code">代码</span></td></tr>
+  <tr><td>11</td><td>B5 词表收口</td><td>共享alias / 补3个type=theme / 删rural</td><td><span class="pill p-data">数据</span></td></tr>
+  <tr><td>12</td><td>SCHEMA §4 校准</td><td>深档门 D1≥3→重要性≥3 OR国省级 + 加字段</td><td><span class="pill p-data">doc</span></td></tr>
+  <tr><td>13</td><td>golden 标注+校准</td><td>~50篇我标+埋错 → 用户抽查 → 冻结 → judge上岗</td><td><span class="pill p-stop">⛔ 人工</span></td></tr>
+  <tr><td>14</td><td>935 dry-run</td><td>跑全量 → 用户看分布批准</td><td><span class="pill p-stop">⛔ 人工</span></td></tr>
+  <tr><td>15</td><td>apply + verify</td><td>写 business_view + 幂等/schema/0乡村 验证</td><td><span class="pill p-stop">⛔ 人工</span></td></tr>
+</table>
+
+<h2 id="tasks">任务详情</h2>
+
+<div class="card"><h3>Task 1 · models <span class="pill p-code">代码</span></h3>
+<div class="files">Create: <code>scripts/l2_themescore/models.py</code> · Test: <code>test_models.py</code></div>
+纯 dataclass。<code>Scores</code>(D1-6 + to_dict/from_dict)、<code>BusinessViewDraft</code>(pid/themes/primary/scores/importance/action_class/value_tags/gate/影响分析/行动建议)、<code>JudgeVerdict</code>、<code>QueueRecord</code>、<code>GoldenRecord</code>。
+<ul class="steps"><li>写序列化往返测试 → 失败 → 实现 → 通过 → commit</li></ul></div>
+
+<div class="card"><h3>Task 2 · theme_registry <span class="pill p-code">代码</span></h3>
+<div class="files">Create: <code>theme_registry.py</code> · Test: <code>test_theme_registry.py</code></div>
+加载 13 主题。<b>关键(§9.1)</b>:<code>alias_index</code> 的值是 <b>list[id]</b>——一个词(如"负荷聚合")可映射多个 theme,语义 LLM 消歧。
+<pre><span class="c"># 测试断言</span>
+assert set(r.alias_index[<span class="g">"负荷聚合"</span>]) == {<span class="g">"vpp_theme"</span>,<span class="g">"aggregator_access"</span>}</pre></div>
+
+<div class="card"><h3>Task 3 · scoring <span class="pill p-code">代码</span></h3>
+<div class="files">Create: <code>scoring.py</code> · Test: <code>test_scoring.py</code></div>
+确定性纯函数,规则源 scoring.yaml。重要性公式 + 行动分类 2×2 + D6 修正 + 门。
+<pre><span class="k">def</span> importance(s): <span class="k">return</span> round(s.D1*.40 + s.D2*.40 + s.D3*.20)
+<span class="k">def</span> gate_passed_deep(imp, region_level):
+    <span class="k">return</span> imp >= 3 <span class="k">or</span> region_level <span class="k">in</span> (<span class="g">"国家"</span>,<span class="g">"省"</span>)</pre>
+<ul class="steps"><li>边界测试(公式取整 / 2×2 矩阵 / D6 前跳后降 / 门四象限) → 实现 → 通过 → commit</li></ul></div>
+
+<div class="card"><h3>Task 4 · program_gate <span class="pill p-code">代码</span></h3>
+<div class="files">Create: <code>program_gate.py</code> · Test: <code>test_program_gate.py</code></div>
+§7 程序门纯函数。结构 / 公式重算自洽 / <b>registry 正向白名单</b> / 影响分析键=恰好3键(任何 stray 键含历史遗留自动拒,不点名) / 深档⟺门 / 语料级分布(过挂·孤岛)。返回违规列表。</div>
+
+<div class="card"><h3>Task 5 · prompts + generator <span class="pill p-code">代码</span></h3>
+<div class="files">Create: <code>prompts.py</code> <code>generator.py</code> · Test: <code>test_generator.py</code></div>
+prompts 从 registry+scoring+framework 构建。generator 喂 title+body_head+issuer+region 要 JSON。<b>无 JSON 模式 → <code>parse_json_block</code> 去 markdown 围栏 + 失败重试1次</b>,仍失败抛(编排层入 generation_error)。
+<pre>pass1 → {<span class="g">"themes"</span>:[..],<span class="g">"primary_theme"</span>:..,<span class="g">"scores"</span>:{D1..D6}}
+pass2 → {<span class="g">"影响分析"</span>:{加油,充电,电力_储能_V2G_交易},<span class="g">"行动建议"</span>:[..]}  <span class="c"># 仅过门篇</span></pre></div>
+
+<div class="card"><h3>Task 6 · judge <span class="pill p-code">代码</span></h3>
+<div class="files">Create: <code>judge.py</code> · Test: <code>test_judge.py</code></div>
+模型B(≠A)。给政策+草稿,只挑语义错(theme漏/错挂、分不合理、影响分析幻觉/缺失),返回 <code>{verdict,dim,reason,confidence}</code>。默认严格:拿不准像错→reject。非JSON→reject(conf 0)。</div>
+
+<div class="card"><h3>Task 7 · golden <span class="pill p-code">代码</span></h3>
+<div class="files">Create: <code>golden.py</code> · Test: <code>test_golden.py</code></div>
+加载冻结答案键(jsonl)。<code>score_judge(rows)</code> 算<b>召回</b>(埋错被reject比例)与<b>精度</b>(reject中真埋错比例)。</div>
+
+<div class="card"><h3>Task 8 · business_view_writer <span class="pill p-code">代码</span></h3>
+<div class="files">Create: <code>business_view_writer.py</code> · Test: <code>test_business_view_writer.py</code></div>
+整文件重生 <code>{vault}/_meta/business_view/{pid}.yaml</code>,覆盖旧文件(清 ②-A 改id化石 + 历史残留)。<b>§C 守卫</b>:断言路径不含 0_raw;测试含 <code>test_never_writes_raw</code>(raw 一字未动)。过门篇才写影响分析/行动建议。</div>
+
+<div class="card"><h3>Task 9 · review_queue + report <span class="pill p-code">代码</span></h3>
+<div class="files">Create: <code>review_queue.py</code> <code>report.py</code> · Test: <code>test_review_queue.py</code></div>
+队列 JSONL(一条一行)。report 出 dry-run HTML:theme命中分布 / 重要性分布 / 过门数 / 分布告警 / 入队清单 / judge校准。</div>
+
+<div class="card"><h3>Task 10 · run_2b 编排 CLI <span class="pill p-code">代码</span></h3>
+<div class="files">Create: <code>run_2b.py</code> · Test: <code>test_run_2b.py</code>(全 fake LLM 集成)</div>
+<code>plan()</code>:每篇 gen_pass1→组draft→scoring→过门则gen_pass2→程序门→judge→分类(to_write/queue)。CLI 三模式;<code>--gen-model</code>/<code>--judge-model</code> 且断言 <b>gen≠judge</b>。
+<pre>python -m scripts.l2_themescore.run_2b dry-run --gen-model <span class="g">&lt;A&gt;</span> --judge-model <span class="g">&lt;B&gt;</span></pre></div>
+
+<div class="card"><h3>Task 11 · B5 词表收口 <span class="pill p-data">数据</span></h3>
+<div class="files">Modify: vault <code>_meta/themes_registry.yaml</code> / <code>entities/registry.yaml</code> · pipeline <code>vocab_check.py</code></div>
+vocab_check 改为允许共享 alias(不再当冲突);entities 补 charging_infra/power_market/v2g 的 type=theme;删 rural 的 theme 类型(乡村非theme,B9)。</div>
+
+<div class="card"><h3>Task 12 · SCHEMA §4 校准 <span class="pill p-data">doc</span></h3>
+<div class="files">Modify: vault <code>SCHEMA.md</code> §4</div>
+深档门 <code>D1≥3</code> → <code>重要性≥3 OR region.level∈{国家,省}</code>;加 themes/primary_theme/gate_passed_deep 字段定义 + 评审记录行。走 SCHEMA 修改流程(演进非补丁)。</div>
+
+<div class="card stopcard"><h3>Task 13 · golden 标注 + 校准 <span class="pill p-stop">⛔ 人工</span></h3>
+<div class="files">Create: <code>state/node2b/golden/golden_v1.jsonl</code> + <code>judge_calibration.html</code></div>
+①分层抽~50篇(13theme×层级×档位×过门覆盖) ②<b>我(Opus4.8)写 gold + 埋拟真错</b> ③<b>⛔ 用户抽查~10篇</b>(答案键人工兜底) ④冻结 commit ⑤跑 judge 校准出召回/精度 ⑥<b>⛔ 我裁决上岗阈值</b>(不达标→调judge提示词重跑)。</div>
+
+<div class="card stopcard"><h3>Task 14 · 935 dry-run <span class="pill p-stop">⛔ 人工</span></h3>
+跑全量 dry-run → 产 <code>dryrun.html</code> → <b>⛔ 用户审分布</b>(theme合理?孤岛?过门比例?入队错型?)→ 批准进 apply / 不批则调提示词整体重跑(零补丁)。</div>
+
+<div class="card stopcard"><h3>Task 15 · apply + verify <span class="pill p-stop">⛔ 人工</span></h3>
+apply 写 935 篇 business_view(整文件重生覆盖)→ verify:二跑幂等 + <code>validate_schema</code> 0违反 + <code>grep 乡村 = 0</code>(B9 收尾一次性验证)→ commit vault + tag。</div>
+
+<h2 id="review">Self-Review(对照 spec)</h2>
+<div class="ok">
+<b>✅ Spec 覆盖</b>:§1–§16 每节都能指到任务(§1守卫→Task8、§2三决策→Task2/3/5/7/13、§4模型→1/8、§5流程→10、§7门→4、§8judge→6/7/13、§9 B5→11、§10 SCHEMA→12、§12队列→9/10、§14纪律→8守卫、§15验收门→13/14/15 STOP、§16开放项→A/B模型为CLI参数+阈值Task13)。无遗漏。<br>
+<b>✅ Placeholder 扫描</b>:代码任务均给完整代码;Task11/12/13 为数据/人工,步骤是精确命令/编辑,非占位。<br>
+<b>✅ 类型一致</b>:5个 dataclass + 所有函数签名跨 Task 与 run_2b 调用一致。
+</div>
+<div class="note"><b>已知可调</b>:generator 只喂正文前2000字——对多数政策主旨够;若 Task14 dry-run 显示长文漏判,扩为读全文。</div>
+
+<h2 id="handoff">执行方式 — 待你选</h2>
+<table>
+<tr><th>方式</th><th>说明</th></tr>
+<tr><td><b>1 · Subagent-Driven(推荐)</b></td><td>每个任务派新 subagent 实现,我两段审查(spec符合→代码质量)后进下一个。Task 1–10 纯代码连跑最适合。</td></tr>
+<tr><td><b>2 · Inline 执行</b></td><td>本会话内批量执行 + 检查点。</td></tr>
+</table>
+<div class="note">建议:<b>Task 1–10(纯代码 TDD)走 subagent-driven 连跑</b>;<b>Task 11–15(数据/人工/STOP 门)回主会话由我 + 你逐个过</b>。另:Task 10/13/14/15 需要你提供的 <b>A/B 两个三方模型</b>(--gen-model / --judge-model),代码不依赖具体选型、是配置项,可边写边等。</div>
+
+<div class="foot">②-B 实施计划 · 2026-06-01 · canonical .md 含每步完整代码(给实现者);本 HTML 为复核总览(给你)。</div>
+
+</div>
+</body>
+</html>
