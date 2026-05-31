@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>源文档审计 · 八步采集法 + L2建设思路</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#171a21; --card2:#1d212b; --ink:#e6e9ef; --dim:#9aa3b2;
+    --line:#2a2f3a; --red:#ff6b6b; --amber:#ffb454; --green:#5fd28b; --blue:#6ab7ff;
+    --tox-hi:#ff6b6b; --tox-mid:#ffb454; --tox-lo:#9aa3b2; --keep:#5fd28b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.65 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased;padding:0 0 80px}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  header{padding:40px 0 24px;border-bottom:1px solid var(--line);margin-bottom:28px}
+  h1{font-size:26px;margin:0 0 6px;letter-spacing:.3px}
+  .sub{color:var(--dim);font-size:13px}
+  h2{font-size:19px;margin:38px 0 14px;padding-left:11px;border-left:3px solid var(--blue)}
+  h3{font-size:15px;margin:22px 0 8px;color:var(--blue)}
+  .verdict{background:linear-gradient(135deg,#221a1a,#1a1f2b);border:1px solid #3a2a2a;
+    border-radius:12px;padding:20px 22px;margin:8px 0 4px}
+  .verdict .big{font-size:17px;font-weight:600;line-height:1.55}
+  .verdict .small{color:var(--dim);font-size:13.5px;margin-top:10px}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;
+    vertical-align:middle;margin-right:7px;letter-spacing:.4px}
+  .p-hi{background:rgba(255,107,107,.16);color:var(--red);border:1px solid rgba(255,107,107,.4)}
+  .p-mid{background:rgba(255,180,84,.14);color:var(--amber);border:1px solid rgba(255,180,84,.4)}
+  .p-lo{background:rgba(154,163,178,.12);color:var(--dim);border:1px solid rgba(154,163,178,.3)}
+  .p-keep{background:rgba(95,210,139,.14);color:var(--green);border:1px solid rgba(95,210,139,.4)}
+  table{width:100%;border-collapse:collapse;margin:10px 0 6px;font-size:13.5px}
+  th,td{text-align:left;padding:10px 12px;vertical-align:top;border-bottom:1px solid var(--line)}
+  th{color:var(--dim);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+  tr td:first-child{white-space:nowrap}
+  code{background:#0a0c10;border:1px solid var(--line);border-radius:4px;padding:1px 6px;
+    font:12.5px/1.4 "SF Mono",Menlo,Consolas,monospace;color:#cdd6e4}
+  .ln{color:var(--amber);font-weight:600;white-space:nowrap}
+  .finding{background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:16px 18px;margin:12px 0}
+  .finding .ttl{font-weight:600;font-size:15px;margin-bottom:6px}
+  .finding .ev{color:var(--dim);font-size:12.5px;margin-top:8px}
+  .finding .impact{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:13.5px}
+  .impact b{color:var(--red)}
+  .keepbox{background:rgba(95,210,139,.06);border:1px solid rgba(95,210,139,.25)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:760px){.grid2{grid-template-columns:1fr}}
+  .map{font-size:13.5px;background:var(--card2);border-radius:10px;padding:14px 18px;border:1px solid var(--line)}
+  .map .row{display:flex;gap:10px;padding:5px 0;align-items:baseline}
+  .map .old{color:var(--dim);min-width:230px}
+  .map .arrow{color:var(--amber)}
+  .map .new{color:var(--green)}
+  .rec{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:4px 20px;margin-top:8px}
+  .rec ol{padding-left:20px}
+  .rec li{margin:14px 0}
+  .rec li b{color:var(--blue)}
+  .foot{color:var(--dim);font-size:12px;margin-top:40px;border-top:1px solid var(--line);padding-top:16px}
+  .tag{font-size:11px;color:var(--dim);border:1px solid var(--line);border-radius:4px;padding:1px 6px;margin-left:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>源文档审计 — 在 ②-B 开工前</h1>
+  <div class="sub">审计对象:<code>00 背景资料/策略-八步采集法.md</code>(843 行)· <code>00 背景资料/策略-L2建设思路.md</code>(256 行)<br>
+  视角:对抗式独立裁决,逐条钉行号 · 基准:四节点重构(源→归属→分析→消费)+ 三纪律(采集追加·整文件重生·定期GC)+ 零补丁 · 2026-05-31</div>
+</header>
+
+<div class="verdict">
+  <div class="big">裁决:两份都是<strong style="color:var(--amber)">重构前的化石</strong>。它们用的是旧的 Karpathy L1/L2/L3 分层模型、服务对象是<strong style="color:var(--red)">已退役的月报原型</strong>、通篇钉着 4 月的快照数字当现状,且——对我们最致命的——<strong style="color:var(--red)">把四个节点揉进了一条流水线</strong>。</div>
+  <div class="small">但毒性的解药是<strong style="color:var(--green)">"重新划界"而不是"重写"</strong>。现在重写这两份 = 掉进推倒重来的坑(你的元目标裁决 2026-05-30 已否过一次)。真正的保护是:把 ②-B 的权威输入<strong>显式钉死在框架文件上</strong>,并给这两份化石贴上"已过时/已被取代"标记——和月报原型 B9 同一套处理。下面是证据。</div>
+</div>
+
+<!-- ========================= 文档一 ========================= -->
+<h2>文档一 · 八步采集法 <span class="tag">这是 ①源采集 的 SOP</span></h2>
+<p style="color:var(--dim);font-size:13.5px;margin-top:-4px">
+本质问题:它叫"采集法",却把 ②归属 / ③分析 / ④消费 的逻辑全焊死在 8 步里。乡村去污染已生效(line 472 已是 3-key),但其余结构性问题如下。</p>
+
+<div class="finding">
+  <div class="ttl"><span class="pill p-hi">高毒</span>raw 不可改原则与 ②-A 的 §C <b>直接冲突</b></div>
+  <div>line 21 写死:"Raw 一旦入库,任何后续流程禁止修改其内容……发现 raw 不准确 → <b>重抓重入,不就地编辑</b>"。Step 6.5 又临时开了个 <code>related_policy</code> 写 raw 的口子(line 690–700),是 ad-hoc 例外清单。</div>
+  <div class="ev">证据:<span class="ln">line 21</span> / <span class="ln">line 690–700</span></div>
+  <div class="impact"><b>对 ②-B 的威胁:</b>②-A 已经按 SCHEMA §C v1.1 <i>就地把确定性身份重算写进了 raw</i>(148 篇,带嵌套 provenance 审计)。这份 SOP 的"绝不写 raw"是更旧、更粗的规则。若把它当权威,②-A 的合法写入会被误判成违规。<b>§C 已取代它,但文档没更新。</b></div>
+</div>
+
+<div class="finding">
+  <div class="ttl"><span class="pill p-hi">高毒</span>Step 5C 是 ②-B 唯一最像的"前身",但它<b>没有 theme、耦合采集、规则过时</b></div>
+  <div>Step 5C(line 448–557)用一次 LLM 调用产出 scores + 影响分析 + 行动建议,写 <code>business_view.yaml</code>——这正是 ②-B 要重建的东西。但:</div>
+  <table>
+    <tr><th>问题</th><th>行号</th><th>说明</th></tr>
+    <tr><td>无 theme 挂载</td><td><span class="ln">428 / 505</span></td><td>theme(business_tags)被明确<b>甩给"B1 任务"</b>,从未建过 → ②-B 在 theme 这块是<b>净新增</b>,不是重建</td></tr>
+    <tr><td>行动语言用"立即"</td><td><span class="ln">500</span></td><td><code>"A 立即:..."</code>——月报规范要求 sanitize 成"趁早";化石未改</td></tr>
+    <tr><td>打分深度门是 D1≥3</td><td><span class="ln">493 / 498</span></td><td>影响分析/行动建议只在 <code>D1≥3</code> 时写。这与 ②-B 待拍的"重要性≥3 或 国/省级"门<b>是两套口径</b>,要在 spec 里调和</td></tr>
+    <tr><td>采集×打分耦合</td><td><span class="ln">569 / 585–596</span></td><td>Step 6 评论"按分配额"靠 business_view 综合分触发 → 采集流程被打分绑架</td></tr>
+  </table>
+  <div class="impact"><b>对 ②-B 的威胁:</b>如果把 Step 5C 整段当 ②-B 的方法照搬,就会继承"无 theme + 立即/趁早错 + D1门 + 采集耦合"。<b>正确用法:Step 5C 只能当 <code>business_view.yaml</code> 的 schema 形状参考,不能当 ②-B 的方法。</b></div>
+</div>
+
+<div class="finding">
+  <div class="ttl"><span class="pill p-mid">中毒</span>通篇是"补丁堆积"——靠追加"与旧版对照"表长大,而非整体重生</div>
+  <div>843 行里塞满了改造历史 / 与旧 SOP 对照 / 范式转变 表:Step 4.5 改造史(line 304)、Step 5/5C 对照(line 560)、Step 6 范式转变(line 577)、Step 7 范式转变 + 对照(line 708/748)。这是<b>把 git 该干的活写进了活文档</b>。</div>
+  <div class="ev">证据:<span class="ln">304 / 560 / 577 / 708 / 748</span> ——每次改版都<b>追加</b>一张"我以前怎么错的"表,而不是重写干净</div>
+  <div class="impact"><b>这正是你说的"堆屎"的实体证据:</b>文档本身违反了它服务的项目的"整体重生·零补丁"纪律。它是补丁堆积的纪念碑。</div>
+</div>
+
+<div class="finding">
+  <div class="ttl"><span class="pill p-mid">中毒</span>快照数字当现状 · 维护期自动化是想象</div>
+  <div>钉死的 4 月快照:247篇净化 / 263篇(line 40)、17+号 / 1170评论(line 164/602)、71/357≈20% dup(line 229)、281/1170=24% 关联率(line 679)。① 现在是 <b>935 篇</b>,这些全是化石。<br>
+  line 798 描述"每日 cron 9:00 自动跑"——但 B6 已确认<b>采集自 4 月中 bulk 后无增量</b>,维护期自动化是 aspirational,不是现实。</div>
+  <div class="ev">证据:<span class="ln">40 / 164 / 229 / 602 / 679 / 798</span> · 重叠 backlog <b>B6</b></div>
+  <div class="impact">违反滑坡自审第一条:"是常驻规则还是钉快照的一次性?" —— 大量内容是钉快照,却长得像常驻 SOP。</div>
+</div>
+
+<div class="finding">
+  <div class="ttl"><span class="pill p-lo">低毒</span>路径指向 /tmp 与"待建" · 新旧库布局混用</div>
+  <div>Step 6.5 的 B1/B2/B3 工具挂在 <code>/tmp/*.py</code>(line 653/660/668,"需正式归档");lint 脚本"待建"(line 35/441);文档内 <code>01 核心政策/</code>(line 98/292,旧布局)与 <code>0_raw/policies/</code>(line 19/392,新布局)<b>同篇混用</b>。</div>
+  <div class="ev">证据:<span class="ln">35 / 98 / 292 / 441 / 653 / 660 / 668</span></div>
+  <div class="impact">不会直接污染 ②-B,但说明文档与真实仓状态已脱节,不可作权威引用。</div>
+</div>
+
+<div class="finding keepbox">
+  <div class="ttl"><span class="pill p-keep">保留</span>采集机制本身是健康的——别误伤</div>
+  <div>8 步骨架(遍历→过滤去重→抓取→入库→评论→反扫→缺口→反哺)是个 sound 的采集闭环。这些应当保留:</div>
+  <table>
+    <tr><td>Step 3.5 URL 去重</td><td><span class="ln">225–262</span></td><td>实证 20% 同 URL 重复入库 → 事前拦截。证据驱动,扎实</td></tr>
+    <tr><td>Firecrawl→trafilatura 兜底</td><td><span class="ln">62–81</span></td><td>实测 trafilatura 100% 成功,不是质量妥协</td></tr>
+    <tr><td>push主/pull兜底(wewe-rss)</td><td><span class="ln">573–614</span></td><td>对旧搜狗反扫是真改进</td></tr>
+    <tr><td>Step 2.5 渠道发现日同步</td><td><span class="ln">181–202</span></td><td>反拖延设计,周/月级→日级</td></tr>
+  </table>
+  <div class="impact" style="border-top-color:rgba(95,210,139,.25)"><b>结论:</b>采集<i>机制</i>留,采集 SOP 里夹带的 ②/③/④ <i>逻辑</i>剥离。</div>
+</div>
+
+<!-- ========================= 文档二 ========================= -->
+<h2>文档二 · L2建设思路 <span class="tag">最致命:它描述的"L2"≠ 我们要建的节点②</span></h2>
+
+<div class="finding">
+  <div class="ttl"><span class="pill p-hi">高毒 · 头号问题</span>它的"L2"是知识图谱,我们的"②"是归属——根本不是一回事</div>
+  <div>本文档定义 L2 = <code>standardize → relate → crystallize → reverse</code> = 8 类派生资产(entities + 8类relations + diffs + opinions + themes四件套 + regions + global_index + reverse links)(line 16 / 32–95)。<br>
+  但四节点重构里的 ②归属 = <b>仅</b> theme 挂载 + 重要性打分(per-policy 归属视图)。把旧"L2"映射到新四节点:</div>
+  <div class="map">
+    <div class="row"><span class="old">standardize(实体/issuer canonical)</span><span class="arrow">→</span><span class="new">②-A 身份(已做)</span></div>
+    <div class="row"><span class="old">relate(8 类 typed relations)</span><span class="arrow">→</span><span class="new">③ 分析(关系网)— 重构已显式排除出 ②</span></div>
+    <div class="row"><span class="old">crystallize(themes四件套/regions/global)</span><span class="arrow">→</span><span class="new">③/④ 消费(聚合渲染)— 同上</span></div>
+    <div class="row"><span class="old">reverse(反链页)</span><span class="arrow">→</span><span class="new">③/④</span></div>
+    <div class="row" style="border-top:1px dashed var(--line);margin-top:6px;padding-top:8px"><span class="old" style="color:var(--green)">真正落在新 ②(归属)的</span><span class="arrow">=</span><span class="new">只有 standardize(≈②-A)+ 隐含的 theme 打标(被 8步甩成 B1,从没建)</span></div>
+  </div>
+  <div class="impact"><b>对 ②-B 的威胁(最大):</b>若把"L2建设思路"当节点②的 spec 来读,会把<b>关系网 + 结晶 + 渲染(=③/④)全拽进 ②</b>——而这正是顶层设计 v2 刻意拆开的。MEMORY 已记:②-B "不含渲染聚合/关系网(=④/分析层)"。这份文档会把这条纪律带歪。</div>
+</div>
+
+<div class="finding">
+  <div class="ttl"><span class="pill p-hi">高毒</span>整篇的服务对象是<b>已退役的月报原型</b></div>
+  <div>line 4:"服务对象:<code>[[策略-L3月报需求原型]]</code> 的素材底座";line 253 同。8 类资产表的"月报怎么用"整列(line 34–44)都由月报需求背书;"够用 6–12 个月""月报可持续性延到 12–18 个月"(line 117/175)是为撑月报而设的妥协框架。</div>
+  <div class="ev">证据:<span class="ln">4 / 34–44 / 117 / 175 / 253</span> · 月报原型已 <b>B9 退役</b></div>
+  <div class="impact"><b>对 ②-B 的威胁:</b>整份文档的目的论指向一个死掉的靶子。任何"为了月报所以 ② 要 X"的推理都已失效。</div>
+</div>
+
+<div class="finding">
+  <div class="ttl"><span class="pill p-mid">中毒</span>规范+进度+路线图揉成一篇 → 耐久的设计被化石淹没</div>
+  <div>line 7 自己声明本文 = "为什么这么设计 + 当前进度 + 下一步"。结果:状态快照(2026-04-28:263政策/298边/密度1.13/反链27%/opinion 20.5%,line 98–113)会腐烂,ROI 排序的下一轮 TODO(line 163–213)是对着化石状态+退役月报做的规划。只有设计推理与三洞察有持久价值,却被埋在化石里。</div>
+  <div class="ev">证据:<span class="ln">7 / 98–113 / 163–213</span></div>
+</div>
+
+<div class="finding keepbox">
+  <div class="ttl"><span class="pill p-keep">抢救</span>三个核心洞察很锋利——但属于 ③(分析),不是 ②</div>
+  <table>
+    <tr><th>洞察</th><th>行号</th><th>价值</th></tr>
+    <tr><td>① 中文政策不明说关系,regex 上限~30%,必须 LLM 读正文</td><td><span class="ln">123–136</span></td><td>真实,③ 关系抽取的前提</td></tr>
+    <tr><td>② conflicts_with=0 是国情不是 bug,应从 <code>policy↔policy</code> 改为 <code>commentary→[A,B]</code></td><td><span class="ln">138–153</span></td><td>架构级洞见,③ 直接受用</td></tr>
+    <tr><td>③ opinion 是血肉,依赖评论 A 类,0 个来自公众号</td><td><span class="ln">155–160</span></td><td>关联 ① 覆盖 / B6</td></tr>
+    <tr><td>方法论教训:抽取前先问"这关系在中文语境以什么形态显化",别照搬西方文献</td><td><span class="ln">153</span></td><td>优秀元原则,留给 ③</td></tr>
+  </table>
+  <div class="impact" style="border-top-color:rgba(95,210,139,.25)">幂等 + temperature=0 原则(line 234)也对,保留。<b>这些洞察该被抢救成 ③(分析)的设计输入,而不是用来塑形 ②-B。</b></div>
+</div>
+
+<!-- ========================= 建议 ========================= -->
+<h2>建议 · 外科手术,不推倒重来</h2>
+<div class="rec">
+<ol>
+  <li><b>现在不重写这两份文档。</b>它们是参考材料;②-B 的真正 spec 我们马上要在 brainstorm→spec 流程里<b>从零写</b>。只要 ②-B 的 spec 是对着框架文件+四节点模型写的,化石就不会传染。重写它们=推倒重来,且会阻塞 ②-B。</li>
+
+  <li><b>给 ②-B 钉死权威输入(这是真正的解药):</b><br>
+  ✅ 权威 = <code>scoring.yaml</code>(6维+重要性公式)+ <code>themes_registry.yaml</code>(17主题)+ <code>decision_framework.yaml</code>(3-key)+ 四节点模型。<br>
+  ⛔ 对 ②-B <b>非</b>权威 = 「L2建设思路」(旧模型/退役月报导向)整篇;「八步采集法」Step 5C–8(采集耦合/无theme/§C冲突)——Step 5C 只可当 <code>business_view.yaml</code> 的 schema 形状参考。</li>
+
+  <li><b>给两份化石贴标记,和月报原型 B9 同套路。</b>顶部加一个"已过时/已被四节点重构取代"的 header,指明:① 八步采集法 → 待重生为纯 ①采集 SOP(把 Step 4.5/5C/6.5/7/8 剥到各自节点);② L2建设思路 → 待退役,其三洞察抢救进 ③分析 设计输入。<b>这是唯一的写操作,廉价可逆,不阻塞 ②-B。</b></li>
+
+  <li><b>在 ②-B spec 里显式调和这几点:</b>(a) 行动语言 立即→趁早;(b) 打分深度门 D1≥3 vs 重要性≥3/国省级,二选一钉死;(c) theme 挂载是净新增(B1 从没建),不是"重建 Step 5C";(d) 写明 §C 取代八步采集法 line 21 的"绝不写 raw"。</li>
+</ol>
+</div>
+
+<div class="foot">
+审计方法:逐条钉 <code>策略-八步采集法.md</code> / <code>策略-L2建设思路.md</code> 行号,基准为四节点重构 + 三纪律 + 零补丁。毒性分级:<span class="pill p-hi">高毒</span>会直接带歪 ②-B · <span class="pill p-mid">中毒</span>结构性陈旧 · <span class="pill p-lo">低毒</span>脱节但不传染 · <span class="pill p-keep">保留/抢救</span>有持久价值。<br>
+本报告为人类阅读层(HTML);裁决与行动请见对话里的决策块。
+</div>
+
+</div>
+</body>
+</html>

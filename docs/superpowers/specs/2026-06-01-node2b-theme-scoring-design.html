@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>②-B 归属挂载 · 设计 spec</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#171a21; --card2:#1d212b; --ink:#e6e9ef; --dim:#9aa3b2;
+    --line:#2a2f3a; --red:#ff6b6b; --amber:#ffb454; --green:#5fd28b; --blue:#6ab7ff; --purple:#b794f6;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.65 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased;padding:0 0 90px}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 24px}
+  header{padding:38px 0 22px;border-bottom:1px solid var(--line);margin-bottom:8px}
+  h1{font-size:25px;margin:0 0 8px;letter-spacing:.3px}
+  .meta{color:var(--dim);font-size:13px;line-height:1.9}
+  .meta b{color:var(--ink)}
+  h2{font-size:18px;margin:34px 0 12px;padding-left:11px;border-left:3px solid var(--blue);scroll-margin-top:14px}
+  h3{font-size:14.5px;margin:18px 0 7px;color:var(--blue)}
+  p{margin:9px 0}
+  ul,ol{margin:8px 0;padding-left:22px}
+  li{margin:5px 0}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13.5px}
+  th,td{text-align:left;padding:9px 12px;vertical-align:top;border-bottom:1px solid var(--line)}
+  th{color:var(--dim);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.4px}
+  code{background:#0a0c10;border:1px solid var(--line);border-radius:4px;padding:1px 6px;
+    font:12.5px/1.4 "SF Mono",Menlo,Consolas,monospace;color:#cdd6e4}
+  pre{background:#0a0c10;border:1px solid var(--line);border-radius:9px;padding:15px 17px;overflow-x:auto;
+    font:12.5px/1.6 "SF Mono",Menlo,Consolas,monospace;color:#cdd6e4;margin:12px 0}
+  pre .c{color:#6b7280}    /* comment */
+  pre .k{color:var(--blue)} /* key */
+  pre .v{color:var(--green)}/* value */
+  .toc{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:14px 20px;margin:18px 0 6px;
+    columns:2;column-gap:30px;font-size:13px}
+  .toc a{color:var(--blue);text-decoration:none;display:block;padding:3px 0}
+  .toc a:hover{text-decoration:underline}
+  @media(max-width:680px){.toc{columns:1}}
+  .box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 20px;margin:12px 0}
+  .lock{background:rgba(95,210,139,.07);border:1px solid rgba(95,210,139,.3)}
+  .warn{background:rgba(255,180,84,.08);border:1px solid rgba(255,180,84,.4);padding:14px 18px;border-radius:10px;margin:12px 0}
+  .warn b{color:var(--amber)}
+  .nope{background:rgba(255,107,107,.07);border:1px solid rgba(255,107,107,.3)}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;margin-right:6px}
+  .p-lock{background:rgba(95,210,139,.15);color:var(--green);border:1px solid rgba(95,210,139,.4)}
+  .p-open{background:rgba(255,180,84,.14);color:var(--amber);border:1px solid rgba(255,180,84,.4)}
+  .flow{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin:12px 0;
+    font:12.5px/1.7 "SF Mono",Menlo,Consolas,monospace;color:#cdd6e4;white-space:pre;overflow-x:auto}
+  .flow .a{color:var(--amber)} .flow .g{color:var(--green)} .flow .b{color:var(--blue)} .flow .d{color:var(--dim)}
+  .yes{color:var(--green);font-weight:600}.no{color:var(--red);font-weight:600}
+  .foot{color:var(--dim);font-size:12px;margin-top:42px;border-top:1px solid var(--line);padding-top:16px}
+  .tag{font-size:11px;color:var(--dim);border:1px solid var(--line);border-radius:4px;padding:1px 6px;margin-left:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>②-B 归属挂载(theme + 重要性打分)· 设计 spec</h1>
+  <div class="meta">
+    <b>日期</b> 2026-06-01 &nbsp;·&nbsp; <b>定位</b> 加工(L2)里的「归属」子阶段 &nbsp;·&nbsp; <b>状态</b> 设计已分段确认,3 决策锁定,待写 plan<br>
+    <b>前置</b> ②-A 确定性身份已完成(148篇,tag pre-2a-2026-05-31) &nbsp;·&nbsp; <b>基线</b> 源文档审计已贴标冻结(本 spec 不依赖八步采集法/L2建设思路)<br>
+    <span class="tag">canonical .md:&nbsp;docs/superpowers/specs/2026-06-01-node2b-theme-scoring-design.md</span>
+  </div>
+</header>
+
+<div class="toc">
+  <a href="#s1">1 · 定位与边界</a>
+  <a href="#s2">2 · 三个已锁决策</a>
+  <a href="#s3">3 · 权威 / 非权威输入</a>
+  <a href="#s4">4 · 数据模型(business_view)</a>
+  <a href="#s5">5 · 架构与数据流</a>
+  <a href="#s6">6 · 确定性计算</a>
+  <a href="#s7">7 · 程序门(第一层)</a>
+  <a href="#s8">8 · LLM judge + golden 校准</a>
+  <a href="#s9">9 · theme 词表 + B5 收口</a>
+  <a href="#s10">10 · SCHEMA §4 门校准</a>
+  <a href="#s11">11 · 模块结构</a>
+  <a href="#s12">12 · 错误处理 / 队列</a>
+  <a href="#s13">13 · 测试策略</a>
+  <a href="#s14">14 · 纪律 / 滑坡自审</a>
+  <a href="#s15">15 · 交付物 + 验收门</a>
+  <a href="#s16">16 · 开放/待定项</a>
+</div>
+
+<h2 id="s1">1 · 定位与边界</h2>
+<p><b>做什么</b>:一次 per-policy 的 LLM pass,给 vault 现有 <b>935 篇政策</b>每篇:</p>
+<ol>
+  <li>挂 <b>theme(s)</b> — 命中的所有主题(不限数量)+ 1 个 <b>主 theme</b></li>
+  <li>打 <b>重要性分</b> — 六维 D1–D6 + 脚本算综合分 / 行动分类 / 价值标签</li>
+  <li>(过门的)写 <b>3-key 影响分析 + 行动建议</b></li>
+</ol>
+<p>产物:<b>整文件重生</b> <code>_meta/business_view/{pid}.yaml</code>(加 <code>themes</code> / <code>primary_theme</code>)。</p>
+<div class="box nope">
+  <p><b>不做</b>(防旧 L2 黑箱回潮):</p>
+  <ul>
+    <li>❌ 关系网抽取(supersedes/references/derives_from…)= <b>③分析</b></li>
+    <li>❌ 主题聚合页 / 区域页 / 反链 / 渲染 = <b>L3取 / 结晶</b>(③/④)</li>
+    <li>❌ 任何写 raw frontmatter / body 的动作</li>
+  </ul>
+</div>
+<p><b>为什么是一个节点</b>:theme 挂载与重要性打分都是"读这一篇、判断它本身"的 per-policy 归属判断,天然合一、一次 pass 出。跨篇(关系)、聚合(结晶)是后面的节点。</p>
+
+<h2 id="s2">2 · 三个已锁决策 <span class="tag">用户 2026-06-01 确认</span></h2>
+<table>
+  <tr><th>#</th><th>决策</th><th>选定</th><th>理由</th></tr>
+  <tr><td>1</td><td>一篇挂几 theme</td><td><span class="pill p-lock">锁</span>不限数量 + 1 主 theme</td><td>国家级规划纲领必然多主题,设上限会在最高价值政策上翻车</td></tr>
+  <tr><td>2</td><td>打分深度</td><td><span class="pill p-lock">锁</span>两遍 + 确定性门 = 重要性≥3 OR 国/省级</td><td>分层为信噪比(非省钱):对零相关政策强写影响分析 = 逼模型幻觉</td></tr>
+  <tr><td>3</td><td>judge 校准 golden</td><td><span class="pill p-lock">锁</span>~50篇分层 · 我(Opus4.8)写gold+塞拟真错 · 用户抽查~10 · 冻结</td><td>整条链信任锚在答案键,人工抽查是低成本兜底</td></tr>
+</table>
+
+<h2 id="s3">3 · 权威 / 非权威输入</h2>
+<h3>✅ 权威(spec 唯一依据)</h3>
+<ul>
+  <li><code>_meta/themes_registry.yaml</code> — <b>13 主题</b> canonical 词表 + aliases(注:在 <code>_meta/</code>,非 <code>_meta/framework/</code>)</li>
+  <li><code>_meta/framework/scoring.yaml</code> — 六维 + <code>重要性=round(D1·.4+D2·.4+D3·.2)</code> + 行动分类(D4×D5 + D6修正)+ 价值标签</li>
+  <li><code>_meta/framework/decision_framework.yaml</code> — 3 业务(加油/充电/电力)+ 决策层口径</li>
+  <li><code>SCHEMA.md</code> §4(business_view 契约)+ §C(raw 边界)</li>
+  <li>四节点 / 统一结构约定(MEMORY)</li>
+</ul>
+<div class="box nope">
+  <p>⛔ <b>非权威</b>:<code>report_blueprint</code> / <code>factcheck_rules</code>(TAINTED,归 L3)· 「L2建设思路」整篇(旧模型,三洞察归③)· 八步采集法 Step 5C(<b>只作 business_view schema 形状参考,非方法</b>)</p>
+</div>
+
+<h2 id="s4">4 · 数据模型(business_view)</h2>
+<p>沿用 SCHEMA §4,<b>新增 theme 两字段</b>:</p>
+<pre><span class="k">pid</span>: P_2024_NDRC_718
+<span class="c"># === 归属:theme(②-B 新增) ===</span>
+<span class="k">themes</span>: [energy_storage_theme, power_market, vpp_theme]   <span class="c"># 命中的全部,∈ registry</span>
+<span class="k">primary_theme</span>: energy_storage_theme                       <span class="c"># 1 个主 theme,∈ themes</span>
+<span class="c"># === 评分(必填) ===</span>
+<span class="k">scores</span>: {D1: 5, D2: 4, D3: 4, D4: 4, D5: 4, D6: 5}
+<span class="k">重要性</span>: 4                       <span class="c"># 脚本 = round(.4D1+.4D2+.2D3)</span>
+<span class="k">行动分类</span>: A                     <span class="c"># 脚本 = D4×D5 2×2 + D6修正</span>
+<span class="k">价值标签</span>: [合规, 机会]          <span class="c"># 脚本 = 综合分 + theme 推导</span>
+<span class="c"># === 深档(可选,过门才写;门 = 重要性≥3 OR 国/省级) ===</span>
+<span class="k">影响分析</span>:                       <span class="c"># 3-key,固定这三个键</span>
+  <span class="k">加油</span>: "..."
+  <span class="k">充电</span>: "..."
+  <span class="k">电力_储能_V2G_交易</span>: "..."
+<span class="k">行动建议</span>: ["A 趁早:...", "B 研究:..."]   <span class="c"># 注:用"趁早"非"立即"</span>
+<span class="c"># === 可追溯(必填) ===</span>
+<span class="k">sanitized_from</span>: 0_raw/policies/{filename}.md
+<span class="k">extracted_at</span>: '2026-06-01'
+<span class="k">gate_passed_deep</span>: true          <span class="c"># 是否过深档门(可审计)</span></pre>
+<div class="warn">
+  <b>关键(§C)</b>:<b>themes 落派生层、不落 raw</b>。theme 是 LLM <b>语义标签</b>,§C 明令语义标签不写 raw → 只进 business_view。顺带消除旧版 <code>tags</code> 倒灌 raw 的污染(SCHEMA §F 登记的 81 篇违规)。③/④ 建主题聚合页时读 <code>business_view.themes</code>。
+</div>
+
+<h2 id="s5">5 · 架构与数据流</h2>
+<div class="flow">935 raw policies <span class="d">(复用 ②-A corpus 加载器)</span>
+        │
+        ▼  <span class="a">遍1:generator(模型A,temp0)</span>
+  themes[] + primary_theme + D1–D6        <span class="d">← prompt 由 registry + scoring 构建</span>
+        │
+        ▼  <span class="b">确定性计算(脚本,无 LLM)</span>
+  重要性 / 行动分类 / 价值标签 / gate判定
+        │
+        ├─ 过门(重要性≥3 OR 国省级)─▶ <span class="a">遍2:generator(模型A)</span>
+        │                              3-key 影响分析 + 行动建议
+        │                                       │
+        ▼◀─────────────────────────────────────┘
+  完整 business_view 候选(未落盘)
+        │
+        ▼  <span class="b">两层验收门</span>
+  ┌─ 程序门(§7,纯函数,先跑)
+  └─ LLM judge(模型B≠A,§8,语义)
+        │
+        ├─ <span class="g">双门通过</span> ─▶ 整文件重生 _meta/business_view/{pid}.yaml
+        └─ <span class="no">任一否</span> ───▶ review_queue(低置信)+ 报告</div>
+<h3>模型分工</h3>
+<ul>
+  <li><b>模型 A</b>(便宜,用户提供)= generator,跑两遍。<code>scripts/common/llm.py</code>,temp0。</li>
+  <li><b>模型 B</b>(≠A,用户提供)= judge。</li>
+  <li><b>我(Opus4.8)</b>= 测试期出题/校准 + 门失败重调;上岗后例行不参与(B6.1)。</li>
+</ul>
+<div class="warn"><b>口径</b>:D1 业务关联度按 scoring.yaml 的 <b>4 业务版块</b>(加油/充电/储能VPP/电力交易;core_premise:充电站=电力市场参与者)判;<b>影响分析输出固定 3 key</b>(加油/充电/电力_储能_V2G_交易),后两版块并入"电力"。</div>
+
+<h2 id="s6">6 · 确定性计算(纯函数,不依赖 LLM)</h2>
+<p>全部可单测、可重算自洽(程序门据此重算校验):</p>
+<ol>
+  <li><code>重要性 = round(D1·0.40 + D2·0.40 + D3·0.20)</code>(范围 0–5)</li>
+  <li><code>行动分类</code>:D4(紧迫)×D5(实操)2×2 → A立即/B优先研究/C计划跟进/D持续跟踪;再用 D6 机会窗口修正(5–4 前跳一档、2–1 后降一档)</li>
+  <li><code>价值标签</code> ⊆ {合规, 机会, 壁垒, 趋势}:综合分 + theme 组合推导(规则化)</li>
+  <li><code>gate_passed_deep = (重要性 ≥ 3) OR (region.level ∈ {国家, 省})</code> — region.level 取自 raw(②-A 已固化),不重判</li>
+</ol>
+
+<h2 id="s7">7 · 程序门(第一层,纯函数,先于 judge)</h2>
+<p>任一不过 → 不写派生层,入队:</p>
+<ul>
+  <li><b>结构</b>:必填字段齐;<code>themes</code> 非空;<code>primary_theme ∈ themes</code></li>
+  <li><b>公式自洽</b>:用 D1–D6 重算 重要性/行动分类,与 LLM 自报一致(综合分以脚本为准)</li>
+  <li><b>registry 合规</b>:<code>themes ⊆ themes_registry.id</code>(每个都在 13 主题内)</li>
+  <li><b>影响分析键(正向白名单)</b>:过门篇的键 = 恰好这三个,多一个或少一个都拒——任何 stray 键自动挡掉,不点名任何具体词</li>
+  <li><b>深档⟺门</b>:<code>(影响分析非空 且 行动建议非空) ⟺ gate_passed_deep</code></li>
+  <li><b>分布合理</b>:不允许"每篇都挂满 13 theme"(过挂信号);theme / 重要性分布、孤岛(0 theme)数落报告</li>
+</ul>
+
+<h2 id="s8">8 · LLM judge + golden 校准</h2>
+<p><b>judge 职责</b>:程序门管不了的<b>语义质量</b> —— theme 挂对没(漏挂/错挂)、分数合不合理、影响分析有没有幻觉/该写没写。输出 <code>{verdict, dim, reason, confidence}</code>。</p>
+<h3>golden 集(测试期一次性)</h3>
+<ol>
+  <li>从 935 <b>分层抽 ~50 篇</b>:覆盖 13 theme × 国/省/市级 × 高/中/低重要性 × 过门/不过门</li>
+  <li>我(Opus4.8)写每篇 <b>gold 标注</b>(themes+primary+D1–D6+影响分析)</li>
+  <li>注入<b>拟真错</b>(模仿模型A真实错法:乱挂热门theme / 漏挂主题 / 低估地方政策分 / 幻觉业务影响 / 影响分析键缺失),记 <code>error_type</code> 与 <code>is_planted</code></li>
+  <li><b>用户抽查 ~10 篇</b> gold(答案键人工兜底一道)</li>
+  <li><b>冻结</b> → <code>state/node2b/golden/golden_v1.jsonl</code>(committed,immutable)</li>
+</ol>
+<h3>judge 上岗门</h3>
+<ul>
+  <li><b>召回</b> = 抓住的埋错 / 总埋错(别漏)</li>
+  <li><b>精度</b> = 判错里真错 / 判错总数(别冤枉对的)</li>
+  <li>阈值在上岗那刻看实测分布定(测试期我裁决);达标才放 judge 例行 4.8-free</li>
+</ul>
+<p><b>上岗后</b>:generator→程序门→judge 全自动;我只在<b>门失败重调</b>或<b>定期审低置信队列</b>(接 B7)回来。</p>
+
+<h2 id="s9">9 · theme 词表 + B5 收口(②-B 顺带做)</h2>
+<p>B5「词表 4 处不自洽」明确推后到"②建主题匹配时定",本节定:</p>
+<ol>
+  <li><b><code>负荷聚合</code> 同时在 vpp_theme + aggregator_access</b> → <b>两个 theme 都保留</b>(用户 2026-06-01 定)。与决策1(多theme)一致:语义 LLM 定实际挂哪(可能都挂)。<span class="g">B5 规则随之改:alias 允许跨 theme 共享、不当冲突,vocab lint 放行</span></li>
+  <li><b><code>成品油零售</code> 归属</b> → 留 petroleum_retail_compliance(合规向);gas_station_transition 是"油站物理转型",不拥有该词</li>
+  <li><b>charging_infra / power_market / v2g 的 entity 补 <code>type=theme</code></b>(themes_registry 已有,entities/registry 缺 type)——机械补齐</li>
+  <li><b>删 stale theme entity(一次性)</b>:entities/registry 里那个早被 B9 判"非 theme"的 <code>rural_revitalization_theme</code> 残留(已不在 13 主题、正向规则下永不可挂)→ B5 顺手删其 type=theme,纯清死数据;非 ②-B 正确性依赖</li>
+</ol>
+
+<h2 id="s10">10 · SCHEMA §4 门校准(合法 schema 演进)</h2>
+<p>SCHEMA.md §4 现写「影响分析/行动建议(可选,<b>D1≥3</b> 时填)」→ 改为「(可选,<b>重要性≥3 OR region.level∈{国家,省}</b> 时填)」。新增 <code>themes</code> / <code>primary_theme</code> / <code>gate_passed_deep</code> 字段定义。<b>走 SCHEMA 修改流程,留评审记录</b>(SCHEMA 自身规则:不允许约定俗成扩张)。演进非补丁。</p>
+
+<h2 id="s11">11 · 模块结构(新 <code>scripts/l2_themescore/</code>,复用 ②-A 基建)</h2>
+<pre>scripts/
+├── common/llm.py                 <span class="c">(已有,复用 — temp0 客户端)</span>
+├── l2_attribution/               <span class="c">(②-A,复用 corpus 加载器 / models 基类)</span>
+└── l2_themescore/                <span class="c">(②-B 新建)</span>
+    ├── models.py                 <span class="c">ThemeAssignment / Scores / BusinessViewDraft / GoldenRecord / JudgeVerdict</span>
+    ├── theme_registry.py         <span class="c">load registry + alias→id lookup + validate</span>
+    ├── generator.py              <span class="c">模型A:遍1(theme+分)/ 遍2(影响+建议);prompt 构建</span>
+    ├── scoring.py                <span class="c">确定性:重要性/行动分类/价值标签/gate(纯函数)</span>
+    ├── program_gate.py           <span class="c">§7 程序门(纯函数)</span>
+    ├── judge.py                  <span class="c">模型B 客户端 + verdict 解析</span>
+    ├── golden.py                 <span class="c">golden 加载 + judge 跑分(召回/精度)</span>
+    ├── business_view_writer.py   <span class="c">整文件重生 yaml(§C 安全:绝不碰 raw)</span>
+    ├── review_queue.py           <span class="c">低置信入队</span>
+    ├── report.py                 <span class="c">HTML 报告(分布/门结果/队列)</span>
+    └── run_2b.py                 <span class="c">编排 CLI:dry-run / apply / verify</span>
+tests/l2_themescore/             <span class="c">单元(scoring/gate)+ golden(judge)+ 集成(dry-run 样本)</span>
+state/node2b/{golden/, proposed_changes/, review_queue/}</pre>
+
+<h2 id="s12">12 · 错误处理 / 队列</h2>
+<table>
+  <tr><th>情况</th><th>处理</th></tr>
+  <tr><td>模型A 返回非结构化 JSON</td><td>重试 1 次 → 仍失败标 <code>generation_error</code> 入队</td></tr>
+  <tr><td>程序门失败</td><td>不写派生层,入 <code>review_queue</code>,报告归类</td></tr>
+  <tr><td>judge reject</td><td>入低置信队列;测试期我审,上岗后批量回 generator 重生</td></tr>
+  <tr><td>business_view 已存在(②-A改id化石 / 旧字段残留)</td><td><b>整文件重生覆盖</b>(by 当前 raw id),不 patch</td></tr>
+  <tr><td>LLM 多次评分不一致</td><td>取中位数 + <code>_dispute</code> 字段(沿用 SCHEMA §4)</td></tr>
+</table>
+<p><b>顺带清理</b>(随整文件重生自动,by construction):整文件重生用正向 3-key 规则重写,旧文件里任何 stale 键(含历史遗留)一并消失,无需点名。</p>
+
+<h2 id="s13">13 · 测试策略</h2>
+<ul>
+  <li><b>单元</b>(纯函数,必全绿):scoring(重要性/行动分类/价值标签/gate 边界)、program_gate 每条规则、theme alias lookup</li>
+  <li><b>golden</b>:judge 跑冻结 golden,产召回/精度报告</li>
+  <li><b>集成</b>:dry-run on ~30 篇样本,验证两遍流程 + 双门 + 写出格式</li>
+  <li><b>零回归</b>:business_view 重生后跑 SCHEMA validator(0 违反)</li>
+</ul>
+
+<h2 id="s14">14 · 纪律 / 滑坡自审(每步收尾必跑)</h2>
+<ul>
+  <li><b>常驻规则非快照</b>:theme 法、门、阈值都是规则;golden 是冻结基准(显式冻结、可复现)</li>
+  <li><b>零 pid 硬编码</b>:generator/gate/scoring 无任何针对具体 pid 的分支</li>
+  <li><b>动视图非源</b>:只写 <code>_meta/business_view/</code>;<b>raw 一字不动</b>;themes 语义标签 → §C 禁入 raw</li>
+  <li><b>不漏</b>:所有 LLM 判定(theme/分/影响)全落派生层;确定性算分在脚本</li>
+  <li><b>零补丁</b>:改框架/词表 → 整文件重生;不写针对 ②-B 输出的 oneshot/migration(charter 违约信号)</li>
+</ul>
+
+<h2 id="s15">15 · 交付物清单 + 验收门</h2>
+<h3>交付物</h3>
+<ol>
+  <li><code>scripts/l2_themescore/</code> 全模块 + 测试</li>
+  <li>golden_v1.jsonl(我标 + 用户抽查 + 冻结)</li>
+  <li>judge 校准报告(召回/精度)+ 上岗阈值</li>
+  <li>dry-run 报告(935 篇 theme/分/门结果分布)</li>
+  <li>SCHEMA §4 校准(改门 + 加字段 + 评审记录)</li>
+  <li>themes_registry / entities B5 收口(§9)</li>
+</ol>
+<h3>人工验收门(停)</h3>
+<ul>
+  <li><b>A</b>:judge 校准达标(召回/精度)→ 我裁决放行</li>
+  <li><b>B</b>:935 dry-run 报告 → 用户看分布(theme 合理?孤岛多少?过门比例?)→ 批准</li>
+  <li><b>C</b>:apply 写 business_view(派生层,非 raw,风险低)+ verify 幂等</li>
+  <li><b>一次性迁移验证</b>(非常驻规则):全量重生后 grep 确认历史 <code>乡村</code> 残留键 = 0,作为 B9 去污染收尾证据;此后"乡村"不出现在任何常驻逻辑</li>
+</ul>
+
+<h2 id="s16">16 · 开放/待定项(写 plan 前)</h2>
+<div class="warn">
+  <b>① §9.1 ✅ 已定(2026-06-01)</b>:<code>负荷聚合</code> <b>两个 theme 都保留</b>(用户定)——确立"alias 可跨 theme 共享、语义 LLM 消歧"为通则,与决策1多theme一致。
+</div>
+<ul>
+  <li><b>② A/B 两个三方模型</b>:用户寻找中(spec 不依赖具体选型,模型是配置项)</li>
+  <li><b>③ judge 达标阈值</b>:上岗那刻看实测定(不预设)</li>
+  <li><b>④ golden 分层抽样精确配额</b>:写 plan 时定(保证 13 theme 均有样本)</li>
+</ul>
+
+<div class="foot">
+②-B 归属挂载设计 spec · 2026-06-01 · canonical markdown 同名 .md · 渲染为 HTML 供 CC 桌面端浏览。3 决策已锁,§16① 待确认后转 writing-plans。
+</div>
+
+</div>
+</body>
+</html>
