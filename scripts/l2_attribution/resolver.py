@@ -1,7 +1,6 @@
 """resolve_identity:确定性算 identity。纯函数,零 pid 分支。"""
 from __future__ import annotations
 import re
-import datetime
 from pathlib import Path
 from scripts.l2_attribution.models import ResolvedIdentity
 from scripts.l2_attribution.channel_registry import lookup
@@ -11,7 +10,7 @@ from scripts.l2_attribution.extractors import (
 
 _PLACE_RE = re.compile(r"(北京|天津|上海|重庆|[一-龥]{2,6}?[省市区县])")
 _DATE_OK = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-_THIS_YEAR = 2026
+_THIS_YEAR = 2026  # 上限年份;跨年时更新(或改 datetime.date.today().year)
 
 
 def old_hash_of(pid: str) -> str:
@@ -49,10 +48,13 @@ def _alloc_id(year, issuer_short, hsh, existing_ids):
         cand = f"{base}_{suf}"
         if cand not in existing_ids:
             return cand
-    return base  # 极端兜底
+    return None  # 槽耗尽 → 交调用方入队列
 
 
 def resolve_identity(rec, registry, body_tail: str, existing_ids: set) -> ResolvedIdentity:
+    """
+    existing_ids: 其它记录已占用的 id 集合;函数内部会排除 rec.pid 自身,故调用方可安全传入全量 pid 集。
+    """
     ri = ResolvedIdentity(pid=rec.pid)
     entry = lookup(registry, rec.url)
 
@@ -100,8 +102,12 @@ def resolve_identity(rec, registry, body_tail: str, existing_ids: set) -> Resolv
     # 5) id:用最终 date 年 + issuer_short + 原 hash
     year = _date_year(final_date)
     if year:
-        new_id = _alloc_id(year, entry.issuer_short, old_hash_of(rec.pid), existing_ids)
-        if new_id != rec.pid:
+        new_id = _alloc_id(year, entry.issuer_short, old_hash_of(rec.pid),
+                           existing_ids - {rec.pid})
+        if new_id is None:
+            ri.add_conflict("id", reason="id 碰撞槽耗尽(_a.._j 全占)",
+                            signals={"base": f"P_{year}_{entry.issuer_short}_{old_hash_of(rec.pid)}"})
+        elif new_id != rec.pid:
             ri.set_field("id", new_id, method="id_recompute_from_metadata",
                          confidence=0.99, from_val=rec.pid)
     else:
