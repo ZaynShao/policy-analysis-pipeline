@@ -115,6 +115,213 @@ PROVINCE = {
 
 _NAT = {"level": "国家", "code": "000000", "name": "全国"}
 
+# ② 残留区县域名手工 curate (B8) — sample_file 确认后写入,定不了的不进此表
+# domain -> {issuer_short, issuer_canonical, region}
+# issuer_short = 省级码; region.code = code2+"0000"; needs_city_code=True for sub-province
+DOMAIN_OVERRIDE: dict[str, dict] = {
+    # 重庆市 (CQ, code2=50)
+    "cqqj.gov.cn": {
+        "issuer_short": "CQ",
+        "issuer_canonical": "重庆市綦江区人民政府",
+        "region": {"level": "区", "code": "500000", "name": "重庆市綦江区", "needs_city_code": True},
+    },
+    "www.cqkz.gov.cn": {
+        "issuer_short": "CQ",
+        "issuer_canonical": "重庆市开州区人民政府",
+        "region": {"level": "区", "code": "500000", "name": "重庆市开州区", "needs_city_code": True},
+    },
+    "www.cqnc.gov.cn": {
+        "issuer_short": "CQ",
+        "issuer_canonical": "重庆市南川区人民政府",
+        "region": {"level": "区", "code": "500000", "name": "重庆市南川区", "needs_city_code": True},
+    },
+    "www.fl.gov.cn": {
+        "issuer_short": "CQ",
+        "issuer_canonical": "重庆市涪陵区人民政府",
+        "region": {"level": "区", "code": "500000", "name": "重庆市涪陵区", "needs_city_code": True},
+    },
+    "www.qianjiang.gov.cn": {
+        # sample: 黔江府办发〔2022〕11号 — 重庆市黔江区人民政府办公室
+        "issuer_short": "CQ",
+        "issuer_canonical": "重庆市黔江区人民政府",
+        "region": {"level": "区", "code": "500000", "name": "重庆市黔江区", "needs_city_code": True},
+    },
+    # 湖北省 (HB, code2=42)
+    "swj.chongyang.gov.cn": {
+        "issuer_short": "HB",
+        "issuer_canonical": "崇阳县商务局",
+        "region": {"level": "县", "code": "420000", "name": "湖北省崇阳县", "needs_city_code": True},
+    },
+    # 甘肃省 (GS, code2=62)
+    "www.baiyinqu.gov.cn": {
+        "issuer_short": "GS",
+        "issuer_canonical": "白银区人民政府",
+        "region": {"level": "区", "code": "620000", "name": "甘肃省白银市白银区", "needs_city_code": True},
+    },
+    "www.bypc.gov.cn": {
+        "issuer_short": "GS",
+        "issuer_canonical": "白银市平川区人民政府",
+        "region": {"level": "区", "code": "620000", "name": "甘肃省白银市平川区", "needs_city_code": True},
+    },
+    # 北京市 (BJ, code2=11)
+    "www.bjft.gov.cn": {
+        "issuer_short": "BJ",
+        "issuer_canonical": "北京市丰台区人民政府",
+        "region": {"level": "区", "code": "110000", "name": "北京市丰台区", "needs_city_code": True},
+    },
+    # 广东省 (GD, code2=44)
+    "www.by.gov.cn": {
+        "issuer_short": "GD",
+        "issuer_canonical": "广州市白云区人民政府",
+        "region": {"level": "区", "code": "440000", "name": "广州市白云区", "needs_city_code": True},
+    },
+    "www.conghua.gov.cn": {
+        "issuer_short": "GD",
+        "issuer_canonical": "广州市从化区人民政府",
+        "region": {"level": "区", "code": "440000", "name": "广州市从化区", "needs_city_code": True},
+    },
+    "www.haizhu.gov.cn": {
+        "issuer_short": "GD",
+        "issuer_canonical": "广州市海珠区人民政府",
+        "region": {"level": "区", "code": "440000", "name": "广州市海珠区", "needs_city_code": True},
+    },
+    "www.szgm.gov.cn": {
+        "issuer_short": "GD",
+        "issuer_canonical": "深圳市光明区人民政府",
+        "region": {"level": "区", "code": "440000", "name": "深圳市光明区", "needs_city_code": True},
+    },
+    "www.thnet.gov.cn": {
+        "issuer_short": "GD",
+        "issuer_canonical": "广州市天河区人民政府",
+        "region": {"level": "区", "code": "440000", "name": "广州市天河区", "needs_city_code": True},
+    },
+    # 湖南省 (HN, code2=43)
+    "www.hechengqu.gov.cn": {
+        "issuer_short": "HN",
+        "issuer_canonical": "怀化市鹤城区人民政府",
+        "region": {"level": "区", "code": "430000", "name": "湖南省怀化市鹤城区", "needs_city_code": True},
+    },
+    "www.mayang.gov.cn": {
+        "issuer_short": "HN",
+        "issuer_canonical": "麻阳苗族自治县人民政府",
+        "region": {"level": "县", "code": "430000", "name": "湖南省麻阳苗族自治县", "needs_city_code": True},
+    },
+    "www.xiangyin.gov.cn": {
+        "issuer_short": "HN",
+        "issuer_canonical": "湘阴县人民政府",
+        "region": {"level": "县", "code": "430000", "name": "湖南省湘阴县", "needs_city_code": True},
+    },
+    # 江西省 (JX, code2=36)
+    "www.huichang.gov.cn": {
+        # 会昌县政府网 — hosts 赣州市商务局文件; domain owns 会昌县
+        "issuer_short": "JX",
+        "issuer_canonical": "会昌县人民政府",
+        "region": {"level": "县", "code": "360000", "name": "江西省会昌县", "needs_city_code": True},
+    },
+    # 山东省 (SD, code2=37)
+    "www.huimin.gov.cn": {
+        "issuer_short": "SD",
+        "issuer_canonical": "惠民县人民政府",
+        "region": {"level": "县", "code": "370000", "name": "山东省惠民县", "needs_city_code": True},
+    },
+    # 江苏省 (JS, code2=32)
+    "www.yandu.gov.cn": {
+        "issuer_short": "JS",
+        "issuer_canonical": "盐城市盐都区人民政府",
+        "region": {"level": "区", "code": "320000", "name": "江苏省盐城市盐都区", "needs_city_code": True},
+    },
+    # 山西省 (SX, code2=14)
+    "www.fangshan.gov.cn": {
+        "issuer_short": "SX",
+        "issuer_canonical": "方山县人民政府",
+        "region": {"level": "县", "code": "140000", "name": "山西省方山县", "needs_city_code": True},
+    },
+    "xxgk.lczf.gov.cn": {
+        # 陵政办发〔2019〕44号 — 晋城市陵川县
+        "issuer_short": "SX",
+        "issuer_canonical": "陵川县人民政府",
+        "region": {"level": "县", "code": "140000", "name": "山西省晋城市陵川县", "needs_city_code": True},
+    },
+    # 河南省 (HA, code2=41)
+    "www.hnswjrb.gov.cn": {
+        "issuer_short": "HA",
+        "issuer_canonical": "河南省地方金融监督管理局",
+        "region": {"level": "省", "code": "410000", "name": "河南省"},
+    },
+    "www.txzf.gov.cn": {
+        # 通许县人民政府 — 开封市通许县,河南省
+        "issuer_short": "HA",
+        "issuer_canonical": "通许县人民政府",
+        "region": {"level": "县", "code": "410000", "name": "河南省通许县", "needs_city_code": True},
+    },
+    "www.pds.gov.cn": {
+        # 平政〔2023〕9号 — 平顶山市人民政府
+        "issuer_short": "HA",
+        "issuer_canonical": "平顶山市人民政府",
+        "region": {"level": "市", "code": "410000", "name": "河南省平顶山市", "needs_city_code": True},
+    },
+    # 内蒙古自治区 (NM, code2=15)
+    "nyj.nmg.gov.cn": {
+        "issuer_short": "NM",
+        "issuer_canonical": "内蒙古自治区能源局",
+        "region": {"level": "省", "code": "150000", "name": "内蒙古自治区"},
+    },
+    "www.wuda.gov.cn": {
+        # 乌海市乌达区人民政府
+        "issuer_short": "NM",
+        "issuer_canonical": "乌达区人民政府",
+        "region": {"level": "区", "code": "150000", "name": "内蒙古自治区乌海市乌达区", "needs_city_code": True},
+    },
+    "www.xam.gov.cn": {
+        # 内蒙古自治区政府门户 — url xam.gov.cn hosts 内蒙古 provincial content
+        "issuer_short": "NM",
+        "issuer_canonical": "内蒙古自治区人民政府",
+        "region": {"level": "省", "code": "150000", "name": "内蒙古自治区"},
+    },
+    # 广西壮族自治区 (GX, code2=45)
+    "xygx.fgw.gxzf.gov.cn": {
+        "issuer_short": "GX",
+        "issuer_canonical": "广西壮族自治区发展和改革委员会",
+        "region": {"level": "省", "code": "450000", "name": "广西壮族自治区"},
+    },
+    # 四川省 (SC, code2=51)
+    "scms.gov.cn": {
+        # 四川省发展和改革委员会等 — scms = 四川省政务服务门户
+        "issuer_short": "SC",
+        "issuer_canonical": "四川省人民政府",
+        "region": {"level": "省", "code": "510000", "name": "四川省"},
+    },
+    "cds.sczwfw.gov.cn": {
+        # 成都市居民小区... — cds = 成都市(Chengdu) on 四川政务服务网
+        "issuer_short": "SC",
+        "issuer_canonical": "成都市人民政府",
+        "region": {"level": "市", "code": "510000", "name": "四川省成都市", "needs_city_code": True},
+    },
+    # 上海市 (SH, code2=31)
+    "www.shpt.gov.cn": {
+        "issuer_short": "SH",
+        "issuer_canonical": "上海市普陀区人民政府",
+        "region": {"level": "区", "code": "310000", "name": "上海市普陀区", "needs_city_code": True},
+    },
+    "www.shqp.gov.cn": {
+        "issuer_short": "SH",
+        "issuer_canonical": "上海市青浦区人民政府",
+        "region": {"level": "区", "code": "310000", "name": "上海市青浦区", "needs_city_code": True},
+    },
+    "zwgk.shcn.gov.cn": {
+        "issuer_short": "SH",
+        "issuer_canonical": "上海市长宁区发展和改革委员会",
+        "region": {"level": "区", "code": "310000", "name": "上海市长宁区", "needs_city_code": True},
+    },
+    # 河北省 (HE, code2=13)
+    "www.wuji.gov.cn": {
+        # 无政办〔2025〕3号 — 石家庄市无极县
+        "issuer_short": "HE",
+        "issuer_canonical": "无极县人民政府",
+        "region": {"level": "县", "code": "130000", "name": "河北省石家庄市无极县", "needs_city_code": True},
+    },
+}
+
 # 部委 / 中央域名 -> {issuer_short, issuer_canonical, region}
 # 种子来自 渠道目录.md 中央表;新部委由 Task 4 curate 补
 MINISTRY = {

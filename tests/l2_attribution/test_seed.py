@@ -67,3 +67,27 @@ def test_derive_from_domain_ministry_subdomain():
 def test_derive_from_domain_unknown_none():
     from scripts.l2_attribution.seed_channel_registry import derive_from_domain
     assert derive_from_domain("solar.in-en.com") is None
+
+
+def test_domain_override_haizhu():
+    """DOMAIN_OVERRIDE 中广州市海珠区域名 -> GD + 区级。"""
+    from scripts.l2_attribution.refdata import DOMAIN_OVERRIDE
+    entry = DOMAIN_OVERRIDE["www.haizhu.gov.cn"]
+    assert entry["issuer_short"] == "GD"
+    assert entry["region"]["level"] == "区"
+    assert "海珠" in entry["region"]["name"]
+
+
+def test_domain_override_applied_in_seed(tmp_path):
+    """seed() 对 DOMAIN_OVERRIDE 中的域名直接返回 override 条目,不走 derive。"""
+    from scripts.l2_attribution.seed_channel_registry import derive_entry
+    from scripts.l2_attribution.refdata import DOMAIN_OVERRIDE
+
+    # 选一个 override 域名
+    dom = "www.haizhu.gov.cn"
+    # 传空 channel_name → derive_entry 单独调用会返回 None
+    assert derive_entry(dom, "") is None
+    # 但 DOMAIN_OVERRIDE 中有完整条目
+    ov = DOMAIN_OVERRIDE[dom]
+    assert ov["issuer_short"] == "GD"
+    assert ov["region"]["level"] == "区"

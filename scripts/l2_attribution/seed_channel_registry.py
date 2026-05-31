@@ -6,7 +6,7 @@ import re
 import json
 from pathlib import Path
 import yaml
-from scripts.l2_attribution.refdata import PROVINCE, MINISTRY, CITY_PROVINCE, PROVINCE_PINYIN, MINISTRY_LABEL, CITY_PINYIN
+from scripts.l2_attribution.refdata import PROVINCE, MINISTRY, CITY_PROVINCE, PROVINCE_PINYIN, MINISTRY_LABEL, CITY_PINYIN, DOMAIN_OVERRIDE
 from scripts.l2_attribution.channel_registry import host_of
 from scripts.l1_audit.corpus import load_policies
 
@@ -103,9 +103,12 @@ def seed(channel_md_path: str, policies_dir: str, out_yaml: str, needs_manual_pa
             domains.setdefault(h, rec.path)
     entries, needs_manual = [], []
     for dom, sample_path in sorted(domains.items()):
-        e = derive_entry(dom, md_pairs.get(dom, ""))
-        if e is None:
-            e = derive_from_domain(dom)
+        if dom in DOMAIN_OVERRIDE:
+            e = {"domain": dom, **DOMAIN_OVERRIDE[dom]}
+        else:
+            e = derive_entry(dom, md_pairs.get(dom, ""))
+            if e is None:
+                e = derive_from_domain(dom)
         if e:
             entries.append(e)
         else:
