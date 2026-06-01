@@ -1,0 +1,634 @@
+[
+  {
+    "pid": "P_2020_HN_7de5ab8e",
+    "title": "国家能源局有关负责同志就《关于加强新能源汽车与电网融合互动的 ...",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【国家能源局有关负责同志就《关于加强新能源汽车与电网融合互动的 ...】-湖南省发展和改革委员会-7de5ab8e.md",
+    "level": "省",
+    "level_bucket": "省",
+    "matched_themes": [
+      "v2g",
+      "vpp_theme",
+      "energy_storage_theme",
+      "green_power_trading_theme",
+      "charging_infra",
+      "power_market",
+      "residential_charging",
+      "distribution_grid_opening"
+    ],
+    "n_themes": 8
+  },
+  {
+    "pid": "P_2024_GD_378cdbce",
+    "title": "深圳市发展和改革委员会关于印发《深圳市支持虚拟电厂加快发展的 ...",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【深圳市发展和改革委员会关于印发《深圳市支持虚拟电厂加快发展的 ...(深发改规〔2024〕4号)】-政府门户.fgw.sz.gov.cn-378cdbce.md",
+    "level": "市",
+    "level_bucket": "地方",
+    "matched_themes": [
+      "v2g",
+      "vpp_theme",
+      "energy_storage_theme",
+      "equipment_renewal_theme",
+      "green_power_trading_theme",
+      "charging_infra",
+      "power_market",
+      "aggregator_access"
+    ],
+    "n_themes": 8
+  },
+  {
+    "pid": "P_2024_NDRC_718",
+    "title": "推动车网互动规模化应用试点工作的通知",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【推动车网互动规模化应用试点工作的通知(发改办能源〔2024〕718号)】-国家发展改革委办公厅 国家能源局 工业和信息化部 市场监管总局-2ed7.md",
+    "level": "国家",
+    "level_bucket": "国家",
+    "matched_themes": [
+      "v2g",
+      "vpp_theme",
+      "green_power_trading_theme",
+      "charging_infra",
+      "power_market",
+      "residential_charging",
+      "aggregator_access"
+    ],
+    "n_themes": 7
+  },
+  {
+    "pid": "P_2019_GZ_64193177",
+    "title": "贵州省电网建设专项行动方案",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【贵州省电网建设专项行动方案】-贵州省发展和改革委员会-64193177.md",
+    "level": "省",
+    "level_bucket": "省",
+    "matched_themes": [
+      "gas_station_transition_theme",
+      "charging_infra",
+      "residential_charging",
+      "distribution_grid_opening"
+    ],
+    "n_themes": 4
+  },
+  {
+    "pid": "P_2022_GO_6a4cc949",
+    "title": "国务院办公厅转发国家发展改革委国家能源局关于促进新时代新能源高质量发展实施方案的通知 国办函〔2022〕39号-国家能源局网站",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【国务院办公厅转发国家发展改革委国家能源局关于促进新时代新能源高质量发展实施方案的通知 国办函〔2022〕39号-国家能源局网站(国办函〔2022〕39号)】-国家能源局-6a4cc949.md",
+    "level": "国家",
+    "level_bucket": "国家",
+    "matched_themes": [
+      "energy_storage_theme",
+      "green_power_trading_theme",
+      "power_market",
+      "carbon_market_theme",
+      "distribution_grid_opening"
+    ],
+    "n_themes": 5
+  },
+  {
+    "pid": "P_2015_SD_af076ca3",
+    "title": "济南市人民政府办公厅关于进一步加强成品油监管工作的通知",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【济南市人民政府办公厅关于进一步加强成品油监管工作的通知(鲁政办字〔2015〕194号)】-政府门户.www.jinan.gov.cn-af076ca3.md",
+    "level": "市",
+    "level_bucket": "地方",
+    "matched_themes": [
+      "gas_station_transition_theme",
+      "petroleum_retail_compliance"
+    ],
+    "n_themes": 2
+  },
+  {
+    "pid": "P_2019_FJ_99e4d508",
+    "title": "省商务厅调整与成品油市场准入改革相关的权责事项清单",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【省商务厅调整与成品油市场准入改革相关的权责事项清单(国办发〔2019〕42号)】-政府门户.swt.fujian.gov.cn-99e4d508.md",
+    "level": "省",
+    "level_bucket": "省",
+    "matched_themes": [
+      "gas_station_transition_theme",
+      "petroleum_retail_compliance"
+    ],
+    "n_themes": 2
+  },
+  {
+    "pid": "P_2020_SH_d3a442c8",
+    "title": "上海市经济信息化委关于进一步加强成品油市场管理的紧急通知",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【上海市经济信息化委关于进一步加强成品油市场管理的紧急通知】-政府门户.www.sheitc.sh.gov.cn-d3a442c8.md",
+    "level": "市",
+    "level_bucket": "地方",
+    "matched_themes": [
+      "petroleum_retail_compliance",
+      "aggregator_access"
+    ],
+    "n_themes": 2
+  },
+  {
+    "pid": "P_2024_GD_d62c53cf",
+    "title": "广州市市场监督管理局关于印发广州市以标准提升牵引设备更新和消费品以旧换新行动方案的通知",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【广州市市场监督管理局关于印发广州市以标准提升牵引设备更新和消费品以旧换新行动方案的通知】-政府门户.scjgj.gz.gov.cn-d62c53cf.md",
+    "level": "市",
+    "level_bucket": "地方",
+    "matched_themes": [
+      "vpp_theme",
+      "equipment_renewal_theme",
+      "carbon_market_theme"
+    ],
+    "n_themes": 3
+  },
+  {
+    "pid": "P_2025_BJ_3701c968",
+    "title": "2024年度总目录索引 - 北京市人民政府",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【2024年度总目录索引 - 北京市人民政府】-北京市人民政府-3701c968.md",
+    "level": "省",
+    "level_bucket": "省",
+    "matched_themes": [
+      "equipment_renewal_theme",
+      "carbon_market_theme"
+    ],
+    "n_themes": 2
+  },
+  {
+    "pid": "P_1900_SX_caf8e7eb",
+    "title": "国家发展改革委、国务院国资委、中国证监会、全国工商联有关负责同志就《关于完善中国特色现代企业制度的意见》相关情况答记者问-山西省发改委门户网站",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【国家发展改革委、国务院国资委、中国证监会、全国工商联有关负责同志就《关于完善中国特色现代企业制度的意见》相关情况答记者问-山西省发改委门户网站】-山西省发展和改革委员会-.md",
+    "level": "省",
+    "level_bucket": "省",
+    "matched_themes": [],
+    "n_themes": 0
+  },
+  {
+    "pid": "P_1990_NEA_1162",
+    "title": "加强电网调峰工作若干规定",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【加强电网调峰工作若干规定(能源办〔1990〕1162号)】-国家能源局（原能源部）-c7c5.md",
+    "level": "国家",
+    "level_bucket": "国家",
+    "matched_themes": [],
+    "n_themes": 0
+  },
+  {
+    "pid": "P_2012_BJ_466935e2",
+    "title": "（失效）北京市发展和改革委员会转发国家发展改革委关于提高成品 ...",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【（失效）北京市发展和改革委员会转发国家发展改革委关于提高成品 ...(京发改〔2012〕1370号)】-北京市发展和改革委员会-466935e2.md",
+    "level": "省",
+    "level_bucket": "省",
+    "matched_themes": [
+      "petroleum_retail_compliance"
+    ],
+    "n_themes": 1
+  },
+  {
+    "pid": "P_2012_SH_020",
+    "title": "上海市居民生活用电试行阶梯电价实施方案",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【上海市居民生活用电试行阶梯电价实施方案(沪发改价管(2012)020号)】-上海市发展改革委-f559.md",
+    "level": "省",
+    "level_bucket": "省",
+    "matched_themes": [],
+    "n_themes": 0
+  },
+  {
+    "pid": "P_2013_BJ_cee25b16",
+    "title": "北京市发展和改革委员会关于开展碳排放权交易试点工作的通知",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【北京市发展和改革委员会关于开展碳排放权交易试点工作的通知(京发改规〔2013〕5号)】-北京市人民政府-cee25b16.md",
+    "level": "省",
+    "level_bucket": "省",
+    "matched_themes": [
+      "carbon_market_theme"
+    ],
+    "n_themes": 1
+  },
+  {
+    "pid": "P_2015_BJ_c5505b70",
+    "title": "（失效）北京市发展和改革委员会转发国家发展改革委关于降低国内 ...",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【（失效）北京市发展和改革委员会转发国家发展改革委关于降低国内 ...(京发改〔2015〕1668号)】-北京市发展和改革委员会-c5505b70.md",
+    "level": "省",
+    "level_bucket": "省",
+    "matched_themes": [
+      "petroleum_retail_compliance"
+    ],
+    "n_themes": 1
+  },
+  {
+    "pid": "P_2015_NDRC_3d821d6e",
+    "title": "国家发展改革委 国家能源局关于印发电力体制改革配套文件的通知_政府信息公开_政务公开-国家发展改革委",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【国家发展改革委 国家能源局关于印发电力体制改革配套文件的通知_政府信息公开_政务公开-国家发展改革委(中发〔2015〕9号)】-政府门户.zfxxgk.ndrc.gov.cn-3d821d6e.md",
+    "level": "国家",
+    "level_bucket": "国家",
+    "matched_themes": [
+      "power_market",
+      "distribution_grid_opening"
+    ],
+    "n_themes": 2
+  },
+  {
+    "pid": "P_2015_NEA_73",
+    "title": "加快电动汽车充电基础设施建设的指导意见",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【加快电动汽车充电基础设施建设的指导意见(国办发〔2015〕73号)】-国务院办公厅-1fdb.md",
+    "level": "国家",
+    "level_bucket": "国家",
+    "matched_themes": [
+      "charging_infra"
+    ],
+    "n_themes": 1
+  },
+  {
+    "pid": "P_2015_TJ_9ec9c169",
+    "title": "市发展改革委关于进一步规范光伏发电项目建设管理有关事项的通知_ ...",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【市发展改革委关于进一步规范光伏发电项目建设管理有关事项的通知_ ...(津发改能源〔2015〕980号)】-天津市发展和改革委员会-9ec9c169.md",
+    "level": "省",
+    "level_bucket": "省",
+    "matched_themes": [
+      "distribution_grid_opening"
+    ],
+    "n_themes": 1
+  },
+  {
+    "pid": "P_2016_AH_ae5294fd",
+    "title": "安徽省能源局安徽省物价局国家能源局华东监管局关于印发《安徽省 ...",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【安徽省能源局安徽省物价局国家能源局华东监管局关于印发《安徽省 ...(皖能源电力〔2016〕78号)】-安徽省发展和改革委员会-ae5294fd.md",
+    "level": "省",
+    "level_bucket": "省",
+    "matched_themes": [
+      "power_market",
+      "distribution_grid_opening"
+    ],
+    "n_themes": 2
+  },
+  {
+    "pid": "P_2016_CQ_58e17873",
+    "title": "重庆市能源局关于开展重庆市增量配电业务试点项目业主市场化优选 ...",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【重庆市能源局关于开展重庆市增量配电业务试点项目业主市场化优选 ...(发改经体〔2016〕2120号)】-重庆市发展和改革委员会-58e17873.md",
+    "level": "省",
+    "level_bucket": "省",
+    "matched_themes": [
+      "distribution_grid_opening"
+    ],
+    "n_themes": 1
+  },
+  {
+    "pid": "P_2016_HI_3bac5b3a",
+    "title": "海南省发展和改革委员会关于印发《海南省电动汽车充电基础设施 ...",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【海南省发展和改革委员会关于印发《海南省电动汽车充电基础设施 ...(琼发改交能〔2016〕1697号)】-海南省发展和改革委员会-3bac5b3a.md",
+    "level": "省",
+    "level_bucket": "省",
+    "matched_themes": [
+      "charging_infra"
+    ],
+    "n_themes": 1
+  },
+  {
+    "pid": "P_2016_NDRC_8890ad14",
+    "title": "关于规范开展增量配电业务改革试点的通知(发改经体〔2016〕2480号)",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【关于规范开展增量配电业务改革试点的通知(发改经体〔2016〕2480号)(发改经体〔2016〕2480号)】-国家发展和改革委员会-8890ad14.md",
+    "level": "国家",
+    "level_bucket": "国家",
+    "matched_themes": [
+      "distribution_grid_opening"
+    ],
+    "n_themes": 1
+  },
+  {
+    "pid": "P_2017_CQ_c8d99857",
+    "title": "重庆市能源局关于报送第二批增量配电业务改革试点项目的通知",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【重庆市能源局关于报送第二批增量配电业务改革试点项目的通知(渝能源电〔2017〕61号)】-重庆市发展和改革委员会-c8d99857.md",
+    "level": "省",
+    "level_bucket": "省",
+    "matched_themes": [
+      "distribution_grid_opening"
+    ],
+    "n_themes": 1
+  },
+  {
+    "pid": "P_2017_GD_406db0aa",
+    "title": "广东省发展改革委关于印发广东省2017 年度碳排放配额分配实施 ...",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【广东省发展改革委关于印发广东省2017 年度碳排放配额分配实施 ...(粤发改气候函〔2017〕4509号)】-广东省发展和改革委员会-406db0aa.md",
+    "level": "省",
+    "level_bucket": "省",
+    "matched_themes": [
+      "carbon_market_theme"
+    ],
+    "n_themes": 1
+  },
+  {
+    "pid": "P_2017_NDRC_09206e37",
+    "title": "电力需求侧管理办法(2017年修订版)",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【电力需求侧管理办法(2017年修订版)】-国家发展改革委等六部门-dd8c.md",
+    "level": "国家",
+    "level_bucket": "国家",
+    "matched_themes": [
+      "power_market",
+      "distribution_grid_opening"
+    ],
+    "n_themes": 2
+  },
+  {
+    "pid": "P_2018_NDRC_ce8700fb",
+    "title": "【关于印发《清洁能源消纳行动计划(2018-2020年)》的通知(发改 ...",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【【关于印发《清洁能源消纳行动计划(2018-2020年)》的通知(发改 ...(发改能源规〔2018〕1575号)】-国家发展和改革委员会-ce8700fb.md",
+    "level": "国家",
+    "level_bucket": "国家",
+    "matched_themes": [],
+    "n_themes": 0
+  },
+  {
+    "pid": "P_2019_NDRC_0720b570",
+    "title": "关于建立健全可再生能源电力消纳保障机制的通知(发改能源〔2019〕807号)",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【关于建立健全可再生能源电力消纳保障机制的通知(发改能源〔2019〕807号)(发改能源〔2019〕807号)】-国家发展和改革委员会-0720b570.md",
+    "level": "国家",
+    "level_bucket": "国家",
+    "matched_themes": [
+      "power_market",
+      "distribution_grid_opening"
+    ],
+    "n_themes": 2
+  },
+  {
+    "pid": "P_2020_HE_6d08b05b",
+    "title": "政府公报- 邯郸市信息公开 - 邯郸市人民政府",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【政府公报- 邯郸市信息公开 - 邯郸市人民政府(邯政字〔2020〕17号)】-政府门户.www.hd.gov.cn-6d08b05b.md",
+    "level": "市",
+    "level_bucket": "地方",
+    "matched_themes": [],
+    "n_themes": 0
+  },
+  {
+    "pid": "P_2020_NDRC_06306aac",
+    "title": "电力中长期交易基本规则(暂行)",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【电力中长期交易基本规则(暂行)】-国家发展和改革委员会、国家能源局-eaa5.md",
+    "level": "国家",
+    "level_bucket": "国家",
+    "matched_themes": [
+      "power_market",
+      "residential_charging",
+      "distribution_grid_opening"
+    ],
+    "n_themes": 3
+  },
+  {
+    "pid": "P_2021_NDRC_0421ce4f",
+    "title": "关于加快推动新型储能发展的指导意见(征求意见稿)",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【关于加快推动新型储能发展的指导意见(征求意见稿)】-国家发展改革委、国家能源局-0a44.md",
+    "level": "国家",
+    "level_bucket": "国家",
+    "matched_themes": [
+      "vpp_theme",
+      "energy_storage_theme",
+      "charging_infra",
+      "distribution_grid_opening"
+    ],
+    "n_themes": 4
+  },
+  {
+    "pid": "P_2017_GD_70875d73",
+    "title": "广州市工业和信息化委关于印发进一步加强电动汽车充电基础设施建设运营管理的通知 - 广州市人民政府门户网站",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【广州市工业和信息化委关于印发进一步加强电动汽车充电基础设施建设运营管理的通知 - 广州市人民政府门户网站(穗工信规字〔2017〕2号)】-政府门户.www.gz.gov.cn-70875d73.md",
+    "level": "市",
+    "level_bucket": "地方",
+    "matched_themes": [
+      "charging_infra"
+    ],
+    "n_themes": 1
+  },
+  {
+    "pid": "P_2017_NDRC_d5bc4c87",
+    "title": "【关于试行可再生能源绿色电力证书核发及自愿认购交易制度的通知(发改能源〔2017〕132号)】-国家发展和改革委员会",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【【关于试行可再生能源绿色电力证书核发及自愿认购交易制度的通知(发改能源〔2017〕132号)】-国家发展和改革委员会(发改能源〔2017〕132号)】-国家发展和改革委员会-d5bc4c87.md",
+    "level": "国家",
+    "level_bucket": "国家",
+    "matched_themes": [
+      "green_power_trading_theme"
+    ],
+    "n_themes": 1
+  },
+  {
+    "pid": "P_2018_GD_3e8388c2",
+    "title": "充电基础设施补贴资金管理办法的通知 - 广州市人民政府",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【充电基础设施补贴资金管理办法的通知 - 广州市人民政府(穗工信规字〔2018〕3号)】-政府门户.www.gz.gov.cn-3e8388c2.md",
+    "level": "市",
+    "level_bucket": "地方",
+    "matched_themes": [
+      "charging_infra"
+    ],
+    "n_themes": 1
+  },
+  {
+    "pid": "P_2019_GD_0c52cbb8",
+    "title": "广州市海珠区科技工业商务和信息化局关于开展2019-2021年度电动 ...",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【广州市海珠区科技工业商务和信息化局关于开展2019-2021年度电动 ...】-政府门户.www.haizhu.gov.cn-0c52cbb8.md",
+    "level": "区",
+    "level_bucket": "地方",
+    "matched_themes": [
+      "charging_infra"
+    ],
+    "n_themes": 1
+  },
+  {
+    "pid": "P_2019_GD_781f09c6",
+    "title": "广州市工业和信息化局关于印发进一步加强电动汽车充电基础设施建设运营管理的通知 - 广州市人民政府门户网站",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【广州市工业和信息化局关于印发进一步加强电动汽车充电基础设施建设运营管理的通知 - 广州市人民政府门户网站(穗工信规字〔2019〕1号)】-政府门户.www.gz.gov.cn-781f09c6.md",
+    "level": "市",
+    "level_bucket": "地方",
+    "matched_themes": [
+      "charging_infra"
+    ],
+    "n_themes": 1
+  },
+  {
+    "pid": "P_2020_SH_39_b",
+    "title": "新能源汽车产业发展规划(2021—2035年)",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【新能源汽车产业发展规划(2021—2035年)(国办发〔2020〕39号)】-国务院办公厅-9884.md",
+    "level": "市",
+    "level_bucket": "地方",
+    "matched_themes": [],
+    "n_themes": 0
+  },
+  {
+    "pid": "P_2020_SX_a009034f",
+    "title": "陵川县人民政府办公室关于2019年贯彻落实国发42号文件重点工作的 ...",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【陵川县人民政府办公室关于2019年贯彻落实国发42号文件重点工作的 ...(陵政办发〔2019〕44号)】-政府门户.xxgk.lczf.gov.cn-a009034f.md",
+    "level": "县",
+    "level_bucket": "地方",
+    "matched_themes": [],
+    "n_themes": 0
+  },
+  {
+    "pid": "P_2021_AH_1001d59f",
+    "title": "六安市成品油零售网点“十四五”发展规划(征求意见稿)",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【六安市成品油零售网点“十四五”发展规划(征求意见稿)】-六安市商务局-45a0.md",
+    "level": "市",
+    "level_bucket": "地方",
+    "matched_themes": [
+      "gas_station_transition_theme",
+      "petroleum_retail_compliance"
+    ],
+    "n_themes": 2
+  },
+  {
+    "pid": "P_2025_NDRC_101520b2",
+    "title": "电动汽车充电设施服务能力「三年倍增」行动方案(2025—2027年)",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【电动汽车充电设施服务能力「三年倍增」行动方案(2025—2027年)】-国家发展和改革委员会、国家能源局-6066.md",
+    "level": "国家",
+    "level_bucket": "国家",
+    "matched_themes": [
+      "v2g",
+      "vpp_theme",
+      "charging_infra",
+      "power_market",
+      "residential_charging",
+      "distribution_grid_opening",
+      "aggregator_access"
+    ],
+    "n_themes": 7
+  },
+  {
+    "pid": "P_2025_NDRC_910",
+    "title": "关于开展零碳园区建设的通知",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【关于开展零碳园区建设的通知(发改环资〔2025〕910号)】-国家发展改革委-2458.md",
+    "level": "国家",
+    "level_bucket": "国家",
+    "matched_themes": [
+      "vpp_theme",
+      "equipment_renewal_theme",
+      "green_power_trading_theme",
+      "power_market",
+      "distribution_grid_opening",
+      "aggregator_access"
+    ],
+    "n_themes": 6
+  },
+  {
+    "pid": "P_2024_NDRC_1721",
+    "title": "加强新能源汽车与电网融合互动的实施意见",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【加强新能源汽车与电网融合互动的实施意见(发改能源〔2023〕1721号)】-国家发展改革委等部门-8a92.md",
+    "level": "国家",
+    "level_bucket": "国家",
+    "matched_themes": [
+      "v2g",
+      "vpp_theme",
+      "energy_storage_theme",
+      "charging_infra",
+      "power_market",
+      "residential_charging"
+    ],
+    "n_themes": 6
+  },
+  {
+    "pid": "P_2024_SD_3363e0d7",
+    "title": "山东省发展和改革委员会 监测分析 虚拟电厂提速发展助力平衡电力供需",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【山东省发展和改革委员会 监测分析 虚拟电厂提速发展助力平衡电力供需】-山东省发展和改革委员会-3363e0d7.md",
+    "level": "省",
+    "level_bucket": "省",
+    "matched_themes": [
+      "v2g",
+      "vpp_theme",
+      "energy_storage_theme",
+      "charging_infra",
+      "power_market",
+      "aggregator_access"
+    ],
+    "n_themes": 6
+  },
+  {
+    "pid": "P_2022_CQ_229620a1",
+    "title": "重庆市发展和改革委员会关于市五届人大五次会议第0630号建议办理 ...",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【重庆市发展和改革委员会关于市五届人大五次会议第0630号建议办理 ...】-重庆市发展和改革委员会-229620a1.md",
+    "level": "省",
+    "level_bucket": "省",
+    "matched_themes": [
+      "vpp_theme",
+      "energy_storage_theme",
+      "charging_infra",
+      "power_market",
+      "residential_charging",
+      "aggregator_access"
+    ],
+    "n_themes": 6
+  },
+  {
+    "pid": "P_2026_SD_7440c4a3",
+    "title": "山东省发展和改革委员会工作信息山东探索出独具特色电改路",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【山东省发展和改革委员会工作信息山东探索出独具特色电改路】-山东省发展和改革委员会-7440c4a3.md",
+    "level": "省",
+    "level_bucket": "省",
+    "matched_themes": [
+      "v2g",
+      "vpp_theme",
+      "energy_storage_theme",
+      "green_power_trading_theme",
+      "charging_infra",
+      "power_market"
+    ],
+    "n_themes": 6
+  },
+  {
+    "pid": "P_2026_CQ_0275a8b2",
+    "title": "重庆市能源局关于市六届人大四次会议第1123号建议协办意见的函",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【重庆市能源局关于市六届人大四次会议第1123号建议协办意见的函】-重庆市发展和改革委员会-0275a8b2.md",
+    "level": "省",
+    "level_bucket": "省",
+    "matched_themes": [
+      "v2g",
+      "vpp_theme",
+      "energy_storage_theme",
+      "gas_station_transition_theme",
+      "power_market"
+    ],
+    "n_themes": 5
+  },
+  {
+    "pid": "P_2023_NDRC_092751f2_a",
+    "title": "电力需求侧管理办法(2023年版)",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【电力需求侧管理办法(2023年版)】-国家发展和改革委员会等六部门-7611.md",
+    "level": "国家",
+    "level_bucket": "国家",
+    "matched_themes": [
+      "vpp_theme",
+      "energy_storage_theme",
+      "green_power_trading_theme",
+      "power_market",
+      "distribution_grid_opening",
+      "aggregator_access"
+    ],
+    "n_themes": 6
+  },
+  {
+    "pid": "P_2024_NEA_93_a",
+    "title": "国家能源局关于支持电力领域新型经营主体创新发展的指导意见",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【国家能源局关于支持电力领域新型经营主体创新发展的指导意见(国能发法改〔2024〕93号)】-国家能源局-381e.md",
+    "level": "国家",
+    "level_bucket": "国家",
+    "matched_themes": [
+      "vpp_theme",
+      "energy_storage_theme",
+      "green_power_trading_theme",
+      "power_market",
+      "distribution_grid_opening",
+      "aggregator_access"
+    ],
+    "n_themes": 6
+  },
+  {
+    "pid": "P_2024_JL_232",
+    "title": "关于促进吉林省用户侧储能设施建设的若干措施",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【关于促进吉林省用户侧储能设施建设的若干措施(吉能储能〔2024〕232号)】-吉林省能源局、发改委、工信厅-982e.md",
+    "level": "省",
+    "level_bucket": "省",
+    "matched_themes": [
+      "v2g",
+      "vpp_theme",
+      "energy_storage_theme",
+      "charging_infra",
+      "distribution_grid_opening",
+      "aggregator_access"
+    ],
+    "n_themes": 6
+  },
+  {
+    "pid": "P_2025_GO_d433682b",
+    "title": "最高补20万元！福建宁德市推广集中式“光储充检”一体化示范站",
+    "path": "/Users/shaoziyuan/Documents/Zayn Main/政策分析/0_raw/policies/【最高补20万元！福建宁德市推广集中式“光储充检”一体化示范站】-未知机构-d433682b.md",
+    "level": "国家",
+    "level_bucket": "国家",
+    "matched_themes": [
+      "equipment_renewal_theme",
+      "charging_infra",
+      "residential_charging",
+      "distribution_grid_opening"
+    ],
+    "n_themes": 4
+  }
+]
