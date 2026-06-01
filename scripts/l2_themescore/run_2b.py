@@ -1,7 +1,7 @@
 import argparse, json
 from pathlib import Path
 from scripts.l1_audit.corpus import load_policies
-from scripts.common.llm import LLMClient
+from scripts.common.llm import LLMClient, OpenAICompatClient
 from .theme_registry import ThemeRegistry
 from .models import BusinessViewDraft, Scores, QueueRecord
 from . import scoring, program_gate, prompts
@@ -16,6 +16,13 @@ DEFAULT_SCORING = "_meta/framework/scoring.yaml"
 
 def _scoring_text(vault) -> str:
     return Path(f"{vault}/{DEFAULT_SCORING}").read_text(encoding="utf-8")
+
+def make_client(provider: str, model: str, log_path: str):
+    """provider=anthropic → LLMClient(读 ANTHROPIC_*,如 Claude / MiniMax 兼容端点);
+    provider=openai → OpenAICompatClient(读 OPENAI_*,如 DashScope/Qwen)。gen 与 judge 各自独立端点。"""
+    if provider == "openai":
+        return OpenAICompatClient(model=model, log_path=log_path)
+    return LLMClient(model=model, log_path=log_path)
 
 def plan(vault, registry_path, scoring_text, gen_client, judge_client, gen_pass2_client=None):
     gen_pass2_client = gen_pass2_client or gen_client
@@ -92,13 +99,15 @@ def main():
     ap.add_argument("--state", default="state/node2b")
     ap.add_argument("--gen-model", required=True)
     ap.add_argument("--judge-model", required=True)
+    ap.add_argument("--gen-provider", default="anthropic", choices=["anthropic", "openai"])
+    ap.add_argument("--judge-provider", default="anthropic", choices=["anthropic", "openai"])
     args = ap.parse_args()
     assert args.gen_model != args.judge_model, "judge 模型必须 ≠ generator 模型"
 
     reg_path = f"{args.vault}/_meta/themes_registry.yaml"
     sc_text = _scoring_text(args.vault)
-    gen_client = LLMClient(model=args.gen_model, log_path=f"{args.state}/gen_calls.jsonl")
-    judge_client = LLMClient(model=args.judge_model, log_path=f"{args.state}/judge_calls.jsonl")
+    gen_client = make_client(args.gen_provider, args.gen_model, f"{args.state}/gen_calls.jsonl")
+    judge_client = make_client(args.judge_provider, args.judge_model, f"{args.state}/judge_calls.jsonl")
 
     to_write, queue = plan(args.vault, reg_path, sc_text, gen_client, judge_client)
     drafts = [d for _, d in to_write]

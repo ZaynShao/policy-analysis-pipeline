@@ -75,3 +75,11 @@ def test_verify_artifacts_catches_tampered(tmp_path):
     failures = verify_artifacts(str(tmp_path), str(reg))
     bad = [pid for pid, _ in failures]
     assert "P_BAD" in bad and "P_OK" not in bad
+
+
+def test_make_client_picks_provider(tmp_path):
+    from scripts.l2_themescore.run_2b import make_client
+    from scripts.common.llm import LLMClient, OpenAICompatClient
+    log = str(tmp_path / "c.jsonl")
+    assert isinstance(make_client("anthropic", "claude-x", log), LLMClient)
+    assert isinstance(make_client("openai", "qwen3.6-plus", log), OpenAICompatClient)

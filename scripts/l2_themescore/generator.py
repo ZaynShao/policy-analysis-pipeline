@@ -16,8 +16,9 @@ def _complete_json(client, system, user, max_tokens=1024) -> dict:
                               user=user, max_tokens=max_tokens)
         return parse_json_block(txt)
 
+# reasoning 模型(MiniMax-M2.7 等)先思考再出答案,预算须覆盖"思考+输出";原 896/1024 偏紧→截断风险。
 def gen_pass1(client, system: str, user: str) -> dict:
-    return _complete_json(client, system, user, max_tokens=896)
+    return _complete_json(client, system, user, max_tokens=2048)
 
 def gen_pass2(client, system: str, user: str) -> dict:
-    return _complete_json(client, system, user, max_tokens=1024)
+    return _complete_json(client, system, user, max_tokens=3072)

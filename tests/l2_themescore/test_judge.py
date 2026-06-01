@@ -25,3 +25,17 @@ def test_judge_reject(tmp_path):
                   log_path=str(tmp_path/"l.jsonl"))
     v = judge_draft(c, rec_title="储能政策", rec_body="...", draft=_d())
     assert v.verdict == "reject" and v.dim == "theme"
+
+def test_judge_has_reasoning_headroom(tmp_path):
+    # judge 可能是 reasoning 模型(Qwen 等),256 太小→思考耗光预算;守住头寸不回退。
+    seen = []
+    class M:
+        def create(self, **kw):
+            seen.append(kw.get("max_tokens"))
+            class R: content=[type("B",(),{"text":'{"verdict":"accept","dim":"overall","reason":"ok","confidence":0.9}'})()]
+            return R()
+    class A:
+        def __init__(self,**kw): self.messages=M()
+    c = LLMClient(client=A(), log_path=str(tmp_path/"l.jsonl"))
+    judge_draft(c, rec_title="t", rec_body="b", draft=_d())
+    assert seen[0] >= 1024

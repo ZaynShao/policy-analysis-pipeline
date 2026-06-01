@@ -12,7 +12,8 @@ def judge_draft(client, rec_title: str, rec_body: str, draft) -> JudgeVerdict:
             f"待审归属:themes={draft.themes} primary={draft.primary_theme} "
             f"scores={draft.scores.to_dict()} 重要性={draft.importance} "
             f"影响分析={draft.影响分析}")
-    txt = client.complete(system=JUDGE_SYSTEM, user=user, max_tokens=256)
+    # 256 对 reasoning 模型(judge 可能是 Qwen 等)太小,思考会吃光预算→空;给足裁决头寸。
+    txt = client.complete(system=JUDGE_SYSTEM, user=user, max_tokens=1024)
     try:
         d = parse_json_block(txt)
     except Exception:
