@@ -6,7 +6,7 @@ from scripts.l2_themescore.business_view_writer import write_business_view
 def _d():
     return BusinessViewDraft(pid="P_2024_NDRC_718", themes=["power_market","energy_storage_theme"],
         primary_theme="power_market", scores=Scores(5,4,4,4,4,5), importance=4, action_class="A",
-        value_tags=["机会"], gate_passed_deep=True,
+        value_tags=["机会"], gate_passed_deep=True, comprehensive=True,
         影响分析={"加油":"a","充电":"b","电力_储能_V2G_交易":"c"}, 行动建议=["A 趁早:x"],
         didi_impact_one_liner="y")
 
@@ -23,6 +23,7 @@ def test_write_and_reload(tmp_path):
     assert set(data["影响分析"].keys()) == {"加油","充电","电力_储能_V2G_交易"}
     assert data["sanitized_from"] == raw_file
     assert data["gate_passed_deep"] is True
+    assert data["comprehensive"] is True
 
 def test_overwrites_整文件重生(tmp_path):
     vault = tmp_path

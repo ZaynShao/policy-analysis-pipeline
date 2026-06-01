@@ -34,7 +34,7 @@ def _setup(tmp_path):
     reg = tmp_path/"themes_registry.yaml"; reg.write_text(REG, encoding="utf-8")
     return str(tmp_path), str(reg)
 
-P1 = '{"themes":["power_market"],"primary_theme":"power_market","scores":{"D1":5,"D2":4,"D3":4,"D4":4,"D5":4,"D6":5}}'
+P1 = '{"themes":["power_market"],"primary_theme":"power_market","comprehensive":true,"scores":{"D1":5,"D2":4,"D3":4,"D4":4,"D5":4,"D6":5}}'
 P2 = '{"影响分析":{"加油":"a","充电":"b","电力_储能_V2G_交易":"c"},"行动建议":["A 趁早:x"],"didi_impact_one_liner":"y"}'
 
 def test_plan_clean_goes_to_write(tmp_path):
@@ -46,6 +46,7 @@ def test_plan_clean_goes_to_write(tmp_path):
     assert len(to_write) == 1 and len(queue) == 0
     rec, draft = to_write[0]
     assert draft.primary_theme == "power_market"
+    assert draft.comprehensive is True
     assert draft.importance == 4 and draft.gate_passed_deep is True
     assert set(draft.影响分析.keys()) == {"加油","充电","电力_储能_V2G_交易"}
 

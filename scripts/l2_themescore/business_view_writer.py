@@ -13,6 +13,7 @@ def write_business_view(draft, vault: str, sanitized_from: str, extracted_at: st
         "pid": draft.pid,
         "themes": list(draft.themes or []),
         "primary_theme": draft.primary_theme,
+        "comprehensive": bool(draft.comprehensive),
         "scores": draft.scores.to_dict(),
         "重要性": draft.importance,
         "行动分类": draft.action_class,

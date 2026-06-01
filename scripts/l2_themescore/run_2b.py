@@ -36,6 +36,7 @@ def plan(vault, registry_path, scoring_text, gen_client, judge_client, gen_pass2
             o1 = gen_pass1(gen_client, p1_sys, prompts.pass1_user(rec))
             draft = BusinessViewDraft(
                 pid=rec.pid, themes=o1.get("themes", []), primary_theme=o1.get("primary_theme",""),
+                comprehensive=bool(o1.get("comprehensive", False)),
                 scores=Scores.from_dict(o1["scores"]))
         except Exception as e:
             queue.append(QueueRecord(pid=rec.pid, stage="generation_error", reason=str(e)[:200]))

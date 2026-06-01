@@ -13,12 +13,15 @@ def pass1_system(registry, scoring_text: str) -> str:
 - 挂上所有真正命中的 theme(不限数量);政策跨多主题就都挂。
 - 再从挂上的里选 1 个 primary_theme(最核心的那个)。
 - 上面每个 theme 后的词是关键词锚,命中可作信号;但以语义为准,不是出现关键词就必挂。
+- comprehensive:若政策横跨多主题且**无单一中心**(综合/纲领性,如"XX高质量发展实施方案""XX建设总体方案"),置 true(primary 仍选一个**名义**主书架);否则 false。
 
 【六维打分(0-5,定义见下)】
 {scoring_text}
 
+【过期政策】若政策文本标明已失效/废止/有效期已过,D2(直接影响度)按"无现行约束力"打低(1-2);theme 照常挂、D1 据相关度照打——重要性会自然封顶。
+
 只输出 JSON,无解释:
-{{"themes":["id1","id2"],"primary_theme":"id1","scores":{{"D1":0,"D2":0,"D3":0,"D4":0,"D5":0,"D6":0}}}}
+{{"themes":["id1","id2"],"primary_theme":"id1","comprehensive":false,"scores":{{"D1":0,"D2":0,"D3":0,"D4":0,"D5":0,"D6":0}}}}
 """
 
 def pass1_user(rec) -> str:

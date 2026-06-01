@@ -17,6 +17,7 @@ class BusinessViewDraft:
     action_class: str = None
     value_tags: list = field(default_factory=list)
     gate_passed_deep: bool = False
+    comprehensive: bool = False   # 综合/纲领政策:跨多主题无单一中心,primary 为名义主书架
     影响分析: dict = None
     行动建议: list = field(default_factory=list)
     didi_impact_one_liner: str = None
