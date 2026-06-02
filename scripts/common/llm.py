@@ -76,5 +76,5 @@ class OpenAICompatClient:
         req = urllib.request.Request(
             url, data=json.dumps(payload).encode("utf-8"),
             headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"})
-        with urllib.request.urlopen(req, timeout=60) as r:
+        with urllib.request.urlopen(req, timeout=180) as r:
             return json.loads(r.read())

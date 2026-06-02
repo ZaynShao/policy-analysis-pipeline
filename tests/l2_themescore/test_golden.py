@@ -9,6 +9,16 @@ def test_load_golden(tmp_path):
     recs = load_golden(str(p))
     assert len(recs) == 2 and recs[1].is_planted
 
+def test_load_golden_accepts_frozen_v1_shape(tmp_path):
+    p = tmp_path/"g.jsonl"
+    p.write_text(
+        '{"pid":"P1","themes":["power_market"],"primary_theme":"power_market","scores":{"D1":5,"D2":4,"D3":4,"D4":4,"D5":4,"D6":5},"is_planted":false}\n',
+        encoding="utf-8")
+    rec = load_golden(str(p))[0]
+    assert rec.gold_themes == ["power_market"]
+    assert rec.gold_primary == "power_market"
+    assert rec.gold_scores["D1"] == 5
+
 def test_score_judge_recall_precision():
     # rows: list[(pid, verdict, is_planted)]
     rows = [("P1","accept",False), ("P2","reject",True)]

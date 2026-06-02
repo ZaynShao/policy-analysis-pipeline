@@ -1,4 +1,4 @@
-from scripts.l2_themescore.theme_registry import ThemeRegistry
+from scripts.l2_themescore.theme_registry import ThemeRegistry, canonical_theme_id, canonicalize_theme_ids
 
 REG = """
 schema_version: 1.0
@@ -23,3 +23,8 @@ def test_validate(tmp_path):
     p = tmp_path/"r.yaml"; p.write_text(REG, encoding="utf-8")
     r = ThemeRegistry.load(str(p))
     assert r.is_valid("vpp_theme") and not r.is_valid("nonsense_theme")
+
+def test_canonical_theme_id_handles_none_and_suffix_alias():
+    assert canonical_theme_id(None, ["v2g"]) == ""
+    assert canonical_theme_id("v2g_theme", ["v2g"]) == "v2g"
+    assert canonicalize_theme_ids([None, "", "v2g_theme", "v2g"], ["v2g"]) == ["v2g"]

@@ -14,7 +14,16 @@ def _complete_json(client, system, user, max_tokens=1024) -> dict:
     except Exception:
         txt = client.complete(system=system + "\n\n严格:只输出 JSON,不要任何其他字符。",
                               user=user, max_tokens=max_tokens)
-        return parse_json_block(txt)
+        try:
+            return parse_json_block(txt)
+        except Exception:
+            repair_user = (
+                "下面文本本应是 JSON,但格式有误。请只返回修复后的合法 JSON,不要解释。\n\n"
+                f"{txt}"
+            )
+            txt = client.complete(system="你是 JSON 修复器。只输出合法 JSON,不要任何其他字符。",
+                                  user=repair_user, max_tokens=max_tokens)
+            return parse_json_block(txt)
 
 # reasoning 模型(MiniMax-M2.7 等)先思考再出答案,预算须覆盖"思考+输出";原 896/1024 偏紧→截断风险。
 def gen_pass1(client, system: str, user: str) -> dict:

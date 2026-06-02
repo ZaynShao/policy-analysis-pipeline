@@ -1,5 +1,5 @@
 from scripts.l2_themescore.models import Scores, BusinessViewDraft
-from scripts.l2_themescore.program_gate import check_draft
+from scripts.l2_themescore.program_gate import check_draft, check_distribution
 
 VALID_IDS = ["power_market","vpp_theme","energy_storage_theme"]
 KEYS = {"加油","充电","电力_储能_V2G_交易"}
@@ -13,6 +13,19 @@ def _draft(**kw):
 
 def test_clean_passes():
     assert check_draft(_draft(), VALID_IDS) == []
+
+def test_zero_theme_clean_passes():
+    d = _draft(themes=[], primary_theme="", scores=Scores(1,1,1,1,1,1),
+               importance=1, action_class="D", value_tags=["趋势"],
+               gate_passed_deep=False, 影响分析=None, 行动建议=[])
+    assert check_draft(d, VALID_IDS) == []
+
+def test_zero_theme_with_primary_rejected():
+    d = _draft(themes=[], primary_theme="power_market", scores=Scores(1,1,1,1,1,1),
+               importance=1, action_class="D", value_tags=["趋势"],
+               gate_passed_deep=False, 影响分析=None, 行动建议=[])
+    v = check_draft(d, VALID_IDS)
+    assert any("primary" in x for x in v)
 
 def test_primary_not_in_themes():
     v = check_draft(_draft(primary_theme="vpp_theme"), VALID_IDS)
@@ -33,3 +46,9 @@ def test_deep_iff_gate_violation():
 def test_formula_mismatch():
     v = check_draft(_draft(importance=1), VALID_IDS)
     assert any("公式" in x for x in v)
+
+def test_distribution_allows_zero_theme_drafts():
+    d = _draft(themes=[], primary_theme="", scores=Scores(1,1,1,1,1,1),
+               importance=1, action_class="D", value_tags=["趋势"],
+               gate_passed_deep=False, 影响分析=None, 行动建议=[])
+    assert check_distribution([d], len(VALID_IDS)) == []

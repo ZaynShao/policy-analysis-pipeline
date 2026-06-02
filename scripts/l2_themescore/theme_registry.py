@@ -25,3 +25,29 @@ class ThemeRegistry:
 
     def is_valid(self, tid: str) -> bool:
         return tid in self.zh
+
+
+def canonical_theme_id(tid: str, valid_ids) -> str:
+    if not tid:
+        return ""
+    valid = set(valid_ids)
+    if tid in valid:
+        return tid
+    if tid.endswith("_theme"):
+        base = tid[:-6]
+        if base in valid:
+            return base
+    return tid
+
+
+def canonicalize_theme_ids(ids, valid_ids) -> list:
+    out = []
+    seen = set()
+    for tid in ids or []:
+        canon = canonical_theme_id(tid, valid_ids)
+        if not canon:
+            continue
+        if canon not in seen:
+            out.append(canon)
+            seen.add(canon)
+    return out
