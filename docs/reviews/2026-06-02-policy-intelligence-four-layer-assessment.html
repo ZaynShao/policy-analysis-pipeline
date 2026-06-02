@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>政策情报四层重构 · 三源视角评估</title>
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;margin:0;background:#f6f7f9;color:#1f2937;line-height:1.6}
+main{max-width:1120px;margin:0 auto;padding:34px 24px 60px}
+h1{font-size:30px;margin:0 0 8px}
+h2{font-size:20px;margin:28px 0 12px}
+h3{font-size:16px;margin:18px 0 8px}
+.sub{color:#5b6472;margin-bottom:22px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:16px}
+.wide{grid-column:1/-1}
+.tag{display:inline-block;padding:2px 8px;border-radius:999px;background:#e7f0ff;color:#1d4ed8;font-size:12px;font-weight:600}
+.risk{background:#fff4e5;color:#9a3412}
+.ok{background:#e8f7ef;color:#166534}
+.warn{background:#fef3c7;color:#92400e}
+table{border-collapse:collapse;width:100%;background:#fff;border:1px solid #e5e7eb}
+th,td{border:1px solid #e5e7eb;padding:9px 10px;text-align:left;vertical-align:top}
+th{background:#f1f5f9}
+.num{font-size:28px;font-weight:700}
+.muted{color:#6b7280}
+code{background:#eef2f7;padding:1px 4px;border-radius:4px}
+</style>
+</head>
+<body>
+<main>
+<h1>政策情报四层重构 · 三源视角评估</h1>
+<div class="sub">评估对象: ①源到位 → ②归属 → ③分析 → ④消费。视角: 不是继续拆任务,而是判断这套系统是否足以生产决策情报。</div>
+
+<section class="grid">
+  <div class="card"><div class="tag ok">已存在</div><h3>政策源</h3><div class="num">935</div><p class="muted">正式政策 raw,当前 ②-A/②-B 主线主要围绕它推进。</p></div>
+  <div class="card"><div class="tag warn">有资产,未接成主线</div><h3>评论源</h3><div class="num">283</div><p class="muted">schema 有 commentaries / opinions,但 ②-B business_view 当前未消费评论。</p></div>
+  <div class="card"><div class="tag risk">轻量承认</div><h3>市场情报</h3><div class="num">待建</div><p class="muted">backlog 已承认 market_intel,但完整 representation 与采集策略推后。</p></div>
+</section>
+
+<h2>核心判断</h2>
+<div class="card">
+  <p>当前工程不是没有评论资产,而是四层重构的落地主线还偏 policy-only。schema 里有 <code>0_raw/commentaries</code>、<code>1_extracted/opinions</code> 和 <code>commentary_audit</code>;但已实现的 ②-A / ②-B 主要处理政策本体。继续直接全量重生 <code>business_view</code>,会强化政策本体流水线,但不能自动变成政策情报系统。</p>
+  <p><b>结论:</b>下一阶段需要先补"三源接线"设计,再继续全量 ②-B。否则 ③/④ 很容易继续只消费政策分数和主题,而评论与市场信号仍悬空。</p>
+</div>
+
+<h2>三源角色</h2>
+<table>
+<tr><th>源</th><th>回答的问题</th><th>正确位置</th><th>不能做什么</th></tr>
+<tr><td>政策</td><td>规则是什么,谁发布,适用哪里,正式要求是什么</td><td><code>0_raw/policies</code>, <code>business_view</code>, policy relations</td><td>不能被评论直接改写事实或主题分数</td></tr>
+<tr><td>评论</td><td>外部如何解读,争议在哪里,行业预期是什么</td><td><code>0_raw/commentaries</code>, <code>1_extracted/opinions</code>, 观点矩阵</td><td>不能混进 policy 的 raw 或直接覆盖 <code>business_view</code></td></tr>
+<tr><td>市场情报</td><td>哪里已有项目、招标、补贴、容量、价格、落地动作</td><td>独立 market_intel representation,后续进入机会验证层</td><td>不能混成政策,也不能混成评论</td></tr>
+</table>
+
+<h2>四层接线评估</h2>
+<table>
+<tr><th>层</th><th>现状</th><th>评估</th><th>应补 done-gate</th></tr>
+<tr><td>① 源到位</td><td>政策清洗推进充分;评论资产存在;market_intel 仅 backlog 轻量承认</td><td>源不是单一政策源,但当前主线表达仍偏政策</td><td>三源数量、误分类、未归属、market_intel manifest</td></tr>
+<tr><td>② 归属</td><td>政策身份和 theme/business_view 已开始形成新流程</td><td>评论归属、市场情报归属未形成同等流程</td><td>commentary → policy/theme/stance; market_intel → region/theme/opportunity</td></tr>
+<tr><td>③ 分析</td><td>backlog 定义为政策关系/演进/区域</td><td>缺评论观点矩阵和市场验证层,会导致分析层偏窄</td><td>政策关系 + 观点矩阵 + 市场信号验证三件套</td></tr>
+<tr><td>④ 消费</td><td>旧月报 tainted,新消费层未重生</td><td>这是重新定义决策问题的机会</td><td>报告/卡片必须说明政策依据、外部观点、市场信号三类证据</td></tr>
+</table>
+
+<h2>为什么不先删旧 business_view</h2>
+<div class="card">
+  <p>旧 <code>business_view</code> 是旧规则下的派生产物,不是 raw,也不是全都无价值。直接删除会制造两个风险:一是下游视图突然缺数据;二是审计链断裂,看不出旧判断如何被新判断替代。</p>
+  <p>正确方式是 dry-run 生成新产物,做旧/新对比,通过 scoped verify 后整文件覆盖或归档。只有 raw 已归档、非政策、或无源可追溯的派生,才进入 archive/delete。</p>
+</div>
+
+<h2>推荐路线</h2>
+<ol>
+  <li>先冻结命名:本工程叫 <b>政策情报四层重构</b>。</li>
+  <li>补三源接线 spec:政策 / 评论 / 市场情报在 ①②③④ 的输入、产物、done-gate。</li>
+  <li>先做一个小范围评论观点矩阵闭环,不要直接冲 935 全量 business_view。</li>
+  <li>再推进 ②-B 全量重生,并让 ③/④ 消费层同时读取 policy business_view、commentary opinions、market_intel signals。</li>
+</ol>
+</main>
+</body>
+</html>
