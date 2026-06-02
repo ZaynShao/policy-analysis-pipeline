@@ -4,3 +4,4 @@ _llm_gen_input.jsonl
 _llm_gen_output.jsonl
 _admin_codes.csv
 _vault_backfill_proposal.md
+*.log
