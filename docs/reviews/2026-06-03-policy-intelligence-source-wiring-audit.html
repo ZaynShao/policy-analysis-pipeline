@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>政策情报四层重构 · 三源接线现状审计</title>
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;margin:0;background:#f7f8fb;color:#172033;line-height:1.62}
+main{max-width:1180px;margin:0 auto;padding:34px 24px 64px}
+h1{font-size:30px;line-height:1.25;margin:0 0 8px}
+h2{font-size:20px;margin:30px 0 12px}
+h3{font-size:16px;margin:18px 0 8px}
+p{margin:8px 0}
+.sub{color:#5f6b7a;margin-bottom:22px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:#fff;border:1px solid #e1e6ef;border-radius:8px;padding:16px}
+.wide{grid-column:1/-1}
+.two{grid-column:span 2}
+.tag{display:inline-block;padding:2px 8px;border-radius:999px;background:#e8f1ff;color:#1d4ed8;font-size:12px;font-weight:650}
+.ok{background:#e7f7ee;color:#166534}
+.warn{background:#fff5db;color:#92400e}
+.risk{background:#feecef;color:#b42318}
+.neutral{background:#eef2f7;color:#475569}
+.num{font-size:30px;font-weight:760;margin-top:6px}
+.muted{color:#667085}
+.callout{border-left:4px solid #2563eb;background:#fff;padding:14px 16px;border-radius:8px;border-top:1px solid #e1e6ef;border-right:1px solid #e1e6ef;border-bottom:1px solid #e1e6ef}
+.callout.riskline{border-left-color:#b42318}
+.callout.warnline{border-left-color:#d97706}
+table{border-collapse:collapse;width:100%;background:#fff;border:1px solid #e1e6ef}
+th,td{border:1px solid #e1e6ef;padding:9px 10px;text-align:left;vertical-align:top}
+th{background:#f1f5f9;color:#344054}
+code{background:#eef2f7;padding:1px 5px;border-radius:4px}
+ol{background:#fff;border:1px solid #e1e6ef;border-radius:8px;padding:14px 18px 14px 34px}
+li{margin:7px 0}
+.small{font-size:13px}
+.status{font-weight:700}
+.good{color:#166534}
+.bad{color:#b42318}
+.mid{color:#92400e}
+@media (max-width:860px){.grid{grid-template-columns:1fr}.two{grid-column:1}.num{font-size:26px}}
+</style>
+</head>
+<body>
+<main>
+<h1>政策情报四层重构 · 三源接线现状审计</h1>
+<div class="sub">审计日期: 2026-06-03。范围: 工程库 <code>/Users/shaoziyuan/dev/政策分析-pipeline</code> 与资料库 <code>/Users/shaoziyuan/Documents/Zayn Main/政策分析</code> 的现状。性质: 只读评估,未跑模型,未写资料库。</div>
+
+<section class="grid">
+  <div class="card"><div class="tag ok">正式政策源</div><h3>raw policies</h3><div class="num">935</div><p class="muted">②-A / ②-B 当前主线主要围绕政策本体推进。</p></div>
+  <div class="card"><div class="tag warn">评论源存在</div><h3>raw commentaries</h3><div class="num">283</div><p class="muted">其中 189 篇已有 related_policy 线索,但尚未形成稳定校准信号层。</p></div>
+  <div class="card"><div class="tag warn">旧派生混存</div><h3>business_view</h3><div class="num">955</div><p class="muted">新流程已落地 11 篇;其余多数仍是旧流程或旧口径产物。</p></div>
+  <div class="card"><div class="tag risk">第三源待建</div><h3>market_intel</h3><div class="num">23</div><p class="muted">已登记 manifest,但仍标为 kept_in policies,缺独立 representation。</p></div>
+</section>
+
+<h2>核心结论</h2>
+<div class="callout">
+  <p><b>没有看到原则崩塌。</b>现在的问题不是系统开始按单篇 PID 打补丁,而是三源在四层结构里的接线还没有完全机制化。政策源已经有较强工程纪律;评论源和市场情报源被 schema / backlog 承认,但没有接成同等可复现的归属、分析和消费路径。</p>
+  <p><b>当前最大风险:</b>如果继续直接全量推进 ②-B,系统会自然滑向 policy-only 的政策评分系统,而不是政策情报系统。这个风险应通过三源接线、done-gate 和旧 <code>business_view</code> 退出机制处理,不是靠逐篇人工看单篇文件。</p>
+</div>
+
+<h2>现状证据</h2>
+<table>
+<tr><th>对象</th><th>审计结果</th><th>判断</th></tr>
+<tr><td>政策 raw</td><td><code>0_raw/policies</code> 935 篇</td><td><span class="status good">主线已接</span>: ②-A 身份归属、②-B theme / scoring / manual review / apply 已围绕它建立。</td></tr>
+<tr><td>评论 raw</td><td><code>0_raw/commentaries</code> 283 篇; related_policy 非空 189 篇; <code>1_extracted/opinions</code> 76 个文件; <code>commentary_audit</code> 8 个文件</td><td><span class="status mid">半接线</span>: 有资产、有初步派生,但未形成 <code>commentary_signals</code> 这样的稳定内部校准层。</td></tr>
+<tr><td>市场情报</td><td><code>state/source_ready/market_intel_manifest.jsonl</code> 23 条; note 写明第三源推后</td><td><span class="status mid">轻量承认</span>: 已避免直接 archive,但仍缺独立数据形态和下游消费者。</td></tr>
+<tr><td>新 ②-B business_view</td><td>11 篇已通过 v7 + v11 bounded hardening 后 apply; apply 队列 0</td><td><span class="status good">机制成立</span>: 这 11 篇证明新流程能闭环,但覆盖面仍很小。</td></tr>
+<tr><td>旧 business_view</td><td>955 个总文件中,新模型标记 11 个; 862 个仍含 <code>影响分析.乡村</code>; 863 个影响分析 key 不符合当前三业务口径</td><td><span class="status bad">不宜消费</span>: 旧产物保留在可消费资料库中会污染 ③/④ 判断。</td></tr>
+<tr><td>关系层</td><td><code>1_extracted/relations</code> 存在 16 个文件,包含 8 类关系文件和若干 archive / summary</td><td><span class="status mid">存在但 stale</span>: backlog 已记录其产于 raw 清洗和 ②归属之前,需要在 ②-B 稳定后整文件重生。</td></tr>
+</table>
+
+<h2>四层接线矩阵</h2>
+<table>
+<tr><th>层</th><th>政策源</th><th>评论源</th><th>市场情报源</th><th>审计判断</th></tr>
+<tr><td>① 源到位</td><td>已形成清洗后的 raw 快照。</td><td>raw 存在,frontmatter 已比早期更干净。</td><td>manifest 承认,但未形成独立源形态。</td><td><span class="status mid">源存在,边界未完全落地。</span></td></tr>
+<tr><td>② 归属</td><td>issuer / region / theme / business_view 正在机制化。</td><td>related_policy 有线索,但缺 <code>commentary_id / theme_ids / signal_role / confidence / evidence</code> 的稳定产物。</td><td>缺 region / theme / opportunity_type / time_validity 的结构化归属。</td><td><span class="status mid">当前 ② 实际偏政策归属。</span></td></tr>
+<tr><td>③ 分析</td><td>关系层有旧产物,待重生。</td><td>缺可聚合的内部校准信号。</td><td>缺可验证机会的市场信号层。</td><td><span class="status bad">分析层还不能称为三源汇合。</span></td></tr>
+<tr><td>④ 消费</td><td>可用政策依据和业务判断作为外显主体。</td><td>应默认作为内部校准参数,审计/追溯时展开。</td><td>应默认作为内部验证参数,审计/追溯时展开。</td><td><span class="status mid">消费契约需重写,避免把内部校准/验证参数说成外显方法论。</span></td></tr>
+</table>
+
+<h2>原则与机制状态</h2>
+<table>
+<tr><th>机制</th><th>当前状态</th><th>评价</th></tr>
+<tr><td>规则文件</td><td><code>AGENTS.md</code> 明确写入规则优先、不打补丁、dry-run before apply、raw 不可变、人工确认池、展示材料用 HTML、模型成本纪律。</td><td><span class="status good">有效。</span> 本轮判断继续从规则入手,没有新增 PID 特例。</td></tr>
+<tr><td>人工确认池</td><td>②-B 已把 queue 定义为待裁决池,人工裁决回到正常 dry-run / apply,不能作为手工 apply 清单。</td><td><span class="status good">有效。</span> 前面用户裁决的两条属于数据层结论,不是源码补丁。</td></tr>
+<tr><td>审计门</td><td><code>scripts/audit/principle_guard.py</code> 检查 <code>scripts/l2_themescore</code> 源码中真实政策 PID 字面量;对应测试存在。</td><td><span class="status good">有效,但需每次验证显式运行。</span></td></tr>
+<tr><td>apply 门</td><td><code>preview-accepted</code> / <code>apply-accepted</code> 只消费 accepted drafts,不消费 queue。</td><td><span class="status good">有效。</span> 这能防止人工池绕过流水线。</td></tr>
+<tr><td>Git hook</td><td>本地 <code>.git/hooks</code> 只有 sample 文件,未发现启用的 pre-commit / pre-push hook。</td><td><span class="status mid">不要误称自动钩子已兜底。</span> 当前靠规则文件、测试和显式命令兜底;后续可把 principle guard 接入 hook 或 CI。</td></tr>
+<tr><td>Superpowers 插件</td><td>旧缓存路径失效,当前插件目录可解析到新的 cache 路径。</td><td><span class="status good">插件可用。</span> 但项目原则仍以 repo 规则和审计门为准。</td></tr>
+</table>
+
+<h2>风险判断</h2>
+<div class="grid">
+  <div class="card two"><div class="tag risk">高</div><h3>旧 business_view 污染消费层</h3><p>旧产物数量远大于新流程产物,且大量仍含过时的“乡村”影响口径。只要它继续留在可消费路径,③/④ 就可能把旧 AI 判断当成当前可信结论。</p></div>
+  <div class="card two"><div class="tag risk">高</div><h3>继续全量 ②-B 会强化 policy-only</h3><p>②-B 机制本身是必要资产,但它目前只解决政策本体归属的一部分。若不先补评论和市场情报接线,全量跑完也不能自然得到政策情报系统。</p></div>
+  <div class="card two"><div class="tag warn">中</div><h3>评论源有线索但缺稳定消费者</h3><p>189 篇评论已有 related_policy 线索,说明可接入价值真实存在。缺口在于没有最小 <code>commentary_signals</code> schema、聚合规则和消费层内部读取口径。</p></div>
+  <div class="card two"><div class="tag warn">中</div><h3>市场情报目前只是“别丢”</h3><p>manifest 的价值是避免误删,不是完成第三源建设。项目、补贴、容量、价格、公示等信号需要独立表示,否则会继续混在 policies 里。</p></div>
+</div>
+
+<h2>建议的处置顺序</h2>
+<ol>
+  <li><b>先给旧 <code>business_view</code> 设退出策略。</b>原则上不应留在可消费资料库;最大妥协是库外 backup。当前资料库内只应把新流程产物视为可信。</li>
+  <li><b>补一个三源接线 done-gate。</b>每层都要写明 policy / commentary / market_intel 的输入、产物、校验门和禁止混入规则。</li>
+  <li><b>先做小范围 <code>commentary_signals</code> 闭环。</b>用现有 189 篇 related_policy 非空评论做抽样,证明评论能作为内部校准参数进入 ③/④,但不改写 policy raw 或 <code>business_view</code> 分数。</li>
+  <li><b>market_intel 先从 manifest 升级为表示设计。</b>短期仍可不全量采集,但要定义最小字段: region、theme、signal_type、time_validity、source、related_policy。</li>
+  <li><b>再继续 ②-B 全量重生。</b>全量重生应在三源边界和旧产物退出机制明确后进行,否则会把 policy-only 当作完成态。</li>
+</ol>
+
+<h2>本次审计结论</h2>
+<div class="callout warnline">
+  <p><b>可以继续推进,但下一步不应是无条件全量跑模型。</b>下一步更合理的业务目标是:先把旧 <code>business_view</code> 从消费路径隔离,同时把评论源做成最小内部校准闭环。这样 ②-B 后续全量跑出来的结果才会进入真正的“政策情报四层重构”,而不是只得到一批新的政策评分文件。</p>
+  <p class="small muted">本报告没有新增源码 PID 例外,没有要求逐篇人工改业务结论,也没有把评论/市场情报作为消费层默认外显证据。</p>
+</div>
+</main>
+</body>
+</html>
