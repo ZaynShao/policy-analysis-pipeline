@@ -14,12 +14,12 @@
 
 1. **源到位**:三源进入各自 raw / state 边界,事实与来源可追溯。
 2. **归属**:把素材归到政策、主题、地区、业务线、观点/机会类型。
-3. **分析**:把单篇判断连接成关系、观点矩阵、区域差异、市场信号验证。
+3. **分析**:把单篇判断连接成关系、评论校准信号、区域差异、市场信号验证。
 4. **消费**:生成报告、决策卡片、主题页、区域视图、查询接口。
 
 ## 2. 核心评估
 
-现状的 schema 已承认评论,并为评论 raw、评论审计、评论观点矩阵预留了位置;backlog 也承认 market_intel 第三源。但已落地的 ②-A / ②-B 主线实际上主要围绕政策本体推进。尤其 ②-B 的 `business_view` 只消费 `0_raw/policies`,没有把评论作为解释层输入,也没有把市场情报作为验证层输入。
+现状的 schema 已承认评论,并为评论 raw、评论审计、评论观点产物预留了位置;backlog 也承认 market_intel 第三源。但已落地的 ②-A / ②-B 主线实际上主要围绕政策本体推进。尤其 ②-B 的 `business_view` 只消费 `0_raw/policies`,没有把评论作为校准信号输入,也没有把市场情报作为验证信号输入。
 
 这不是原则崩塌,但它暴露了一个结构性风险:如果继续只推进 `business_view` 全量重生,系统会变成"政策本体归档与评分系统",而不是"政策情报系统"。对决策层来说,后者才是目标。
 
@@ -33,14 +33,25 @@
 
 ### 评论
 
-评论是解释层,不是事实源。它的价值在于:
+评论是校准层,不是事实源,也不是消费层默认外显的"观点证据"。它的价值在于:
 
 - 识别市场共识与分歧。
 - 解释政策为什么重要或为什么被忽视。
 - 暴露行业担忧、执行阻力、套利空间、口径变化。
-- 为 ④ 消费层提供可读叙事和风险提示。
+- 作为内部参数校正政策重要性、可执行性和风险判断。
 
-评论应在 ② 归属阶段绑定到 `policy_id`、theme、业务线、观点类型和可信度;在 ③ 分析阶段生成 `opinions` / 舆论矩阵;在 ④ 消费层与 policy `business_view` 合并展示。
+评论应在 ② 归属阶段生成最小工程字段,进入 `1_extracted/commentary_signals.jsonl`:
+
+```yaml
+commentary_id: C_xxx
+related_policy_ids: [P_xxx]
+theme_ids: [charging_infra, v2g]
+signal_role: opportunity|risk|execution|attention|interpretation|noise
+confidence: 0.0-1.0
+evidence: 原文短摘或位置
+```
+
+这些字段只保留有工程消费者的内容:`related_policy_ids` 用于挂回政策,`theme_ids` 用于主题聚合,`signal_role` 用于内部校准,`confidence` 用于聚合加权,`evidence` 用于审计追溯。
 
 评论不应直接写入 `business_view` 的 `scores` 或 `themes`,否则会把外部观点和政策本体混在一起。
 
@@ -66,7 +77,7 @@ done-gate 应包括三源数量、未分类素材、误入 policies 的 commenta
 
 政策归属包括 issuer / region / date / theme / importance / business_view。
 
-评论归属包括 related_policy / theme / business_line / commentary_type / stance / confidence。
+评论归属包括 commentary_id / related_policy_ids / theme_ids / signal_role / confidence / evidence。
 
 市场情报归属包括 region / theme / opportunity_type / business_line / time_validity / related_policy。
 
@@ -74,23 +85,25 @@ done-gate 应包括三源数量、未分类素材、误入 policies 的 commenta
 
 ### ③ 分析
 
-③ 不能只做政策关系。它应至少包含三类分析:
+③ 不能只做政策关系。它应至少包含三类内部分析:
 
 - 政策关系:废止、迭代、引用、派生、区域扩展。
-- 评论观点:共识、分歧、风险、执行阻力、行业预期。
+- 评论信号:机会、风险、执行、关注度、解释性、噪声。
 - 市场验证:招标/补贴/项目/容量/价格等信号对政策主题的验证。
 
 这三类分析在 ③ 汇合,但仍保持来源类型和证据路径。
 
 ### ④ 消费
 
-④ 面向决策层。消费层不应只展示"政策列表 + 分数",而应回答:
+④ 面向决策层。消费层不应只展示"政策列表 + 分数",也不应把内部方法论外显成"因为注入了政策依据、外部观点、市场信号,所以得出结论"。正确口径是:对外输出结论、影响和建议;必要时外显政策依据。评论与市场信号默认作为内部校准/验证参数,只在用户追溯、质疑或审计时展开。
+
+消费层应回答:
 
 - 哪些主题正在升温?
-- 哪些区域有政策与市场信号双重支持?
-- 哪些政策被评论高度关注或存在争议?
-- 哪些机会有正式政策支持,但市场信号未出现?
-- 哪些市场信号出现了,但政策依据薄弱?
+- 哪些区域的机会判断更可靠?
+- 哪些政策需要被提高或降低关注权重?
+- 哪些机会政策依据强,但落地可信度不足?
+- 哪些机会热度高,但正式政策依据薄弱?
 
 ## 5. 对当前 ②-B 的判断
 
@@ -102,7 +115,7 @@ done-gate 应包括三源数量、未分类素材、误入 policies 的 commenta
 
 1. 先补三源接线审计,明确三源在 ①/②/③/④ 的输入、产物和 done-gate。
 2. 再决定 ②-B 全量 business_view 是否继续推进。
-3. 同时定义评论归属最小闭环,避免 ③/④ 继续 policy-only。
+3. 同时定义 `commentary_signals` 最小闭环,避免 ③/④ 继续 policy-only。
 
 ## 6. 推荐路线
 
@@ -111,14 +124,13 @@ done-gate 应包括三源数量、未分类素材、误入 policies 的 commenta
 1. **一页总图**:政策情报四层重构的三源接线图。
 2. **现状审计**:统计三源数量、现有产物、缺口、stale 资产。
 3. **done-gate 重写**:为 ①/②/③/④ 加入 policy/commentary/market_intel 三源条件。
-4. **最小闭环优先**:先让评论进入一个小范围 policy 的观点矩阵,再继续全量 business_view。
+4. **最小闭环优先**:先让评论进入一个小范围 policy 的内部校准信号,再继续全量 business_view。
 5. **业务消费倒推**:从决策问题倒推三源产物,避免继续堆派生文件。
 
 ## 7. 原则
 
 - 不用评论改写政策本体。
 - 不把市场情报混入政策或评论。
-- 不直接删除旧派生;先审计、dry-run、对比、覆盖或归档。
+- 旧 `business_view` 不保留在可消费资料库中;最大妥协是库外 backup,不参与 pipeline。
 - 不用 PID 补丁修视角问题;修三源边界、schema、done-gate 和消费契约。
 - 所有展示性评估输出 HTML。
-

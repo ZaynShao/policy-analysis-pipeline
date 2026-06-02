@@ -46,7 +46,7 @@ code{background:#eef2f7;padding:1px 4px;border-radius:4px}
 <table>
 <tr><th>源</th><th>回答的问题</th><th>正确位置</th><th>不能做什么</th></tr>
 <tr><td>政策</td><td>规则是什么,谁发布,适用哪里,正式要求是什么</td><td><code>0_raw/policies</code>, <code>business_view</code>, policy relations</td><td>不能被评论直接改写事实或主题分数</td></tr>
-<tr><td>评论</td><td>外部如何解读,争议在哪里,行业预期是什么</td><td><code>0_raw/commentaries</code>, <code>1_extracted/opinions</code>, 观点矩阵</td><td>不能混进 policy 的 raw 或直接覆盖 <code>business_view</code></td></tr>
+<tr><td>评论</td><td>外部如何解读,哪里有风险/机会/执行阻力</td><td><code>0_raw/commentaries</code>, <code>1_extracted/commentary_signals.jsonl</code></td><td>不能混进 policy 的 raw 或直接覆盖 <code>business_view</code>;默认不作为消费层外显证据</td></tr>
 <tr><td>市场情报</td><td>哪里已有项目、招标、补贴、容量、价格、落地动作</td><td>独立 market_intel representation,后续进入机会验证层</td><td>不能混成政策,也不能混成评论</td></tr>
 </table>
 
@@ -54,23 +54,23 @@ code{background:#eef2f7;padding:1px 4px;border-radius:4px}
 <table>
 <tr><th>层</th><th>现状</th><th>评估</th><th>应补 done-gate</th></tr>
 <tr><td>① 源到位</td><td>政策清洗推进充分;评论资产存在;market_intel 仅 backlog 轻量承认</td><td>源不是单一政策源,但当前主线表达仍偏政策</td><td>三源数量、误分类、未归属、market_intel manifest</td></tr>
-<tr><td>② 归属</td><td>政策身份和 theme/business_view 已开始形成新流程</td><td>评论归属、市场情报归属未形成同等流程</td><td>commentary → policy/theme/stance; market_intel → region/theme/opportunity</td></tr>
-<tr><td>③ 分析</td><td>backlog 定义为政策关系/演进/区域</td><td>缺评论观点矩阵和市场验证层,会导致分析层偏窄</td><td>政策关系 + 观点矩阵 + 市场信号验证三件套</td></tr>
-<tr><td>④ 消费</td><td>旧月报 tainted,新消费层未重生</td><td>这是重新定义决策问题的机会</td><td>报告/卡片必须说明政策依据、外部观点、市场信号三类证据</td></tr>
+<tr><td>② 归属</td><td>政策身份和 theme/business_view 已开始形成新流程</td><td>评论归属、市场情报归属未形成同等流程</td><td>commentary → policy/theme/signal_role; market_intel → region/theme/opportunity</td></tr>
+<tr><td>③ 分析</td><td>backlog 定义为政策关系/演进/区域</td><td>缺评论校准信号和市场验证层,会导致分析层偏窄</td><td>政策关系 + commentary_signals + 市场信号验证</td></tr>
+<tr><td>④ 消费</td><td>旧月报 tainted,新消费层未重生</td><td>这是重新定义决策问题的机会</td><td>外显结论、影响、建议和必要政策依据;评论与市场信号作为内部校准/验证参数,审计时可展开</td></tr>
 </table>
 
 <h2>为什么不先删旧 business_view</h2>
 <div class="card">
-  <p>旧 <code>business_view</code> 是旧规则下的派生产物,不是 raw,也不是全都无价值。直接删除会制造两个风险:一是下游视图突然缺数据;二是审计链断裂,看不出旧判断如何被新判断替代。</p>
-  <p>正确方式是 dry-run 生成新产物,做旧/新对比,通过 scoped verify 后整文件覆盖或归档。只有 raw 已归档、非政策、或无源可追溯的派生,才进入 archive/delete。</p>
+  <p>旧 <code>business_view</code> 若已被判定为 stale / tainted,就不应继续留在可消费资料库里参与 pipeline。最大妥协是库外 backup,用于审计和必要回看,但不作为运行时输入。</p>
+  <p>资料库主线应只保留新流程产物。若新流程尚未覆盖某篇政策,宁可暂时缺 business_view,也不要让旧判断被消费层误当成可信结果。</p>
 </div>
 
 <h2>推荐路线</h2>
 <ol>
   <li>先冻结命名:本工程叫 <b>政策情报四层重构</b>。</li>
   <li>补三源接线 spec:政策 / 评论 / 市场情报在 ①②③④ 的输入、产物、done-gate。</li>
-  <li>先做一个小范围评论观点矩阵闭环,不要直接冲 935 全量 business_view。</li>
-  <li>再推进 ②-B 全量重生,并让 ③/④ 消费层同时读取 policy business_view、commentary opinions、market_intel signals。</li>
+  <li>先做一个小范围 <code>commentary_signals</code> 内部校准闭环,不要直接冲 935 全量 business_view。</li>
+  <li>再推进 ②-B 全量重生,并让 ③/④ 消费层内部读取 policy business_view、commentary signals、market_intel signals。</li>
 </ol>
 </main>
 </body>
