@@ -19,6 +19,12 @@
 
 **轻量承认(现在就做的)**:L1 审计把这类 doc 标 `market_intel`,**保留不 archive、也不混进 policy**,先圈起来不丢。
 
+**进展(2026-06-03)**:
+- `market_intel` 最小 representation dry-run 已完成:从 `state/source_ready/market_intel_manifest.jsonl` 读取 23 条,通过当前 raw `id` 或 `aliases` 全部定位到 `0_raw/policies`,输出 23 条内部市场验证 signal。
+- 工程证据:`state/market_intel_signals/dryrun_20260603/market_signals.jsonl`、`review_queue.jsonl`、`summary.json`、`reports/market_intel_signals_dryrun.html`。
+- 人工池 14 条:11 条 `theme_not_found`(多为风电/光伏/补贴/价格等不在当前 13 主题内或弱主题),3 条 `region_unknown`。这说明第三源表示已可复现,但是否扩主题/业务线还需后续分类法判断。
+- 本 dry-run 不写资料库、不移动 raw、不调用模型;市场信号仍作为内部验证参数,不作为消费层外显方法论。
+
 **触发条件(什么时候捡起)**:
 - ①源到位 + ②归属 + ③分析 稳定之后;**或**
 - 用户为某个具体业务决策需要"市场需求/业务机会"情报时(如充电场站选址、储能项目机会、加油价格情报)。
@@ -174,7 +180,7 @@
 - 库外 backup:`/Users/shaoziyuan/dev/policy-analysis-backups/business_view_isolation_20260603_apply`。
 - 工程侧审计证据:`state/business_view_isolation/dryrun_20260603/manifest.jsonl`、`apply_log.jsonl`、`reports/business_view_isolation_apply.html`。
 - `commentary_signals` 最小 dry-run 已完成:只读 283 篇 `0_raw/commentaries`,对 189 篇已有 `related_policy` 的评论产出内部校准 signal;52 篇 `not_policy_related` 跳过;42 篇无关联跳过;18 篇进入人工池(15 篇主题未命中,3 篇正文不可读)。报告和机器证据在 `state/commentary_signals/dryrun_20260603/`。
-- 本条剩余部分:处理 `commentary_signals` apply/消费契约,以及 market_intel representation 设计。
+- 本条剩余部分:处理 `commentary_signals` / `market_intel_signals` 的 apply/消费契约,以及人工池裁决如何回流到分类法。
 
 **处置原则**:
 - 旧 `business_view` 不应继续作为可消费资料库的可信输入;最大妥协是库外 backup,不参与 pipeline。

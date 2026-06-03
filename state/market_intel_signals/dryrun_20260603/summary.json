@@ -1,0 +1,40 @@
+{
+  "manifest_rows": 23,
+  "located_raw": 23,
+  "emitted_signals": 23,
+  "review_queue": 14,
+  "by_signal_type": {
+    "project_list": 1,
+    "competitive_allocation": 4,
+    "project_commissioned": 2,
+    "pilot_landing": 6,
+    "capacity_disclosure": 1,
+    "subsidy_list": 3,
+    "project_case": 1,
+    "price_signal": 1,
+    "trading_result": 1,
+    "market_access": 1,
+    "tender_procurement": 2
+  },
+  "by_theme": {
+    "energy_storage_theme": 6,
+    "v2g": 5,
+    "charging_infra": 5,
+    "vpp_theme": 6,
+    "gas_station_transition_theme": 1,
+    "petroleum_retail_compliance": 1,
+    "residential_charging": 1,
+    "aggregator_access": 2,
+    "power_market": 2,
+    "distribution_grid_opening": 1
+  },
+  "by_business_line": {
+    "power": 11,
+    "charging": 6,
+    "fuel": 1
+  },
+  "by_queue_reason": {
+    "theme_not_found": 11,
+    "region_unknown": 3
+  }
+}
