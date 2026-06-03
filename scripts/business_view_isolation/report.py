@@ -94,3 +94,57 @@ code{{background:#eef2f7;padding:1px 5px;border-radius:4px}}
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(doc, encoding="utf-8")
     return out_path
+
+
+def render_apply_html(apply_rows: list[dict], summary: dict, out_path: Path) -> Path:
+    status_rows = "".join(
+        f"<tr><td>{_esc(key)}</td><td>{_esc(value)}</td></tr>"
+        for key, value in summary.items()
+    )
+    sample_rows = "".join(
+        "<tr>"
+        f"<td>{_esc(row.get('pid', ''))}</td>"
+        f"<td>{_esc(row.get('status', ''))}</td>"
+        f"<td>{_esc(row.get('path', ''))}</td>"
+        f"<td>{_esc(row.get('backup_path', ''))}</td>"
+        "</tr>"
+        for row in apply_rows[:50]
+    )
+    if not sample_rows:
+        sample_rows = '<tr><td colspan="4">无</td></tr>'
+    doc = f"""<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>旧 business_view 消费隔离 apply</title>
+<style>
+body{{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;margin:0;background:#f7f8fb;color:#172033;line-height:1.6}}
+main{{max-width:1160px;margin:0 auto;padding:34px 24px 64px}}
+h1{{font-size:29px;margin:0 0 8px}}
+h2{{font-size:20px;margin:28px 0 12px}}
+.sub{{color:#667085;margin-bottom:20px}}
+.note{{background:#fff;border-left:4px solid #2563eb;border-radius:8px;padding:14px 16px;border-top:1px solid #e1e6ef;border-right:1px solid #e1e6ef;border-bottom:1px solid #e1e6ef}}
+table{{border-collapse:collapse;width:100%;background:#fff;border:1px solid #e1e6ef}}
+th,td{{border:1px solid #e1e6ef;padding:8px 9px;text-align:left;vertical-align:top;font-size:13px}}
+th{{background:#f1f5f9}}
+code{{background:#eef2f7;padding:1px 5px;border-radius:4px}}
+</style>
+</head>
+<body>
+<main>
+<h1>旧 business_view 消费隔离 apply</h1>
+<div class="sub">本报告记录一次 manifest 驱动的 apply:先库外 backup,再从资料库可消费路径移出旧 <code>business_view</code> 文件。</div>
+<div class="note">
+  <p>本 apply 只消费 dry-run manifest 中 <code>isolate_legacy</code> 的行,不重新判断单篇政策,不处理 <code>keep_current</code>,不触碰 raw。</p>
+</div>
+<h2>汇总</h2>
+<table><tr><th>状态</th><th>数量</th></tr>{status_rows}</table>
+<h2>样例</h2>
+<table><tr><th>PID</th><th>状态</th><th>原路径</th><th>backup 路径</th></tr>{sample_rows}</table>
+</main>
+</body>
+</html>
+"""
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(doc, encoding="utf-8")
+    return out_path

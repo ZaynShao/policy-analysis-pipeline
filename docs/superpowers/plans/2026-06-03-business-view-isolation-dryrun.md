@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build a reproducible dry-run that identifies legacy or tainted `_meta/business_view/*.yaml` files, produces a machine-readable backup/isolation manifest, and renders a Chinese HTML review report without writing the vault.
+**Goal:** Build a reproducible dry-run/apply flow that identifies legacy or tainted `_meta/business_view/*.yaml` files, produces a machine-readable isolation manifest, backs those files up outside the vault, and removes them from the consumable vault path only after explicit apply approval.
 
-**Architecture:** Add a focused audit module under `scripts/business_view_isolation/`. It reads business_view YAML files, classifies each file as `keep_current`, `isolate_legacy`, or `manual_review`, writes JSON/JSONL outputs under `state/business_view_isolation/<run>/`, and renders a self-contained HTML report. The tool is read-only for the vault; any future apply step must consume this dry-run output.
+**Architecture:** Add a focused audit module under `scripts/business_view_isolation/`. It reads business_view YAML files, classifies each file as `keep_current`, `isolate_legacy`, or `manual_review`, writes JSON/JSONL outputs under `state/business_view_isolation/<run>/`, and renders self-contained HTML reports. Apply mode consumes the existing manifest, verifies file sha256, copies each legacy file to a backup directory outside the vault, then removes it from `_meta/business_view`.
 
 **Tech Stack:** Python 3, PyYAML, pytest, pathlib, argparse. No model calls.
 
@@ -149,8 +149,39 @@ git commit -m "feat: add business view isolation dry-run"
 git push origin main
 ```
 
+## Task 4: Apply Consuming the Manifest
+
+- [ ] Write failing tests:
+
+```python
+def test_apply_backs_up_and_removes_only_isolate_legacy(tmp_path): ...
+def test_apply_refuses_backup_inside_vault(tmp_path): ...
+```
+
+- [ ] Implement `run_apply(vault, state, backup_dir)`.
+
+Rules:
+
+- read only `state/manifest.jsonl`
+- process only `action == isolate_legacy`
+- skip `keep_current`
+- require `backup_dir` outside the vault
+- verify source sha256 against manifest before copying
+- verify backup sha256 after copying
+- remove the source only after backup verification
+- write `apply_log.jsonl`, `apply_summary.json`, and `reports/business_view_isolation_apply.html`
+
+- [ ] Run real apply only after user approval:
+
+```bash
+python3 -m scripts.business_view_isolation.run apply \
+  --vault "/Users/shaoziyuan/Documents/Zayn Main/政策分析" \
+  --state state/business_view_isolation/dryrun_20260603 \
+  --backup-dir "/Users/shaoziyuan/dev/policy-analysis-backups/business_view_isolation_20260603_apply"
+```
+
 ## Self-review
 
-- Spec coverage: covers old `business_view` inventory, read-only dry-run, HTML report, manifest for later apply, and no PID exceptions.
+- Spec coverage: covers old `business_view` inventory, read-only dry-run, approved apply, HTML reports, manifest-backed backup/removal, and no PID exceptions.
 - Placeholder scan: no TBD/TODO placeholders.
-- Scope: intentionally excludes moving/deleting vault files; that requires a separate apply step consuming the dry-run.
+- Scope: apply moves only old business_view files listed by the dry-run manifest; it does not touch raw, does not regenerate policy judgments, and does not handle `commentary_signals`.

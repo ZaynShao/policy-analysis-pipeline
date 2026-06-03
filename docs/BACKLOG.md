@@ -168,13 +168,20 @@
 - `state/source_ready/market_intel_manifest.jsonl`:23 条,仍是轻量承认,不是第三源 representation。
 - 报告:`docs/reviews/2026-06-03-policy-intelligence-source-wiring-audit.html`。
 
+**进展(2026-06-03)**:
+- 旧 `business_view` 消费隔离已完成:dry-run manifest 955 行 → apply 隔离 905 个旧产物,保留 50 个当前 ②-B 脚本产物。
+- 资料库内 `_meta/business_view` 当前剩余 50 个,均为 `scripts/l2_themescore/run_2b.py` 产物;其中 `MiniMax-M2.7` 39 个、`MiniMax-M2.7+judge-crosscheck+manual-review+v11-global-hardening` 11 个。
+- 库外 backup:`/Users/shaoziyuan/dev/policy-analysis-backups/business_view_isolation_20260603_apply`。
+- 工程侧审计证据:`state/business_view_isolation/dryrun_20260603/manifest.jsonl`、`apply_log.jsonl`、`reports/business_view_isolation_apply.html`。
+- 本条剩余部分:补 `commentary_signals` 最小闭环和 market_intel representation 设计。
+
 **处置原则**:
 - 旧 `business_view` 不应继续作为可消费资料库的可信输入;最大妥协是库外 backup,不参与 pipeline。
 - 评论作为内部校准层,不直接改写 policy raw、policy themes 或 `business_view.scores`。
 - market_intel 作为执行/机会验证信号,不混入 policy 或 commentary。
 - 消费层外显结论、影响、建议和必要政策依据;评论与市场信号默认作为内部校准/验证参数,仅在追溯或审计时展开。
 
-**触发条件**:继续 ②-B 全量重生、启动 ③分析重生、或启动 ④消费层之前。**捡起第一步**:先设计旧 `business_view` 库外 backup + 消费隔离方案,再做小范围 `commentary_signals` 闭环。
+**触发条件**:继续 ②-B 全量重生、启动 ③分析重生、或启动 ④消费层之前。**下一步**:做小范围 `commentary_signals` 闭环,再处理 market_intel representation。
 
 ---
 _登记于 2026-05-30。新增推后项往下追加,不删旧项;做掉的标 ✅ done 并注日期。B2–B5 登记于 2026-05-31。B6–B7 登记于 2026-05-31(采集未补齐 + 2线可操作 + 盲区反馈环)。B8 登记于 2026-05-31(②-A 71 入队残留)。B9 登记于 2026-05-31(月报原型退役 + 乡村去污染)。B10 登记于 2026-06-01(③分析=关系/演进/区域,现存8文件但 stale 待重生,依赖②)。B11 登记于 2026-06-02(②-B 人工确认池 + 全局硬化回流)。B12 登记于 2026-06-03(三源接线 + 旧 business_view 消费隔离)。_
