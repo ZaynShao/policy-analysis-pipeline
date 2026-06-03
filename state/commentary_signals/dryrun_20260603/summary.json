@@ -1,0 +1,30 @@
+{
+  "total_commentaries": 283,
+  "linked_commentaries": 189,
+  "emitted_signals": 189,
+  "review_queue": 18,
+  "skipped_unlinked": 42,
+  "skipped_not_policy_related": 52,
+  "by_signal_role": {
+    "opportunity": 48,
+    "risk": 130,
+    "execution": 6,
+    "interpretation": 3,
+    "attention": 2
+  },
+  "by_theme": {
+    "energy_storage_theme": 69,
+    "power_market": 86,
+    "carbon_market_theme": 38,
+    "distribution_grid_opening": 52,
+    "v2g": 29,
+    "vpp_theme": 57,
+    "equipment_renewal_theme": 43,
+    "green_power_trading_theme": 58,
+    "charging_infra": 42,
+    "gas_station_transition_theme": 8,
+    "residential_charging": 10,
+    "aggregator_access": 30,
+    "petroleum_retail_compliance": 3
+  }
+}

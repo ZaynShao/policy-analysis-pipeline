@@ -173,7 +173,8 @@
 - 资料库内 `_meta/business_view` 当前剩余 50 个,均为 `scripts/l2_themescore/run_2b.py` 产物;其中 `MiniMax-M2.7` 39 个、`MiniMax-M2.7+judge-crosscheck+manual-review+v11-global-hardening` 11 个。
 - 库外 backup:`/Users/shaoziyuan/dev/policy-analysis-backups/business_view_isolation_20260603_apply`。
 - 工程侧审计证据:`state/business_view_isolation/dryrun_20260603/manifest.jsonl`、`apply_log.jsonl`、`reports/business_view_isolation_apply.html`。
-- 本条剩余部分:补 `commentary_signals` 最小闭环和 market_intel representation 设计。
+- `commentary_signals` 最小 dry-run 已完成:只读 283 篇 `0_raw/commentaries`,对 189 篇已有 `related_policy` 的评论产出内部校准 signal;52 篇 `not_policy_related` 跳过;42 篇无关联跳过;18 篇进入人工池(15 篇主题未命中,3 篇正文不可读)。报告和机器证据在 `state/commentary_signals/dryrun_20260603/`。
+- 本条剩余部分:处理 `commentary_signals` apply/消费契约,以及 market_intel representation 设计。
 
 **处置原则**:
 - 旧 `business_view` 不应继续作为可消费资料库的可信输入;最大妥协是库外 backup,不参与 pipeline。
