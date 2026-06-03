@@ -1,0 +1,25 @@
+{
+  "total": 955,
+  "by_action": {
+    "isolate_legacy": 905,
+    "keep_current": 50
+  },
+  "by_reason": {
+    "current_flow": 50,
+    "deprecated_xiangcun_key": 863,
+    "impact_schema_mismatch": 863,
+    "legacy_extracted_by": 905,
+    "legacy_model": 905
+  },
+  "by_extracted_by": {
+    "_meta/scripts/oneshot_apply_5c_subagent_results.py": 895,
+    "scripts/l2_themescore/run_2b.py": 50,
+    "unknown_legacy": 10
+  },
+  "by_extracted_model": {
+    "claude-opus-4-7-via-subagent": 895,
+    "MiniMax-M2.7": 39,
+    "MiniMax-M2.7+judge-crosscheck+manual-review+v11-global-hardening": 11,
+    "unknown_legacy": 10
+  }
+}
