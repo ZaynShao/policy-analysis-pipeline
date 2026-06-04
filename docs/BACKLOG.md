@@ -146,6 +146,8 @@
 
 **③-B 进展(2026-06-04)**:高精度政策关系 preview 已完成第一版确定性抽取,只读当前 git tracked raw 政策正文与 frontmatter 文号,不读取旧 relations 作为 accepted 输入。实测 tracked raw 935 篇,未跟踪 raw 1 篇已排除,可索引文号目标 399 个;产出候选 677 条:`references` 424、`cites_basis` 161、`supersedes` 5、`clarifies` 87。工程证据:`state/analysis_layer/preview_20260604/high_precision_relation_summary.json`、`high_precision_relation_candidates.jsonl`、`policy_relation_candidates/*.jsonl`、`reports/high_precision_relation_preview.html`。本 preview 不写资料库、不写 raw、不 apply、不调用模型;`supersedes` 已按高精度原则收紧为目标文号后近距离出现明确废止/停止执行/失效,不再把泛化"替代/取代"当废止。
 
+**③-E 进展(2026-06-04)**:`analysis_context` preview 已完成第一版合成,把③-B高精度关系候选与③-D已闭环 `policy_context` 合并为④默认读取的 policy-level 上下文。实测输入关系候选 677 条、policy context 87 条;产出 analysis context 342 条,其中 293 条有关系上下文、87 条有信号上下文、38 条两者都有。主要 flags:`has_references` 293、`has_basis_chain` 177、`has_clarification` 87、`relation_only_no_signal_context` 255、`signal_only_no_relation_context` 49、`no_market_validation` 77、`market_validation_weak` 10、`superseded_by_policy` 5。工程证据:`state/analysis_layer/preview_20260604/analysis_context.jsonl`、`analysis_context_summary.json`、`reports/analysis_context_preview.html`。本 preview 只写工程仓 state,不写资料库、不写 raw、不 apply、不调用模型,不消费 review queue 或 blocked signals;它不是最终业务洞察,只作为④消费层的统一输入。
+
 ## B11 · ②-B 人工确认池与全局硬化回流 — 新增
 
 **是什么**:②-B dry-run/apply 后留下的 `review_queue/queue.jsonl` 是**人工确认池**,不是待手工 apply 清单。当前 50 篇样本中 accepted 39 已按离线 scoped verify 写入,剩余 11 入队,暴露的是机制边界,不能逐条补丁处置。

@@ -1,0 +1,30 @@
+{
+  "relation_candidate_count": 677,
+  "policy_context_count": 87,
+  "analysis_context_count": 342,
+  "rows_with_relation_context": 293,
+  "rows_with_signal_context": 87,
+  "rows_with_both": 38,
+  "rows_by_flag": {
+    "certainty_lower": 61,
+    "commentary_attention_high": 35,
+    "commentary_attention_medium": 42,
+    "has_basis_chain": 177,
+    "has_clarification": 87,
+    "has_references": 293,
+    "market_validation_weak": 10,
+    "no_market_validation": 77,
+    "relation_only_no_signal_context": 255,
+    "signal_only_no_relation_context": 49,
+    "superseded_by_policy": 5,
+    "supersedes_policy": 4
+  },
+  "notes": [
+    "preview_only_no_vault_write",
+    "raw_unchanged",
+    "no_model_call",
+    "does_not_consume_review_queue_or_blocked_signals",
+    "not_final_business_insight",
+    "consumer_reads_analysis_context_not_raw_relations_or_signals"
+  ]
+}
