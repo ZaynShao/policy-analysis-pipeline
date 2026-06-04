@@ -140,6 +140,10 @@
 
 **gold评审反馈(2026-06-01)·过期政策彻底检测**:②-B 已就"文本自标失效/废止"做了提示词规则(D2 按无现行约束力打低,theme 照挂)。但**"被哪篇废止/取代"的彻底判定**要靠 ③ 的 `supersedes` 关系——建 ③ 时,`supersedes` 抽取器(通则,全量重生)+ 下游"被废止→按过期处理(D2低/不当 actionable)"一并设计。**机制级**:跟着关系层整体重生,非逐篇补。
 
+**③-A 进展(2026-06-04)**:关系资产审计 preview 已完成,只读旧 `1_extracted/relations/*.jsonl` 与当前 git tracked raw 政策。实测 tracked raw 935 篇,未跟踪 raw 1 篇已排除并单独计数;旧关系行 2000 行,其中 archive 行 89,缺失/空端点行 524。工程证据:`state/analysis_layer/preview_20260604/relation_inventory.json`、`relation_rows.jsonl`、`reports/relation_inventory_preview.html`。本 preview 不写资料库、不写 raw、不 apply、不调用模型;旧 relation 行只作为审计输入,不能作为新 ③ accepted 输出。
+
+**③/④ 模型约束(2026-06-04 补充)**:后续凡接模型的 ③/④ 子流程,必须按普通模型可接入设计(MiniMax/DeepSeek 等),保留并强化既有硬化 prompt、schema 校验、program gate、审计门和人工池阻断。正确性不能依赖强模型自由发挥;不确定样本必须进人工池并等人工结论回流正常 dry-run/apply,不能被标记后继续下塞。
+
 ## B11 · ②-B 人工确认池与全局硬化回流 — 新增
 
 **是什么**:②-B dry-run/apply 后留下的 `review_queue/queue.jsonl` 是**人工确认池**,不是待手工 apply 清单。当前 50 篇样本中 accepted 39 已按离线 scoped verify 写入,剩余 11 入队,暴露的是机制边界,不能逐条补丁处置。

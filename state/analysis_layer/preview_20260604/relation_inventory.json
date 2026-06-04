@@ -1,0 +1,47 @@
+{
+  "tracked_policy_count": 935,
+  "untracked_policy_count": 1,
+  "relation_files": {
+    "_archive_a_commentary_migration.jsonl": 12,
+    "_archive_aligns_v3_below_0.78.jsonl": 70,
+    "_archive_aligns_v3_migrated_to_clarifies.jsonl": 4,
+    "_archive_iterates_dedup_v3.jsonl": 3,
+    "aligns_with.jsonl": 191,
+    "cites_basis.jsonl": 384,
+    "clarifies.jsonl": 113,
+    "derives_from.jsonl": 677,
+    "extends.jsonl": 37,
+    "iterates.jsonl": 58,
+    "references.jsonl": 444,
+    "supersedes.jsonl": 7
+  },
+  "relation_rows": 2000,
+  "rows_by_relation": {
+    "aligns_with": 267,
+    "cites_basis": 384,
+    "clarifies": 116,
+    "derives_from": 677,
+    "extends": 37,
+    "iterates": 61,
+    "references": 451,
+    "supersedes": 7
+  },
+  "rows_by_flag": {
+    "archive_relation_file": 89,
+    "from_missing": 122,
+    "high_precision_candidate": 958,
+    "mixed_precision": 61,
+    "semantic_low_confidence": 981,
+    "to_empty": 384,
+    "to_missing": 43
+  },
+  "endpoint_missing_count": 524,
+  "archive_relation_rows": 89,
+  "recommendation": "audit_only_no_apply",
+  "notes": [
+    "read_only_no_vault_write",
+    "raw_baseline_uses_git_tracked_files_only",
+    "untracked_raw_excluded_from_baseline",
+    "old_relation_rows_are_audit_inputs_not_new_analysis_outputs"
+  ]
+}
