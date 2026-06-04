@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>signal_context 核心说明</title>
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;margin:0;background:#f6f7fb;color:#182033;line-height:1.65}
+main{max-width:1120px;margin:0 auto;padding:34px 24px 64px}
+h1{font-size:30px;margin:0 0 8px}
+h2{font-size:20px;margin:30px 0 12px}
+h3{font-size:16px;margin:20px 0 8px}
+.sub{color:#667085;margin-bottom:22px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card{background:#fff;border:1px solid #e1e6ef;border-radius:8px;padding:16px}
+.label{font-size:13px;color:#667085}
+.num{font-size:28px;font-weight:760;margin-top:2px}
+.note{background:#fff;border:1px solid #e1e6ef;border-left:4px solid #2563eb;border-radius:8px;padding:15px 17px}
+.warn{border-left-color:#d97706}
+.ok{border-left-color:#059669}
+table{border-collapse:collapse;width:100%;background:#fff;border:1px solid #e1e6ef}
+th,td{border:1px solid #e1e6ef;padding:9px 10px;text-align:left;vertical-align:top;font-size:14px}
+th{background:#eef2f7}
+code{background:#eef2f7;padding:1px 5px;border-radius:4px}
+.flow{display:grid;grid-template-columns:1fr 34px 1fr 34px 1fr;gap:10px;align-items:center}
+.box{background:#fff;border:1px solid #d8dee9;border-radius:8px;padding:14px}
+.arrow{text-align:center;font-size:22px;color:#667085}
+ul{padding-left:21px}
+li{margin:5px 0}
+@media (max-width:900px){.grid,.flow{grid-template-columns:1fr}.arrow{display:none}}
+</style>
+</head>
+<body>
+<main>
+<h1>signal_context 核心说明</h1>
+<div class="sub">把 ③/④ 如何读取评论信号和市场验证信号说清楚。对象是设计审核,不是实现计划。</div>
+
+<section class="grid">
+  <div class="card"><div class="label">已发布评论信号</div><div class="num">171</div></div>
+  <div class="card"><div class="label">已发布市场信号</div><div class="num">10</div></div>
+  <div class="card"><div class="label">待人工闭环信号</div><div class="num">31</div></div>
+</section>
+
+<h2>一句话</h2>
+<div class="note ok">
+  ③ 先把已闭环的评论信号和市场验证信号聚合成内部 <code>signal_context</code>;
+  ④ 默认只读取这个聚合结果,不直接读取原始 signal,不把评论/市场原始证据放进对外报告。
+</div>
+
+<h2>为什么要加这一层</h2>
+<table>
+  <tr><th>如果 ④ 直接读 signals</th><th>加 signal_context 后</th></tr>
+  <tr>
+    <td>消费层容易把评论标题、市场标题、证据片段直接展示出去。</td>
+    <td>③ 先聚合成“关注度、验证强弱、不确定性提示”,④ 默认只读这些内部判断。</td>
+  </tr>
+  <tr>
+    <td>容易把评论/市场信号误当成结论依据。</td>
+    <td>评论/市场信号只影响注意力、确定性和复核提示,不改政策事实、不改分数。</td>
+  </tr>
+  <tr>
+    <td>待人工确认的信号可能污染下游。</td>
+    <td>只读已经发布到 <code>1_extracted/*signals.jsonl</code> 的信号;被拦截的 31 条不能进入。</td>
+  </tr>
+</table>
+
+<h2>数据流</h2>
+<div class="flow">
+  <div class="box">
+    <h3>② 已闭环 signals</h3>
+    <ul>
+      <li><code>commentary_signals.jsonl</code></li>
+      <li><code>market_intel_signals.jsonl</code></li>
+      <li>只含已通过发布闸门的信号</li>
+    </ul>
+  </div>
+  <div class="arrow">→</div>
+  <div class="box">
+    <h3>③ signal_context</h3>
+    <ul>
+      <li>按政策聚合</li>
+      <li>按主题聚合</li>
+      <li>按区域聚合</li>
+    </ul>
+  </div>
+  <div class="arrow">→</div>
+  <div class="box">
+    <h3>④ 消费层</h3>
+    <ul>
+      <li>默认展示政策依据和业务判断</li>
+      <li>只使用内部提示调整表达</li>
+      <li>审计模式才展开原始信号</li>
+    </ul>
+  </div>
+</div>
+
+<h2>③ 具体产出什么</h2>
+<table>
+  <tr><th>文件</th><th>回答什么问题</th><th>下游怎么用</th></tr>
+  <tr>
+    <td><code>policy_context.jsonl</code></td>
+    <td>某个政策有没有评论关注、风险、机会、执行阻力;有没有市场验证。</td>
+    <td>提醒这条政策应提高关注、降低确定性,或标记需要复核。</td>
+  </tr>
+  <tr>
+    <td><code>theme_context.jsonl</code></td>
+    <td>某个主题是只有讨论热度,还是已有市场落地信号。</td>
+    <td>区分“热但未验证”“已有验证”“证据很薄”。</td>
+  </tr>
+  <tr>
+    <td><code>region_context.jsonl</code></td>
+    <td>某个区域有没有项目、容量、补贴、招标、价格、准入或落地动作。</td>
+    <td>判断区域机会是否有地面验证。</td>
+  </tr>
+</table>
+
+<h2>④ 默认能说什么,不能说什么</h2>
+<table>
+  <tr><th>默认可以展示</th><th>默认禁止展示</th></tr>
+  <tr>
+    <td>
+      <ul>
+        <li>政策依据</li>
+        <li>业务判断</li>
+        <li>影响和建议</li>
+        <li>不确定性提示,例如“落地信号不足”“市场验证较弱”</li>
+      </ul>
+    </td>
+    <td>
+      <ul>
+        <li>评论原文标题</li>
+        <li>市场情报原文标题</li>
+        <li>signal 证据片段</li>
+        <li>来源账号列表</li>
+        <li>把评论/市场信号说成结论来源的表述</li>
+      </ul>
+    </td>
+  </tr>
+</table>
+
+<h2>审计模式</h2>
+<div class="note">
+  审计模式是显式打开的追溯视图,不是默认报告。它可以展示 signal 数量、signal id、来源标题、证据片段、置信度和 <code>sanitized_from</code>。这样既能追溯,又不会把内部校准/验证参数当成默认外显依据。
+</div>
+
+<h2>红线</h2>
+<div class="note warn">
+  <ul>
+    <li>不改 <code>0_raw/</code></li>
+    <li>不改 <code>business_view.scores</code></li>
+    <li>不改政策主题归属</li>
+    <li>不消费 review queue</li>
+    <li>不把 <code>blocked_signals.jsonl</code> 当已确认数据</li>
+    <li>apply 必须另行批准,且只能整文件写入 <code>1_extracted/signal_context/</code></li>
+  </ul>
+</div>
+
+<h2>你现在需要审核什么</h2>
+<table>
+  <tr><th>审核点</th><th>默认建议</th></tr>
+  <tr><td>是否同意 ③ 先聚合,④ 默认只读聚合结果</td><td>同意</td></tr>
+  <tr><td>是否同意评论/市场信号只影响注意力、确定性和复核提示</td><td>同意</td></tr>
+  <tr><td>是否同意默认报告不展示原始评论/市场证据</td><td>同意,审计模式才展开</td></tr>
+  <tr><td>是否同意下一步只做 preview,不直接 apply</td><td>同意</td></tr>
+</table>
+
+<h2>下一步</h2>
+<div class="note ok">
+  如果这页审核通过,下一步写 implementation plan,然后按 TDD 实现 <code>signal_context preview</code>。
+  第一轮只产出工程侧 preview 和 HTML 报告,不写资料库。
+</div>
+</main>
+</body>
+</html>
