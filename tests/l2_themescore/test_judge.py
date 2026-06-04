@@ -28,7 +28,7 @@ def test_judge_reject(tmp_path):
     assert v.verdict == "reject" and v.dim == "theme"
 
 def test_judge_has_reasoning_headroom(tmp_path):
-    # judge 可能是 reasoning 模型(Qwen 等),256 太小→思考耗光预算;守住头寸不回退。
+    # judge 可能是 reasoning 模型(DeepSeek/Qwen 等),预算太小会被思考耗光→content 为空。
     seen = []
     class M:
         def create(self, **kw):
@@ -39,7 +39,7 @@ def test_judge_has_reasoning_headroom(tmp_path):
         def __init__(self,**kw): self.messages=M()
     c = LLMClient(client=A(), log_path=str(tmp_path/"l.jsonl"))
     judge_draft(c, rec_title="t", rec_body="b", draft=_d())
-    assert seen[0] >= 1024
+    assert seen[0] >= 2048
 
 def test_judge_includes_evidence_beyond_body_head(tmp_path):
     seen = []

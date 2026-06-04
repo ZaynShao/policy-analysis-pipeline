@@ -1,0 +1,40 @@
+{
+  "schema": "node2b_v12_3c_seed_expansion_summary.v1",
+  "state": "state/node2b/dryrun_v12_3c_seed_expansion_rerun",
+  "selected_count": 24,
+  "accepted_count": 19,
+  "queue_count": 5,
+  "generator": "MiniMax-M2.7",
+  "judge": "deepseek-reasoner",
+  "theme_counts": {
+    "power_market": 7,
+    "distribution_grid_opening": 3,
+    "charging_infra": 7,
+    "residential_charging": 4,
+    "vpp_theme": 5,
+    "v2g": 5,
+    "energy_storage_theme": 3,
+    "aggregator_access": 4,
+    "green_power_trading_theme": 2
+  },
+  "primary_counts": {
+    "power_market": 4,
+    "charging_infra": 6,
+    "vpp_theme": 4,
+    "energy_storage_theme": 1,
+    "distribution_grid_opening": 1,
+    "green_power_trading_theme": 1,
+    "空": 1,
+    "v2g": 1
+  },
+  "queue_stage_counts": {
+    "judge_reject": 4,
+    "generation_error": 1
+  },
+  "notes": [
+    "dry_run_only_no_vault_write",
+    "manual_queue_not_downstream",
+    "global_selection_rule_no_pid_patch",
+    "judge_headroom_fixed_for_reasoning_model"
+  ]
+}

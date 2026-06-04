@@ -150,6 +150,8 @@
 
 **③-C 机制设计(2026-06-04)**:已补充语义政策关系生成机制,明确 `derives_from`、`extends`、`aligns_with`、`iterates` 不能靠当前③-B确定性程序直接完成,必须等②-B覆盖足够或用户批准明确子集后,按“程序候选 → 普通模型受限判定 → schema/program gate → 人工池阻断 → preview/apply”执行。`conflicts_with` 默认不自动 accepted,只作为审计提示或人工池。工程证据:`docs/superpowers/specs/2026-06-04-analysis-semantic-relations-design.md`、`docs/reviews/2026-06-04-analysis-semantic-relations-brief.html`。
 
+**②-B 为③-C补覆盖 dry-run(2026-06-04)**:已按全局选样规则跑一批 ③-C seed 扩展样本,只读 tracked raw、当前 business_view 和③-B关系 preview,优先选择当前 business_view 的关系邻居及高价值主题附近政策。模型通道:MiniMax-M2.7 生成 + DeepSeek reasoner judge;为适配 reasoning judge,已把 judge token headroom 从 1024 提到 2048。实测选样 24 篇,accepted draft 19 篇,入队 5 篇,分布告警 0。工程证据:`state/node2b/dryrun_v12_3c_seed_expansion_rerun/summary.json`、`proposed_changes/drafts_full.jsonl`、`review_queue/queue.jsonl`、`reports/coverage_expansion_summary_zh.html`、`reports/apply_preview.html`。本 run 不写资料库、不写 raw、不 apply;入队项不得进入③-C或④下游。
+
 ## B11 · ②-B 人工确认池与全局硬化回流 — 新增
 
 **是什么**:②-B dry-run/apply 后留下的 `review_queue/queue.jsonl` 是**人工确认池**,不是待手工 apply 清单。当前 50 篇样本中 accepted 39 已按离线 scoped verify 写入,剩余 11 入队,暴露的是机制边界,不能逐条补丁处置。

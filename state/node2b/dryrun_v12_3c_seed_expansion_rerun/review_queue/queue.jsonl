@@ -1,0 +1,5 @@
+{"pid": "P_2021_LN_44c4b58c", "stage": "judge_reject", "reason": "政策正文明确提及'虚拟电厂'和'充电设施'作为储能融合发展场景，属于vpp_theme和charging_infra的明确子机制，待审仅挂energy_storage_theme构成漏挂明显13主题", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2025_SD_fb6fcdeb", "stage": "judge_reject", "reason": "政策正文明确要求推动电力市场交易规则、支持车网互动参与电力市场化交易，属于power_market主题的直接内容，但待审themes中未包含power_market，构成漏挂重要主题。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2025_GX_583085e4", "stage": "judge_reject", "reason": "政策正文仅涉及新能源上网电价市场化改革，未直接部署充电设施或车网互动，D1=5明显高估；同时未明确储能/V2G参与电力市场交易，D2=4缺乏依据，属于13主题内部明显评分错误。", "detail": {"dim": "score", "confidence": 0.85}}
+{"pid": "P_2025_HE_79c43f8b", "stage": "judge_reject", "reason": "政策全文核心是虚拟电厂建设运营管理，primary应设为vpp_theme而非charging_infra，后者仅是聚合资源之一，与正文主旨明显颠倒，违反‘primary与13主题主旨明显颠倒’规则。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2024_SN_468da6ab", "stage": "generation_error", "reason": "pass2:Expecting value: line 1 column 1 (char 0)", "detail": {}}

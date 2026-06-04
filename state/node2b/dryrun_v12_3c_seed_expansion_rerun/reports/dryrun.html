@@ -1,0 +1,13 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8">
+<title>②-B dry-run 报告</title>
+<style>body{font-family:-apple-system,"PingFang SC";max-width:900px;margin:0 auto;padding:24px;background:#0f1115;color:#e6e9ef}
+table{border-collapse:collapse;width:100%;margin:10px 0}td,th{border-bottom:1px solid #2a2f3a;padding:6px 10px;text-align:left}
+h2{border-left:3px solid #6ab7ff;padding-left:10px}</style></head><body>
+<h1>②-B 归属挂载 · dry-run 报告</h1>
+<p>政策总数 19 · 过深档门 18 · 入队 5</p>
+<h2>judge 校准</h2><p>召回 - · 精度 -</p>
+<h2>分布告警</h2><ul><li>无</li></ul>
+<h2>重要性分布</h2><table><tr><td>重要性 5</td><td>4</td></tr><tr><td>重要性 4</td><td>14</td></tr><tr><td>重要性 1</td><td>1</td></tr></table>
+<h2>theme 命中分布</h2><table><tr><th>theme</th><th>篇数</th></tr><tr><td>power_market</td><td>7</td></tr><tr><td>charging_infra</td><td>7</td></tr><tr><td>vpp_theme</td><td>5</td></tr><tr><td>v2g</td><td>5</td></tr><tr><td>residential_charging</td><td>4</td></tr><tr><td>aggregator_access</td><td>4</td></tr><tr><td>distribution_grid_opening</td><td>3</td></tr><tr><td>energy_storage_theme</td><td>3</td></tr><tr><td>green_power_trading_theme</td><td>2</td></tr></table>
+<h2>入队(需复核)</h2><table><tr><th>pid</th><th>阶段</th><th>原因</th></tr><tr><td>P_2021_LN_44c4b58c</td><td>judge_reject</td><td>政策正文明确提及&#x27;虚拟电厂&#x27;和&#x27;充电设施&#x27;作为储能融合发展场景，属于vpp_theme和charging_infra的明确子机制，待审仅挂energy_storage_theme构成漏挂明显13主题</td></tr><tr><td>P_2025_SD_fb6fcdeb</td><td>judge_reject</td><td>政策正文明确要求推动电力市场交易规则、支持车网互动参与电力市场化交易，属于power_market主题的直接内容，但待审themes中未包含power_market，构成漏挂重要主题。</td></tr><tr><td>P_2025_GX_583085e4</td><td>judge_reject</td><td>政策正文仅涉及新能源上网电价市场化改革，未直接部署充电设施或车网互动，D1=5明显高估；同时未明确储能/V2G参与电力市场交易，D2=4缺乏依据，属于13主题内部明显评分错误。</td></tr><tr><td>P_2025_HE_79c43f8b</td><td>judge_reject</td><td>政策全文核心是虚拟电厂建设运营管理，primary应设为vpp_theme而非charging_infra，后者仅是聚合资源之一，与正文主旨明显颠倒，违反‘primary与13主题主旨明显颠倒’规则。</td></tr><tr><td>P_2024_SN_468da6ab</td><td>generation_error</td><td>pass2:Expecting value: line 1 column 1 (char 0)</td></tr></table>
+</body></html>

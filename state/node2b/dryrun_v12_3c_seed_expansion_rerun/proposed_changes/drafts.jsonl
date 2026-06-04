@@ -1,0 +1,19 @@
+{"pid": "P_2025_NEA_36", "themes": ["power_market", "distribution_grid_opening"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2022_SH_34824905", "themes": ["charging_infra", "residential_charging"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2025_SH_5_c", "themes": ["vpp_theme", "v2g", "energy_storage_theme"], "primary": "vpp_theme", "重要性": 5, "gate": true}
+{"pid": "P_2024_NEA_26", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_SC_cc687c4e", "themes": ["vpp_theme", "aggregator_access", "power_market"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2023_HA_65ffb0c4", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2019_HE_e4ed728a", "themes": ["distribution_grid_opening", "power_market"], "primary": "distribution_grid_opening", "重要性": 4, "gate": true}
+{"pid": "P_2023_NDRC_1044_b", "themes": ["green_power_trading_theme"], "primary": "green_power_trading_theme", "重要性": 4, "gate": true}
+{"pid": "P_2022_NDRC_53", "themes": ["charging_infra", "residential_charging"], "primary": "charging_infra", "重要性": 5, "gate": true}
+{"pid": "P_2025_NEA_08060ff3", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2024_SX_ce9b782c", "themes": ["power_market", "vpp_theme", "energy_storage_theme", "green_power_trading_theme"], "primary": "power_market", "重要性": 5, "gate": true}
+{"pid": "P_2025_HE_9a2d5057", "themes": ["vpp_theme", "power_market", "aggregator_access"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2024_HI_0adc6a74", "themes": ["charging_infra", "v2g", "residential_charging"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2024_NEA_76", "themes": ["power_market", "aggregator_access", "distribution_grid_opening"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2023_NHC_19_b", "themes": ["charging_infra", "v2g"], "primary": "charging_infra", "重要性": 5, "gate": true}
+{"pid": "P_2025_HA_1201deda", "themes": ["charging_infra", "v2g"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2024_CQ_86", "themes": ["v2g", "charging_infra"], "primary": "v2g", "重要性": 4, "gate": true}
+{"pid": "P_2024_SN_6a3d7fdd", "themes": ["charging_infra", "residential_charging"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2025_SN_cea944a1", "themes": ["vpp_theme", "aggregator_access"], "primary": "vpp_theme", "重要性": 4, "gate": true}

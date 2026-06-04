@@ -1,0 +1,336 @@
+{
+  "schema": "node2b_3c_seed_selection.v1",
+  "tracked_raw_count": 935,
+  "current_business_view_count": 50,
+  "relation_candidate_count": 677,
+  "candidate_pool_count": 192,
+  "selected_count": 24,
+  "selection_rule": "global: relation neighbors of current business_view plus high-value theme keywords and relation degree; excludes already-covered, untracked, and P_1900 identity-risk pids",
+  "selected": [
+    {
+      "pid": "P_2025_SD_fb6fcdeb",
+      "score": 50,
+      "title": "山东省发展和改革委员会通知公告关于公布首批车网互动规模化应用 ...",
+      "path": "0_raw/policies/【山东省发展和改革委员会通知公告关于公布首批车网互动规模化应用 ...(发改办能源〔2025〕241号)】-山东省发展和改革委员会-fb6fcdeb.md",
+      "reasons": [
+        "adjacent_to_current_bv:cites_basis:P_2025_SD_fb6fcdeb->P_2024_NDRC_1721",
+        "adjacent_to_current_bv:cites_basis:P_2025_SD_fb6fcdeb->P_2024_NDRC_718",
+        "adjacent_to_current_bv:references:P_2025_SD_fb6fcdeb->P_2024_NDRC_1721",
+        "adjacent_to_current_bv:references:P_2025_SD_fb6fcdeb->P_2024_NDRC_718",
+        "high_value_keyword:power_market",
+        "high_value_keyword:charging_infra",
+        "high_value_keyword:vpp_v2g",
+        "high_value_keyword:energy_storage"
+      ]
+    },
+    {
+      "pid": "P_2023_NHC_19_b",
+      "score": 39,
+      "title": "进一步构建高质量充电基础设施体系的指导意见",
+      "path": "0_raw/policies/【进一步构建高质量充电基础设施体系的指导意见(国办发〔2023〕19号)】-国务院办公厅-ead1.md",
+      "reasons": [
+        "adjacent_to_current_bv:references:P_2020_HN_7de5ab8e->P_2023_NHC_19_b",
+        "adjacent_to_current_bv:references:P_2024_NDRC_1721->P_2023_NHC_19_b",
+        "adjacent_to_current_bv:references:P_2024_NDRC_718->P_2023_NHC_19_b",
+        "high_value_keyword:power_market",
+        "high_value_keyword:charging_infra",
+        "high_value_keyword:vpp_v2g",
+        "high_value_keyword:energy_storage",
+        "relation_degree:31"
+      ]
+    },
+    {
+      "pid": "P_2022_NDRC_53",
+      "score": 39,
+      "title": "国家发展改革委等部门关于进一步提升电动汽车充电基础设施服务保障能力的实施意见",
+      "path": "0_raw/policies/【国家发展改革委等部门关于进一步提升电动汽车充电基础设施服务保障能力的实施意见(发改能源规〔2022〕53号)】-国家发改委等10部门-cb65.md",
+      "reasons": [
+        "adjacent_to_current_bv:cites_basis:P_2022_NDRC_53->P_2020_SH_39_b",
+        "adjacent_to_current_bv:references:P_2022_NDRC_53->P_2020_SH_39_b",
+        "high_value_keyword:power_market",
+        "high_value_keyword:charging_infra",
+        "high_value_keyword:vpp_v2g",
+        "high_value_keyword:energy_storage",
+        "relation_degree:13"
+      ]
+    },
+    {
+      "pid": "P_2023_NDRC_1044_b",
+      "score": 37,
+      "title": "国家发展改革委 财政部 国家能源局关于做好可再生能源绿色电力证书全覆盖工作促进可再生能源电力消费的通知",
+      "path": "0_raw/policies/【国家发展改革委 财政部 国家能源局关于做好可再生能源绿色电力证书全覆盖工作促进可再生能源电力消费的通知(发改能源〔2023〕1044号)】-国家发展改革委、财政部、国家能源局-4274.md",
+      "reasons": [
+        "adjacent_to_current_bv:clarifies:P_2023_NDRC_1044_b->P_2017_NDRC_d5bc4c87",
+        "adjacent_to_current_bv:references:P_2023_NDRC_1044_b->P_2017_NDRC_d5bc4c87",
+        "adjacent_to_current_bv:supersedes:P_2023_NDRC_1044_b->P_2017_NDRC_d5bc4c87",
+        "high_value_keyword:power_market",
+        "relation_degree:11"
+      ]
+    },
+    {
+      "pid": "P_2025_SN_cea944a1",
+      "score": 36,
+      "title": "陕西省发展和改革委员会国家能源局西北监管局关于印发《创新支持 ...",
+      "path": "0_raw/policies/【陕西省发展和改革委员会国家能源局西北监管局关于印发《创新支持 ...】-陕西省发展和改革委员会-cea944a1.md",
+      "reasons": [
+        "adjacent_to_current_bv:cites_basis:P_2025_SN_cea944a1->P_2024_NEA_93_a",
+        "adjacent_to_current_bv:references:P_2025_SN_cea944a1->P_2024_NEA_93_a",
+        "high_value_keyword:power_market",
+        "high_value_keyword:charging_infra",
+        "high_value_keyword:vpp_v2g",
+        "high_value_keyword:energy_storage",
+        "relation_degree:5"
+      ]
+    },
+    {
+      "pid": "P_2024_HI_0adc6a74",
+      "score": 35,
+      "title": "海南省发展和改革委员会关于抓好2024年电动汽车充换电基础设施 ...",
+      "path": "0_raw/policies/【海南省发展和改革委员会关于抓好2024年电动汽车充换电基础设施 ...】-海南省发展和改革委员会-0adc6a74.md",
+      "reasons": [
+        "adjacent_to_current_bv:cites_basis:P_2024_HI_0adc6a74->P_2024_NDRC_1721",
+        "adjacent_to_current_bv:references:P_2024_HI_0adc6a74->P_2024_NDRC_1721",
+        "high_value_keyword:charging_infra",
+        "high_value_keyword:vpp_v2g",
+        "high_value_keyword:energy_storage",
+        "relation_degree:8"
+      ]
+    },
+    {
+      "pid": "P_2025_SC_cc687c4e",
+      "score": 31,
+      "title": "关于印发《四川省虚拟电厂建设运营管理实施方案》的通知(川发改能源〔2025〕278号)_通知公告_四川省发展和改革委员会",
+      "path": "0_raw/policies/【关于印发《四川省虚拟电厂建设运营管理实施方案》的通知(川发改能源〔2025〕278号)_通知公告_四川省发展和改革委员会(川发改能源〔2025〕278号)】-四川省发展和改革委员会-cc687c4e.md",
+      "reasons": [
+        "adjacent_to_current_bv:cites_basis:P_2025_SC_cc687c4e->P_2024_NEA_93_a",
+        "adjacent_to_current_bv:references:P_2025_SC_cc687c4e->P_2024_NEA_93_a",
+        "high_value_keyword:power_market",
+        "high_value_keyword:vpp_v2g",
+        "relation_degree:9"
+      ]
+    },
+    {
+      "pid": "P_2025_HE_9a2d5057",
+      "score": 31,
+      "title": "河北省虚拟电厂建设运营实施意见 - 河北省发展和改革委员会",
+      "path": "0_raw/policies/【河北省虚拟电厂建设运营实施意见 - 河北省发展和改革委员会】-河北省发展和改革委员会-9a2d5057.md",
+      "reasons": [
+        "adjacent_to_current_bv:cites_basis:P_2025_HE_9a2d5057->P_2024_NEA_93_a",
+        "adjacent_to_current_bv:references:P_2025_HE_9a2d5057->P_2024_NEA_93_a",
+        "high_value_keyword:power_market",
+        "high_value_keyword:vpp_v2g",
+        "high_value_keyword:energy_storage",
+        "relation_degree:4"
+      ]
+    },
+    {
+      "pid": "P_2024_CQ_86",
+      "score": 29,
+      "title": "重庆市新能源汽车与电网融合互动工作方案",
+      "path": "0_raw/policies/【重庆市新能源汽车与电网融合互动工作方案(渝经信发〔2024〕86号)】-重庆市经济和信息化委员会、重庆市发展和改革委员会、重庆市能源局、重庆市市场监督管理局、国网重庆市电力公司-14.md",
+      "reasons": [
+        "adjacent_to_current_bv:references:P_2024_CQ_86->P_2024_NDRC_1721",
+        "adjacent_to_current_bv:references:P_2024_CQ_86->P_2024_NDRC_718",
+        "high_value_keyword:power_market",
+        "high_value_keyword:charging_infra",
+        "high_value_keyword:vpp_v2g",
+        "high_value_keyword:energy_storage",
+        "relation_degree:3"
+      ]
+    },
+    {
+      "pid": "P_2025_HE_79c43f8b",
+      "score": 29,
+      "title": "河北省发展和改革委员会关于印发《河北省虚拟电厂建设运营管理 ...",
+      "path": "0_raw/policies/【河北省发展和改革委员会关于印发《河北省虚拟电厂建设运营管理 ...】-河北省发展和改革委员会-79c43f8b.md",
+      "reasons": [
+        "adjacent_to_current_bv:references:P_2025_HE_79c43f8b->P_2024_NEA_93_a",
+        "high_value_keyword:power_market",
+        "high_value_keyword:charging_infra",
+        "high_value_keyword:vpp_v2g",
+        "high_value_keyword:energy_storage",
+        "relation_degree:10"
+      ]
+    },
+    {
+      "pid": "P_2023_HA_65ffb0c4",
+      "score": 29,
+      "title": "关于印发《河南省电力市场运营基本规则（试行）》的通知",
+      "path": "0_raw/policies/【关于印发《河南省电力市场运营基本规则（试行）》的通知(豫发改电力〔2022〕533号)】-河南省发展和改革委员会-65ffb0c4.md",
+      "reasons": [
+        "adjacent_to_current_bv:cites_basis:P_2023_HA_65ffb0c4->P_2015_NDRC_3d821d6e",
+        "adjacent_to_current_bv:references:P_2023_HA_65ffb0c4->P_2015_NDRC_3d821d6e",
+        "high_value_keyword:power_market",
+        "high_value_keyword:vpp_v2g",
+        "high_value_keyword:energy_storage",
+        "relation_degree:2"
+      ]
+    },
+    {
+      "pid": "P_2025_GX_583085e4",
+      "score": 26,
+      "title": "广西壮族自治区发展和改革委员会　广西壮族自治区能源局关于印发《广西壮族自治区深化新能源上网电价市场化改革实施方案》的通知 - 收费价格 - 广西壮族自治区发展和改革委员会网站 - fgw.gxzf.gov.cn",
+      "path": "0_raw/policies/【广西壮族自治区发展和改革委员会　广西壮族自治区能源局关于印发《广西壮族自治区深化新能源上网电价市场化改革实施方案》的通知 - 收费价格 - 广西壮族自治区发展和(桂发改价费规.md",
+      "reasons": [
+        "adjacent_to_current_bv:cites_basis:P_2025_GX_583085e4->P_2015_NDRC_3d821d6e",
+        "adjacent_to_current_bv:references:P_2025_GX_583085e4->P_2015_NDRC_3d821d6e",
+        "high_value_keyword:power_market",
+        "relation_degree:7"
+      ]
+    },
+    {
+      "pid": "P_2022_SH_34824905",
+      "score": 26,
+      "title": "上海市人民政府办公厅印发《关于本市进一步推动充换电基础设施建设的实施意见》的通知_规范性文件",
+      "path": "0_raw/policies/【上海市人民政府办公厅印发《关于本市进一步推动充换电基础设施建设的实施意见》的通知_规范性文件(沪府办规〔2022〕1号)】-上海市发展和改革委员会-34824905.md",
+      "reasons": [
+        "adjacent_to_current_bv:cites_basis:P_2022_SH_34824905->P_2020_SH_39_b",
+        "adjacent_to_current_bv:references:P_2022_SH_34824905->P_2020_SH_39_b",
+        "high_value_keyword:charging_infra",
+        "high_value_keyword:vpp_v2g",
+        "relation_degree:3"
+      ]
+    },
+    {
+      "pid": "P_2025_SH_5_c",
+      "score": 25,
+      "title": "上海市新型电力系统调节能力奖励资金管理办法",
+      "path": "0_raw/policies/【上海市新型电力系统调节能力奖励资金管理办法(沪发改规范〔2025〕5号)】-上海市发展和改革委员会、经济和信息化委员会、财政局-3898.md",
+      "reasons": [
+        "adjacent_to_current_bv:references:P_2025_SH_5_c->P_2024_NDRC_1721",
+        "high_value_keyword:power_market",
+        "high_value_keyword:charging_infra",
+        "high_value_keyword:vpp_v2g",
+        "high_value_keyword:energy_storage",
+        "relation_degree:4"
+      ]
+    },
+    {
+      "pid": "P_2024_NEA_76",
+      "score": 24,
+      "title": "电力市场注册基本规则",
+      "path": "0_raw/policies/【电力市场注册基本规则(国能发监管规〔2024〕76号)】-国家能源局-7b68.md",
+      "reasons": [
+        "high_value_keyword:power_market",
+        "high_value_keyword:charging_infra",
+        "high_value_keyword:vpp_v2g",
+        "high_value_keyword:energy_storage",
+        "relation_degree:8"
+      ]
+    },
+    {
+      "pid": "P_2025_NEA_08060ff3",
+      "score": 24,
+      "title": "国家能源局关于新疆能源综合改革试点提案的答复",
+      "path": "0_raw/policies/【国家能源局关于新疆能源综合改革试点提案的答复】-国家能源局-edfb.md",
+      "reasons": [
+        "adjacent_to_current_bv:references:P_2025_NEA_08060ff3->P_2024_NEA_93_a",
+        "adjacent_to_current_bv:references:P_2025_NEA_08060ff3->P_2025_NDRC_910",
+        "high_value_keyword:power_market",
+        "high_value_keyword:energy_storage",
+        "relation_degree:6"
+      ]
+    },
+    {
+      "pid": "P_2021_LN_44c4b58c",
+      "score": 24,
+      "title": "国家发展改革委 国家能源局关于加快推动新型储能发展的指导意见",
+      "path": "0_raw/policies/【国家发展改革委 国家能源局关于加快推动新型储能发展的指导意见(发改能源规〔2021〕1051号)】-辽宁省发展和改革委员会-44c4b58c.md",
+      "reasons": [
+        "high_value_keyword:power_market",
+        "high_value_keyword:charging_infra",
+        "high_value_keyword:vpp_v2g",
+        "high_value_keyword:energy_storage",
+        "relation_degree:16"
+      ]
+    },
+    {
+      "pid": "P_2024_SX_ce9b782c",
+      "score": 23,
+      "title": "山西省能源局国家能源局山西监管办公室关于印发《电力市场规则 ...",
+      "path": "0_raw/policies/【山西省能源局国家能源局山西监管办公室关于印发《电力市场规则 ...(晋能源规〔2024〕1号)】-政府门户.www.shanxi.gov.cn-ce9b782c.md",
+      "reasons": [
+        "adjacent_to_current_bv:references:P_2024_SX_ce9b782c->P_2015_NDRC_3d821d6e",
+        "high_value_keyword:power_market",
+        "high_value_keyword:vpp_v2g",
+        "high_value_keyword:energy_storage",
+        "relation_degree:6"
+      ]
+    },
+    {
+      "pid": "P_2019_HE_e4ed728a",
+      "score": 23,
+      "title": "关于增量配电网配电价格管理有关事项的通知 - 河北省发展和改革委员会",
+      "path": "0_raw/policies/【关于增量配电网配电价格管理有关事项的通知 - 河北省发展和改革委员会】-河北省发展和改革委员会-e4ed728a.md",
+      "reasons": [
+        "adjacent_to_current_bv:cites_basis:P_2019_HE_e4ed728a->P_2016_CQ_58e17873",
+        "adjacent_to_current_bv:references:P_2019_HE_e4ed728a->P_2016_CQ_58e17873",
+        "high_value_keyword:power_market",
+        "relation_degree:4"
+      ]
+    },
+    {
+      "pid": "P_2025_NEA_36",
+      "score": 22,
+      "title": "2025年电力领域综合监管工作通知",
+      "path": "0_raw/policies/【2025年电力领域综合监管工作通知(国能发监管〔2025〕36号)】-国家能源局-a305.md",
+      "reasons": [
+        "adjacent_to_current_bv:references:P_2025_NEA_36->P_2015_NDRC_3d821d6e",
+        "adjacent_to_current_bv:references:P_2025_NEA_36->P_2019_NDRC_0720b570",
+        "high_value_keyword:power_market",
+        "relation_degree:8"
+      ]
+    },
+    {
+      "pid": "P_2025_HA_1201deda",
+      "score": 22,
+      "title": "通许县新能源汽车充电设施布局专项规划(2025-2030年)送审稿",
+      "path": "0_raw/policies/【通许县新能源汽车充电设施布局专项规划(2025-2030年)送审稿】-通许县人民政府-3493.md",
+      "reasons": [
+        "adjacent_to_current_bv:references:P_2025_HA_1201deda->P_2020_SH_39_b",
+        "high_value_keyword:charging_infra",
+        "high_value_keyword:vpp_v2g",
+        "high_value_keyword:energy_storage",
+        "relation_degree:5"
+      ]
+    },
+    {
+      "pid": "P_2024_SN_6a3d7fdd",
+      "score": 20,
+      "title": "陕西省发展和改革委员会关于印发《陕西省电动汽车充电基础设施 ...",
+      "path": "0_raw/policies/【陕西省发展和改革委员会关于印发《陕西省电动汽车充电基础设施 ...】-陕西省发展和改革委员会-6a3d7fdd.md",
+      "reasons": [
+        "high_value_keyword:power_market",
+        "high_value_keyword:charging_infra",
+        "high_value_keyword:vpp_v2g",
+        "high_value_keyword:energy_storage",
+        "relation_degree:4"
+      ]
+    },
+    {
+      "pid": "P_2024_SN_468da6ab",
+      "score": 20,
+      "title": "陕西省发展和改革委员会关于印发《陕西省电动汽车充电基础设施建设运营管理办法》的通知-陕西省发改委",
+      "path": "0_raw/policies/【陕西省发展和改革委员会关于印发《陕西省电动汽车充电基础设施建设运营管理办法》的通知-陕西省发改委】-陕西省发展和改革委员会-468da6ab.md",
+      "reasons": [
+        "high_value_keyword:power_market",
+        "high_value_keyword:charging_infra",
+        "high_value_keyword:vpp_v2g",
+        "high_value_keyword:energy_storage",
+        "relation_degree:4"
+      ]
+    },
+    {
+      "pid": "P_2024_NEA_26",
+      "score": 20,
+      "title": "促进新型储能并网和调度运用",
+      "path": "0_raw/policies/【促进新型储能并网和调度运用(国能发科技规〔2024〕26号)】-国家能源局-95ec.md",
+      "reasons": [
+        "high_value_keyword:power_market",
+        "high_value_keyword:vpp_v2g",
+        "high_value_keyword:energy_storage",
+        "relation_degree:8"
+      ]
+    }
+  ]
+}
