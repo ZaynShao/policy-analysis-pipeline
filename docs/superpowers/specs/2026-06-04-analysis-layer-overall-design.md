@@ -168,11 +168,15 @@ Apply 必须只消费 preview 输出,整文件写入派生层。
 2. **③-A 关系资产审计 preview**:只读旧 relations 和当前 raw,出 HTML。
 3. **③-B 高精度关系 preview**:先做 references / cites_basis / supersedes / clarifies。
 4. **signal_context preview**:可以与 ③-B 并行或紧随其后,因为已发布 signals 已闭环。
-5. **analysis_context preview**:把 ③-B 与 signal_context 合成给 ④的统一输入。
-6. **等 ②-B 覆盖足够后做 ③-C 语义关系 preview**。
-7. **所有 apply 另行批准**。
+5. **analysis_context v1 preview**:只把 ③-B 与 signal_context 合成临时统一输入,用于验证上下文契约;这不代表③关系层完成,也不代表④可以开始实质消费。
+6. **③-C 语义关系机制确认**:先明确 `derives_from`、`extends`、`aligns_with`、`iterates` 等语义关系怎么生成、怎么过模型/程序门、怎么进入人工池。
+7. **等 ②-B 覆盖足够后做 ③-C 语义关系 preview**。
+8. **analysis_context v2 preview**:纳入③-C accepted 语义关系后,再作为④实质消费层输入。
+9. **所有 apply 另行批准**。
 
 不推荐现在直接实现完整 ③-C,因为 ②-B 覆盖只有 50 个 business_view,语义关系会重复旧关系的问题。
+
+④可以先做读取契约说明,但不应在③-C和 analysis_context v2 之前启动政策卡片、报告或其他实质消费 preview。
 
 ## 9. 与 signal_context 的关系
 
