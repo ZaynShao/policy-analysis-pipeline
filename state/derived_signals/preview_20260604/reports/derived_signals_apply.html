@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>派生信号 apply</title>
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;margin:0;background:#f7f8fb;color:#172033;line-height:1.6}
+main{max-width:1180px;margin:0 auto;padding:34px 24px 64px}
+h1{font-size:29px;margin:0 0 8px}
+h2{font-size:20px;margin:28px 0 12px}
+.sub{color:#667085;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:#fff;border:1px solid #e1e6ef;border-radius:8px;padding:16px}
+.label{color:#667085;font-size:13px}
+.num{font-size:30px;font-weight:760;margin-top:4px}
+.note{background:#fff;border-left:4px solid #2563eb;border-radius:8px;padding:14px 16px;border-top:1px solid #e1e6ef;border-right:1px solid #e1e6ef;border-bottom:1px solid #e1e6ef}
+table{border-collapse:collapse;width:100%;background:#fff;border:1px solid #e1e6ef}
+th,td{border:1px solid #e1e6ef;padding:8px 9px;text-align:left;vertical-align:top;font-size:13px}
+th{background:#f1f5f9}
+code{background:#eef2f7;padding:1px 5px;border-radius:4px}
+@media (max-width:900px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+<h1>派生信号 apply</h1>
+<div class="sub">把已批准 preview 写入 vault 派生层。</div>
+<section class="grid"><div class="card"><div class="label">写入文件</div><div class="num">2</div></div><div class="card"><div class="label">评论信号</div><div class="num">189</div></div><div class="card"><div class="label">市场信号</div><div class="num">23</div></div><div class="card"><div class="label">raw 写入</div><div class="num">0</div></div></section>
+
+<h2>结论</h2>
+<div class="note">
+  <p>本 apply 只从 preview 输出写入 <code>1_extracted/</code> 下的两个派生文件。</p>
+  <p>它不读取上游人工池,不写 <code>0_raw/</code>,不修改政策或评论原始材料。</p>
+</div>
+
+<h2>写入清单</h2>
+<table><tr><th>路径</th><th>方式</th></tr><tr><td><code>1_extracted/commentary_signals.jsonl</code></td><td>整体重写</td></tr><tr><td><code>1_extracted/market_intel_signals.jsonl</code></td><td>整体重写</td></tr></table>
+
+</main>
+</body>
+</html>
