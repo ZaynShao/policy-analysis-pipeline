@@ -180,7 +180,9 @@
 - 库外 backup:`/Users/shaoziyuan/dev/policy-analysis-backups/business_view_isolation_20260603_apply`。
 - 工程侧审计证据:`state/business_view_isolation/dryrun_20260603/manifest.jsonl`、`apply_log.jsonl`、`reports/business_view_isolation_apply.html`。
 - `commentary_signals` 最小 dry-run 已完成:只读 283 篇 `0_raw/commentaries`,对 189 篇已有 `related_policy` 的评论产出内部校准 signal;52 篇 `not_policy_related` 跳过;42 篇无关联跳过;18 篇进入人工池(15 篇主题未命中,3 篇正文不可读)。报告和机器证据在 `state/commentary_signals/dryrun_20260603/`。
-- 本条剩余部分:处理 `commentary_signals` / `market_intel_signals` 的 apply/消费契约,以及人工池裁决如何回流到分类法。
+- `market_intel_signals` 最小 dry-run 已完成:23 条 manifest 全部定位 raw,产出 23 条内部验证 signal;14 条进入人工池(11 条主题未命中,3 条地区未知)。报告和机器证据在 `state/market_intel_signals/dryrun_20260603/`。
+- `derived_signals` preview/apply 契约已落设计:preview 只消费 `signals.jsonl` / `market_signals.jsonl`,只统计不消费 review queue;apply 只允许从 preview 输出整体写入 `1_extracted/commentary_signals.jsonl` 和 `1_extracted/market_intel_signals.jsonl`。live vault apply 仍未执行,需另行显式批准。
+- 本条剩余部分:人工池裁决如何回流到分类法,以及 ③/④ 是否消费这两个 derived signal 文件的具体读取策略。
 
 **处置原则**:
 - 旧 `business_view` 不应继续作为可消费资料库的可信输入;最大妥协是库外 backup,不参与 pipeline。

@@ -1,6 +1,6 @@
 ---
 title: 政策分析数据 Schema(契约文档)
-version: v1.0 (post-split,2026-05-08)
+version: v1.2 (derived signals,2026-06-04)
 authority: 本文件是 vault 与 pipeline 之间的唯一契约。所有读写以本文为准。
 ---
 
@@ -35,6 +35,8 @@ vault/
 │   ├── policy_summaries.jsonl 政策客观摘要(每行 by policy_id)
 │   ├── relations/*.jsonl      9 类关系 + _index_by_policy/ 反链页
 │   ├── entities/              canonical 实体 + 反链页
+│   ├── commentary_signals.jsonl 评论内部校准信号
+│   ├── market_intel_signals.jsonl 市场内部验证信号
 │   ├── opinions/              评论观点 + 政策舆论矩阵
 │   └── commentary_audit/      评论审计
 │
@@ -344,6 +346,59 @@ Canonical 注册在 `_meta/entities/registry.yaml`(或 vault 内等价位置,以
 
 舆论矩阵 = 共识(≥3 独立来源同向)+ 分歧 + 中性观察 + 待跟进。
 
+### 5.6 评论校准信号 `1_extracted/commentary_signals.jsonl`
+
+每行一条评论派生信号。该文件来自 `0_raw/commentaries/` 的已关联评论 dry-run 结果,用于内部校准、审计追溯和分析师复核。它不直接覆盖政策事实、主题归属或 `_meta/business_view/` 分数,也不作为消费层外显方法论。
+
+```json
+{
+  "schema_version": 1,
+  "source_kind": "commentary",
+  "commentary_id": "C_0d474bd19965",
+  "title": "评论标题",
+  "related_policy_ids": ["P_2026_SC_0305e288"],
+  "theme_ids": ["power_market"],
+  "signal_role": "risk",
+  "confidence": 0.72,
+  "evidence": "评论中的证据片段",
+  "source_account": "来源账号",
+  "business_tag": "power",
+  "sanitized_from": "0_raw/commentaries/{filename}.md",
+  "extracted_by": "scripts/derived_signals/run.py"
+}
+```
+
+`signal_role` 是内部分析角色,可取 `risk` / `opportunity` / `execution` / `attention` / `interpretation` / `noise`。
+
+### 5.7 市场验证信号 `1_extracted/market_intel_signals.jsonl`
+
+每行一条市场情报派生信号。该文件来自已登记 `market_intel` manifest 的 dry-run 结果,用于内部验证项目、容量、补贴、价格、招标、交易、准入或落地动作是否存在。它不混入 policy 或 commentary raw,不直接覆盖政策事实、主题归属或 `_meta/business_view/` 分数。
+
+```json
+{
+  "schema_version": 1,
+  "source_kind": "market_intel",
+  "market_signal_id": "MI_c3474ca838d9",
+  "source_pid": "P_2026_GO_63fd5297",
+  "current_policy_id": "P_2026_GO_63fd5297",
+  "title": "银川电网侧储能项目清单公示(2.4GW/8.1GWh)",
+  "region": {"level": "市", "code": "640100", "name": "银川市"},
+  "theme_ids": ["energy_storage_theme"],
+  "business_lines": ["power"],
+  "signal_type": "project_list",
+  "observed_date": "2026-02-09",
+  "time_validity": "point_in_time",
+  "related_policy_ids": [],
+  "confidence": 0.9,
+  "evidence": "市场情报中的证据片段",
+  "source_url": "https://example.com/source",
+  "sanitized_from": "0_raw/policies/{filename}.md",
+  "extracted_by": "scripts/derived_signals/run.py"
+}
+```
+
+`signal_type` 按工程 registry 控制;未知或边界不清的行进入 review queue,不进入本文件。
+
 ---
 
 ## 6. 主题结晶 `2_crystallized/themes/<theme>/`
@@ -464,6 +519,12 @@ vault 当前内含一些字段,与"理想 schema"有出入,但是真实存在的
 ---
 
 ## Changelog
+
+### v1.2 — 2026-06-04(derived signals 契约)
+
+- `1_extracted/` 新增 `commentary_signals.jsonl` 和 `market_intel_signals.jsonl`
+- 明确评论信号是内部校准,市场信号是内部验证,默认不作为消费层外显方法论
+- 明确 review queue 不能被当成 accepted 派生行写入上述文件
 
 ### v1.1 — 2026-05-12(身份字段重算白名单)
 
