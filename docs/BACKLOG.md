@@ -188,7 +188,9 @@
 - `commentary_signals` 最小 dry-run 已完成:只读 283 篇 `0_raw/commentaries`,对 189 篇已有 `related_policy` 的评论产出内部校准 signal;52 篇 `not_policy_related` 跳过;42 篇无关联跳过;18 篇进入人工池(15 篇主题未命中,3 篇正文不可读)。报告和机器证据在 `state/commentary_signals/dryrun_20260603/`。
 - `market_intel_signals` 最小 dry-run 已完成:23 条 manifest 全部定位 raw,产出 23 条内部验证 signal;14 条进入人工池(11 条主题未命中,3 条地区未知)。报告和机器证据在 `state/market_intel_signals/dryrun_20260603/`。
 - `derived_signals` preview/apply 契约已落地并执行 live apply:`review_queue` 已从"只统计"纠偏为发布闸门。当前 preview 候选 189 条评论信号 / 23 条市场信号,实际发布 171 条评论信号 / 10 条市场信号,拦截 31 条待人工闭环信号(18 条评论、13 条市场)。apply 只允许从 preview 输出整体写入 `1_extracted/commentary_signals.jsonl` 和 `1_extracted/market_intel_signals.jsonl`,不写 raw。
-- 本条剩余部分:人工池裁决如何回流到分类法,以及 ③/④ 是否消费这两个 derived signal 文件的具体读取策略。
+- `signal_context` preview 已完成:只读已发布的 171 条评论信号和 10 条市场信号,blocked 31 条只作为审计门,产出 87 个 policy context、13 个 theme context、10 个 region context。工程证据:`state/signal_context/preview_20260604/policy_context.jsonl`、`theme_context.jsonl`、`region_context.jsonl`、`summary.json`、`reports/signal_context_preview.html`。本 preview 不写资料库、不写 raw、不 apply、不调用模型,且不把 blocked signals 当 accepted。
+- `signal_context` 暴露 2 条 market region 质量 warning:`province_code_with_city_name`(省级 code 搭配城市名),涉及 accepted market signals 的上游 region 规范化,后续应回流到 market_intel 表示/人工池规则,不能在 context 层逐条改。
+- 本条剩余部分:人工池裁决如何回流到分类法,market_intel region 规范化如何收敛,以及 ④如何消费 `signal_context` 而不外显原始评论/市场证据。
 
 **处置原则**:
 - 旧 `business_view` 不应继续作为可消费资料库的可信输入;最大妥协是库外 backup,不参与 pipeline。

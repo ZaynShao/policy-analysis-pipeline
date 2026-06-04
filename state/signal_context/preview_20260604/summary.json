@@ -1,0 +1,21 @@
+{
+  "accepted_commentary_signals": 171,
+  "accepted_market_signals": 10,
+  "blocked_signal_count": 31,
+  "policy_context_count": 87,
+  "theme_context_count": 13,
+  "region_context_count": 10,
+  "unknown_region_market_signals": 0,
+  "region_warning_count": 2,
+  "coverage_warnings": {
+    "commentary_only": 3,
+    "none": 10
+  },
+  "notes": [
+    "preview_only_no_vault_write",
+    "raw_unchanged",
+    "no_model_call",
+    "blocked_signals_audit_only_not_accepted",
+    "consumer_default_must_not_show_raw_signal_evidence"
+  ]
+}
