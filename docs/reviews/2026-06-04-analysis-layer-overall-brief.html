@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>③分析层整体设计说明</title>
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;margin:0;background:#f6f7fb;color:#182033;line-height:1.65}
+main{max-width:1180px;margin:0 auto;padding:34px 24px 64px}
+h1{font-size:30px;margin:0 0 8px}
+h2{font-size:20px;margin:30px 0 12px}
+h3{font-size:16px;margin:18px 0 8px}
+.sub{color:#667085;margin-bottom:22px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:#fff;border:1px solid #e1e6ef;border-radius:8px;padding:16px}
+.label{font-size:13px;color:#667085}.num{font-size:28px;font-weight:760;margin-top:2px}
+.note{background:#fff;border:1px solid #e1e6ef;border-left:4px solid #2563eb;border-radius:8px;padding:15px 17px}
+.warn{border-left-color:#d97706}.ok{border-left-color:#059669}
+table{border-collapse:collapse;width:100%;background:#fff;border:1px solid #e1e6ef}
+th,td{border:1px solid #e1e6ef;padding:9px 10px;text-align:left;vertical-align:top;font-size:14px}
+th{background:#eef2f7}code{background:#eef2f7;padding:1px 5px;border-radius:4px}
+.flow{display:grid;grid-template-columns:1fr 34px 1fr 34px 1fr;gap:10px;align-items:stretch}
+.box{background:#fff;border:1px solid #d8dee9;border-radius:8px;padding:14px}.arrow{text-align:center;font-size:22px;color:#667085;align-self:center}
+ul,ol{padding-left:22px}li{margin:5px 0}
+@media (max-width:900px){.grid,.flow{grid-template-columns:1fr}.arrow{display:none}}
+</style>
+</head>
+<body>
+<main>
+<h1>③分析层整体设计说明</h1>
+<div class="sub">回答你刚才指出的问题:政策主线怎么进③,以及它和 signal_context 有没有先后冲突。</div>
+
+<section class="grid">
+  <div class="card"><div class="label">当前政策 raw</div><div class="num">935+</div></div>
+  <div class="card"><div class="label">当前 business_view</div><div class="num">50</div></div>
+  <div class="card"><div class="label">旧关系文件</div><div class="num">8类</div></div>
+  <div class="card"><div class="label">已闭环 signals</div><div class="num">181</div></div>
+</section>
+
+<h2>一句话</h2>
+<div class="note ok">
+  ③分析层要分成两条线:政策关系主线是主干,signal_context 是评论/市场信号辅线。两条线最后合成 <code>analysis_context</code> 给 ④读取。signal_context 可以先设计,但不能替代③整体设计。
+</div>
+
+<h2>③到底是什么</h2>
+<table>
+  <tr><th>线</th><th>回答的问题</th><th>主要产物</th><th>状态</th></tr>
+  <tr>
+    <td>政策关系主线</td>
+    <td>政策之间谁引用谁、谁依据谁、谁废止谁、国家政策怎么被地方落地。</td>
+    <td><code>relations/*.jsonl</code>、反链页、关系摘要</td>
+    <td>旧产物存在但 stale,需要先审计再重生。</td>
+  </tr>
+  <tr>
+    <td>三源信号辅线</td>
+    <td>评论/市场信号如何影响注意力、确定性、市场验证强弱。</td>
+    <td><code>signal_context/*.jsonl</code></td>
+    <td>signals 已闭环,可以做 preview,但要放在③整体框架里。</td>
+  </tr>
+  <tr>
+    <td>统一分析上下文</td>
+    <td>④最终该读什么,而不是到处直接读 relations/signals。</td>
+    <td><code>analysis_context/*.jsonl</code></td>
+    <td>待设计后实现。</td>
+  </tr>
+</table>
+
+<h2>数据流总图</h2>
+<div class="flow">
+  <div class="box">
+    <h3>②归属层</h3>
+    <ul>
+      <li>政策身份、地区、主题</li>
+      <li><code>business_view</code></li>
+      <li>已闭环评论/市场信号</li>
+    </ul>
+  </div>
+  <div class="arrow">→</div>
+  <div class="box">
+    <h3>③分析层</h3>
+    <ul>
+      <li>政策关系主线</li>
+      <li><code>signal_context</code></li>
+      <li><code>analysis_context</code></li>
+    </ul>
+  </div>
+  <div class="arrow">→</div>
+  <div class="box">
+    <h3>④消费层</h3>
+    <ul>
+      <li>主题判断</li>
+      <li>区域判断</li>
+      <li>政策卡片/报告</li>
+    </ul>
+  </div>
+</div>
+
+<h2>为什么不能直接实现完整③</h2>
+<div class="note warn">
+  当前 <code>business_view</code> 只有 50 个新流程产物。旧关系里的 <code>derives_from</code>、<code>aligns_with</code>、<code>extends</code> 很依赖主题、地区和业务归属;如果现在全量重生语义关系,会重复旧关系“归属未稳就连线”的问题。
+</div>
+
+<h2>正确先后顺序</h2>
+<ol>
+  <li><b>③整体设计确认</b>:当前步骤。</li>
+  <li><b>③-A 关系资产审计 preview</b>:先盘点旧 relations 是否还可定位、哪些类型可信、哪些 stale。</li>
+  <li><b>③-B 高精度关系 preview</b>:先做显式文号引用、依据、废止、细化。</li>
+  <li><b>signal_context preview</b>:使用已闭环的 171 条评论信号和 10 条市场信号。</li>
+  <li><b>analysis_context preview</b>:把政策关系和信号上下文合并成④输入。</li>
+  <li><b>③-C 语义关系 preview</b>:等 ②-B 覆盖足够后再做国家到地方落地、对齐、扩展等语义关系。</li>
+  <li><b>apply</b>:每次都另行批准。</li>
+</ol>
+
+<h2>旧 relations 怎么处理</h2>
+<table>
+  <tr><th>类别</th><th>处理方式</th></tr>
+  <tr><td>高精度边: references / cites_basis / supersedes / clarifies</td><td>可以作为候选和回归样本,但仍要在当前 raw/id/aliases 上重新 preview。</td></tr>
+  <tr><td>低可信语义边: derives_from / aligns_with / extends</td><td>不能当事实复用;先降级为审计对象,等②归属稳定后重生。</td></tr>
+  <tr><td>iterates</td><td>介于两者之间;有同机构同主题年度续作的强规则,但仍需 preview 验证。</td></tr>
+  <tr><td>_index_by_policy</td><td>旧反链页随关系重生整文件重建,不手工修。</td></tr>
+</table>
+
+<h2>下一步真正要做什么</h2>
+<div class="note ok">
+  下一步不是写 <code>signal_context</code> 实现,而是做 <b>③-A 关系资产审计 preview</b>:
+  只读旧 <code>1_extracted/relations</code> 和当前 <code>0_raw/policies</code>,输出中文 HTML 和机器 JSON,标出每条旧关系是否还能定位、是否 stale、是否可作为候选。
+</div>
+
+<h2>原则确认</h2>
+<ul>
+  <li>不写 raw</li>
+  <li>不消费 review queue</li>
+  <li>不把 blocked signals 当 accepted</li>
+  <li>不直接复用旧 relations 当新事实</li>
+  <li>不做 PID 补丁</li>
+  <li>所有 apply 单独批准</li>
+</ul>
+</main>
+</body>
+</html>
