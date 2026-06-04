@@ -55,34 +55,113 @@ def _normalize_market(row: dict) -> dict:
     return normalized
 
 
+def _commentary_queue_index(queue: list[dict]) -> dict[str, list[str]]:
+    index: dict[str, set[str]] = {}
+    for row in queue:
+        key = str(row.get("commentary_id") or "")
+        if not key:
+            continue
+        index.setdefault(key, set()).add(str(row.get("reason") or "manual_review"))
+    return {key: sorted(reasons) for key, reasons in index.items()}
+
+
+def _market_block_key(row: dict) -> str:
+    return "|".join(str(row.get(field) or "") for field in ["source_pid", "current_policy_id", "raw_path"])
+
+
+def _market_match_keys(row: dict) -> set[str]:
+    keys = set()
+    for field in ["source_pid", "current_policy_id", "raw_path", "market_signal_id"]:
+        value = str(row.get(field) or "")
+        if value:
+            keys.add(f"{field}:{value}")
+    composite = _market_block_key(row)
+    if composite.strip("|"):
+        keys.add(f"composite:{composite}")
+    return keys
+
+
+def _market_queue_index(queue: list[dict]) -> tuple[dict[str, list[str]], dict[str, dict]]:
+    reasons: dict[str, set[str]] = {}
+    rows_by_key: dict[str, dict] = {}
+    for row in queue:
+        primary_key = _market_block_key(row)
+        if not primary_key.strip("|"):
+            primary_key = str(row.get("source_pid") or row.get("current_policy_id") or row.get("raw_path") or "")
+        if not primary_key:
+            continue
+        rows_by_key.setdefault(primary_key, row)
+        reasons.setdefault(primary_key, set()).add(str(row.get("reason") or "manual_review"))
+        for match_key in _market_match_keys(row):
+            rows_by_key.setdefault(match_key, row)
+            reasons.setdefault(match_key, set()).add(str(row.get("reason") or "manual_review"))
+    return {key: sorted(value) for key, value in reasons.items()}, rows_by_key
+
+
+def _blocked_row(source_kind: str, block_key: str, row: dict, reasons: list[str]) -> dict:
+    blocked = dict(row)
+    blocked["source_kind"] = source_kind
+    blocked["block_key"] = block_key
+    blocked["queue_reasons"] = reasons
+    blocked["publish_status"] = "blocked_pending_review"
+    return blocked
+
+
 def build_preview(commentary_state: Path, market_state: Path, state: Path) -> dict:
-    commentary_rows = [_normalize_commentary(row) for row in _load_jsonl(commentary_state / "signals.jsonl")]
-    market_rows = [_normalize_market(row) for row in _load_jsonl(market_state / "market_signals.jsonl")]
     commentary_queue = _load_jsonl(commentary_state / "review_queue.jsonl")
     market_queue = _load_jsonl(market_state / "review_queue.jsonl")
+    commentary_queue_index = _commentary_queue_index(commentary_queue)
+    market_queue_index, _ = _market_queue_index(market_queue)
+
+    commentary_rows = []
+    market_rows = []
+    blocked_rows = []
+    for row in _load_jsonl(commentary_state / "signals.jsonl"):
+        key = str(row.get("commentary_id") or "")
+        if key in commentary_queue_index:
+            blocked_rows.append(_blocked_row("commentary", key, _normalize_commentary(row), commentary_queue_index[key]))
+            continue
+        commentary_rows.append(_normalize_commentary(row))
+
+    for row in _load_jsonl(market_state / "market_signals.jsonl"):
+        match_keys = _market_match_keys(row)
+        matched = sorted(key for key in match_keys if key in market_queue_index)
+        if matched:
+            block_key = _market_block_key(row)
+            reasons = sorted({reason for key in matched for reason in market_queue_index[key]})
+            blocked_rows.append(_blocked_row("market_intel", block_key, _normalize_market(row), reasons))
+            continue
+        market_rows.append(_normalize_market(row))
 
     summary = {
         "source_commentary_state": str(commentary_state),
         "source_market_state": str(market_state),
+        "candidate_commentary_signals": len(commentary_rows) + len([row for row in blocked_rows if row["source_kind"] == "commentary"]),
+        "candidate_market_intel_signals": len(market_rows) + len([row for row in blocked_rows if row["source_kind"] == "market_intel"]),
         "commentary_signals": len(commentary_rows),
         "market_intel_signals": len(market_rows),
         "commentary_review_queue": len(commentary_queue),
         "market_intel_review_queue": len(market_queue),
+        "blocked_commentary_signals": len([row for row in blocked_rows if row["source_kind"] == "commentary"]),
+        "blocked_market_intel_signals": len([row for row in blocked_rows if row["source_kind"] == "market_intel"]),
+        "blocked_signals": len(blocked_rows),
         "will_write": [str(COMMENTARY_TARGET), str(MARKET_TARGET)],
         "notes": [
             "preview_only_no_vault_write",
-            "review_queue_counted_not_consumed",
+            "review_queue_blocks_publish",
             "apply_must_read_preview_outputs_only",
         ],
     }
 
     _write_jsonl(state / "commentary_signals.jsonl", commentary_rows)
     _write_jsonl(state / "market_intel_signals.jsonl", market_rows)
+    _write_jsonl(state / "blocked_signals.jsonl", blocked_rows)
     _write_json(state / "summary.json", summary)
     report_path = render_preview_html(
         summary,
         commentary_rows,
         market_rows,
+        blocked_rows,
         state / "reports" / "derived_signals_preview.html",
     )
     return {

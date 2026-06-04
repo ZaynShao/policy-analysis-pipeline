@@ -350,6 +350,8 @@ Canonical 注册在 `_meta/entities/registry.yaml`(或 vault 内等价位置,以
 
 每行一条评论派生信号。该文件来自 `0_raw/commentaries/` 的已关联评论 dry-run 结果,用于内部校准、审计追溯和分析师复核。它不直接覆盖政策事实、主题归属或 `_meta/business_view/` 分数,也不作为消费层外显方法论。
 
+若对应 `commentary_id` 出现在上游 review queue,该 signal 必须保持待审状态,不得进入本文件。人工裁决后,结果必须回到正常 dry-run/preview/apply 流程重新发布。
+
 ```json
 {
   "schema_version": 1,
@@ -373,6 +375,8 @@ Canonical 注册在 `_meta/entities/registry.yaml`(或 vault 内等价位置,以
 ### 5.7 市场验证信号 `1_extracted/market_intel_signals.jsonl`
 
 每行一条市场情报派生信号。该文件来自已登记 `market_intel` manifest 的 dry-run 结果,用于内部验证项目、容量、补贴、价格、招标、交易、准入或落地动作是否存在。它不混入 policy 或 commentary raw,不直接覆盖政策事实、主题归属或 `_meta/business_view/` 分数。
+
+若对应 `source_pid` / `current_policy_id` / `raw_path` 出现在上游 review queue,该 signal 必须保持待审状态,不得进入本文件。人工裁决后,结果必须回到正常 dry-run/preview/apply 流程重新发布。
 
 ```json
 {
@@ -524,7 +528,7 @@ vault 当前内含一些字段,与"理想 schema"有出入,但是真实存在的
 
 - `1_extracted/` 新增 `commentary_signals.jsonl` 和 `market_intel_signals.jsonl`
 - 明确评论信号是内部校准,市场信号是内部验证,默认不作为消费层外显方法论
-- 明确 review queue 不能被当成 accepted 派生行写入上述文件
+- 明确 review queue 是发布闸门,不能被当成 accepted 派生行写入上述文件
 
 ### v1.1 — 2026-05-12(身份字段重算白名单)
 

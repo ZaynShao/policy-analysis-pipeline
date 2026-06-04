@@ -1,17 +1,22 @@
 {
   "source_commentary_state": "state/commentary_signals/dryrun_20260603",
   "source_market_state": "state/market_intel_signals/dryrun_20260603",
-  "commentary_signals": 189,
-  "market_intel_signals": 23,
+  "candidate_commentary_signals": 189,
+  "candidate_market_intel_signals": 23,
+  "commentary_signals": 171,
+  "market_intel_signals": 10,
   "commentary_review_queue": 18,
   "market_intel_review_queue": 14,
+  "blocked_commentary_signals": 18,
+  "blocked_market_intel_signals": 13,
+  "blocked_signals": 31,
   "will_write": [
     "1_extracted/commentary_signals.jsonl",
     "1_extracted/market_intel_signals.jsonl"
   ],
   "notes": [
     "preview_only_no_vault_write",
-    "review_queue_counted_not_consumed",
+    "review_queue_blocks_publish",
     "apply_must_read_preview_outputs_only"
   ]
 }

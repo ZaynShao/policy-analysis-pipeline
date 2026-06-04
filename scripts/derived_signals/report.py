@@ -32,6 +32,22 @@ def _sample_rows(rows: list[dict], title_key: str, id_key: str, limit: int = 40)
     return "".join(body)
 
 
+def _blocked_rows(rows: list[dict], limit: int = 40) -> str:
+    body = []
+    for row in rows[:limit]:
+        body.append(
+            "<tr>"
+            f"<td>{_esc(row.get('source_kind', ''))}</td>"
+            f"<td>{_esc(row.get('block_key', ''))}</td>"
+            f"<td>{_esc(row.get('title', ''))}</td>"
+            f"<td>{_esc('、'.join(row.get('queue_reasons') or []))}</td>"
+            "</tr>"
+        )
+    if not body:
+        return '<tr><td colspan="4">无</td></tr>'
+    return "".join(body)
+
+
 def _shell(title: str, subtitle: str, cards: str, body: str) -> str:
     return f"""<!doctype html>
 <html lang="zh-CN">
@@ -72,12 +88,14 @@ def render_preview_html(
     summary: dict,
     commentary_rows: list[dict],
     market_rows: list[dict],
+    blocked_rows: list[dict],
     out_path: Path,
 ) -> Path:
     cards = _cards(
         [
             ("评论信号", summary["commentary_signals"]),
             ("市场信号", summary["market_intel_signals"]),
+            ("拦截信号", summary["blocked_signals"]),
             ("评论人工池", summary["commentary_review_queue"]),
             ("市场人工池", summary["market_intel_review_queue"]),
         ]
@@ -87,7 +105,7 @@ def render_preview_html(
 <h2>结论</h2>
 <div class="note">
   <p>这是派生信号 preview:只读上游 dry-run 的已产出 signal,不写资料库、不改 raw、不调用模型。</p>
-  <p>人工池只作为未闭环数量和审计状态展示,本 preview 不消费人工池。后续人工裁决必须回到正常 dry-run/apply 流程。</p>
+  <p>人工池是发布闸门:凡与 review queue 重叠的 signal,本 preview 会拦截并写入 <code>blocked_signals.jsonl</code>,不会进入待发布派生文件。这就是不消费人工池的含义。后续人工裁决必须回到正常 dry-run/apply 流程。</p>
   <p>评论信号是内部校准参数,市场信号是内部验证参数。消费层默认不把它们作为外显方法论,仅在追溯、审计或分析师复核时展开。</p>
 </div>
 
@@ -99,6 +117,9 @@ def render_preview_html(
 
 <h2>市场信号样例</h2>
 <table><tr><th>ID</th><th>标题</th><th>主题</th><th>证据</th></tr>{_sample_rows(market_rows, "title", "market_signal_id")}</table>
+
+<h2>人工池拦截样例</h2>
+<table><tr><th>来源</th><th>拦截键</th><th>标题</th><th>原因</th></tr>{_blocked_rows(blocked_rows)}</table>
 """
     doc = _shell("派生信号 preview", "把评论与市场信号整理为 vault 派生层的预览输出。", cards, body)
     out_path.parent.mkdir(parents=True, exist_ok=True)

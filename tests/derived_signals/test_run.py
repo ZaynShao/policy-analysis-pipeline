@@ -103,6 +103,90 @@ def test_preview_writes_only_signal_rows_and_reports_queue_counts(tmp_path):
     assert "不消费人工池" in html
 
 
+def test_preview_blocks_signal_rows_that_overlap_review_queue(tmp_path):
+    commentary_state = tmp_path / "commentary"
+    market_state = tmp_path / "market"
+    preview_state = tmp_path / "preview"
+
+    _write_jsonl(
+        commentary_state / "signals.jsonl",
+        [
+            {"commentary_id": "C_BLOCK", "path": "待判评论.md", "title": "待判评论"},
+            {"commentary_id": "C_ACCEPT", "path": "通过评论.md", "title": "通过评论"},
+        ],
+    )
+    _write_jsonl(
+        commentary_state / "review_queue.jsonl",
+        [
+            {
+                "commentary_id": "C_BLOCK",
+                "path": "待判评论.md",
+                "title": "待判评论",
+                "reason": "linked_commentary_without_theme_hit",
+            }
+        ],
+    )
+    _write_jsonl(
+        market_state / "market_signals.jsonl",
+        [
+            {
+                "market_signal_id": "MI_BLOCK",
+                "source_pid": "P_SOURCE",
+                "current_policy_id": "P_CURRENT",
+                "raw_path": "待判项目.md",
+                "title": "待判项目",
+            },
+            {
+                "market_signal_id": "MI_ACCEPT",
+                "source_pid": "P_OK",
+                "current_policy_id": "P_OK",
+                "raw_path": "通过项目.md",
+                "title": "通过项目",
+            },
+        ],
+    )
+    _write_jsonl(
+        market_state / "review_queue.jsonl",
+        [
+            {
+                "source_pid": "P_SOURCE",
+                "current_policy_id": "P_CURRENT",
+                "raw_path": "待判项目.md",
+                "title": "待判项目",
+                "reason": "theme_not_found",
+            },
+            {
+                "source_pid": "P_SOURCE",
+                "current_policy_id": "P_CURRENT",
+                "raw_path": "待判项目.md",
+                "title": "待判项目",
+                "reason": "region_unknown",
+            },
+        ],
+    )
+
+    result = build_preview(commentary_state, market_state, preview_state)
+
+    assert result["summary"]["commentary_signals"] == 1
+    assert result["summary"]["market_intel_signals"] == 1
+    assert result["summary"]["blocked_signals"] == 2
+    assert result["summary"]["blocked_commentary_signals"] == 1
+    assert result["summary"]["blocked_market_intel_signals"] == 1
+
+    commentary_rows = _read_jsonl(preview_state / "commentary_signals.jsonl")
+    market_rows = _read_jsonl(preview_state / "market_intel_signals.jsonl")
+    blocked_rows = _read_jsonl(preview_state / "blocked_signals.jsonl")
+
+    assert [row["commentary_id"] for row in commentary_rows] == ["C_ACCEPT"]
+    assert [row["market_signal_id"] for row in market_rows] == ["MI_ACCEPT"]
+    assert {(row["source_kind"], row["block_key"]) for row in blocked_rows} == {
+        ("commentary", "C_BLOCK"),
+        ("market_intel", "P_SOURCE|P_CURRENT|待判项目.md"),
+    }
+    market_block = next(row for row in blocked_rows if row["source_kind"] == "market_intel")
+    assert market_block["queue_reasons"] == ["region_unknown", "theme_not_found"]
+
+
 def test_apply_writes_only_1_extracted_from_preview(tmp_path):
     commentary_state = tmp_path / "commentary"
     market_state = tmp_path / "market"

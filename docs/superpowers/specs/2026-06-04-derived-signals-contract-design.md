@@ -23,8 +23,10 @@ Create `scripts/derived_signals` so the pipeline can preview and later apply two
 1. Preview consumes only accepted signal files:
    - commentary: `signals.jsonl`
    - market intel: `market_signals.jsonl`
-2. Preview may read review queues only to count and report unresolved items.
-3. Preview must not treat review-queue rows as accepted data.
+2. Preview must read review queues as a publish gate.
+3. Preview must exclude any signal row whose stable key overlaps review queue.
+   - commentary: `commentary_id`
+   - market intel: `source_pid` / `current_policy_id` / `raw_path`
 4. Apply consumes preview output files only, not the original upstream dry-run directories.
 5. Apply may write only whole files under `1_extracted/`.
 6. Apply must never touch `0_raw/`.
@@ -45,6 +47,7 @@ They are not consumer-facing proof that a conclusion was mechanically produced f
 
 - `commentary_signals.jsonl`
 - `market_intel_signals.jsonl`
+- `blocked_signals.jsonl`
 - `summary.json`
 - `reports/derived_signals_preview.html`
 
@@ -54,6 +57,7 @@ Preview summary records:
 - accepted market-intel signal count
 - commentary review-queue count
 - market-intel review-queue count
+- blocked signal count
 - planned vault target paths
 - source dry-run directories
 
@@ -72,7 +76,7 @@ It also writes engineering evidence beside the preview:
 
 ## Review Pool Closure
 
-Review queues remain unresolved after preview. They are not failures and not accepted data. Their closure path is:
+Review queues remain unresolved after preview. They are not failures and not accepted data. Any overlapping signal is blocked from publish and recorded in preview evidence. Their closure path is:
 
 1. Global rules cannot decide.
 2. Row enters upstream review queue.

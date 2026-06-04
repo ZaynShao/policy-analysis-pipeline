@@ -31,7 +31,7 @@
 Write tests for:
 
 1. Preview writes two derived JSONL files, summary, and HTML report.
-2. Preview counts review-queue rows but does not include them in derived output.
+2. Preview uses review-queue rows as a publish gate and excludes overlapping signal rows.
 3. Apply writes only `1_extracted/commentary_signals.jsonl` and `1_extracted/market_intel_signals.jsonl` from preview output.
 4. Apply refuses missing preview files.
 
@@ -59,6 +59,7 @@ Implement:
 - `build_preview(commentary_state, market_state, state)`
 - JSONL load/write helpers
 - per-row normalization with `schema_version`, `source_kind`, `sanitized_from`, and `extracted_by`
+- queue overlap blocking with `blocked_signals.jsonl`
 
 - [ ] **Step 2: Implement apply helper**
 
@@ -108,6 +109,7 @@ Record that preview/apply contract now exists and live preview has been produced
 - Create: `state/derived_signals/preview_20260604/commentary_signals.jsonl`
 - Create: `state/derived_signals/preview_20260604/market_intel_signals.jsonl`
 - Create: `state/derived_signals/preview_20260604/summary.json`
+- Create: `state/derived_signals/preview_20260604/blocked_signals.jsonl`
 - Create: `state/derived_signals/preview_20260604/reports/derived_signals_preview.html`
 
 - [ ] **Step 1: Run preview**

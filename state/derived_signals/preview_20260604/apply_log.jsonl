@@ -1,2 +1,2 @@
-{"action": "write_whole_file", "source": "state/derived_signals/preview_20260604/commentary_signals.jsonl", "target": "1_extracted/commentary_signals.jsonl", "rows": 189}
-{"action": "write_whole_file", "source": "state/derived_signals/preview_20260604/market_intel_signals.jsonl", "target": "1_extracted/market_intel_signals.jsonl", "rows": 23}
+{"action": "write_whole_file", "source": "state/derived_signals/preview_20260604/commentary_signals.jsonl", "target": "1_extracted/commentary_signals.jsonl", "rows": 171}
+{"action": "write_whole_file", "source": "state/derived_signals/preview_20260604/market_intel_signals.jsonl", "target": "1_extracted/market_intel_signals.jsonl", "rows": 10}

@@ -3,8 +3,8 @@
     "1_extracted/commentary_signals.jsonl",
     "1_extracted/market_intel_signals.jsonl"
   ],
-  "commentary_signals": 189,
-  "market_intel_signals": 23,
+  "commentary_signals": 171,
+  "market_intel_signals": 10,
   "raw_writes": 0,
   "source_preview_state": "state/derived_signals/preview_20260604"
 }
