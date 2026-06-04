@@ -144,6 +144,8 @@
 
 **③/④ 模型约束(2026-06-04 补充)**:后续凡接模型的 ③/④ 子流程,必须按普通模型可接入设计(MiniMax/DeepSeek 等),保留并强化既有硬化 prompt、schema 校验、program gate、审计门和人工池阻断。正确性不能依赖强模型自由发挥;不确定样本必须进人工池并等人工结论回流正常 dry-run/apply,不能被标记后继续下塞。
 
+**③-B 进展(2026-06-04)**:高精度政策关系 preview 已完成第一版确定性抽取,只读当前 git tracked raw 政策正文与 frontmatter 文号,不读取旧 relations 作为 accepted 输入。实测 tracked raw 935 篇,未跟踪 raw 1 篇已排除,可索引文号目标 399 个;产出候选 677 条:`references` 424、`cites_basis` 161、`supersedes` 5、`clarifies` 87。工程证据:`state/analysis_layer/preview_20260604/high_precision_relation_summary.json`、`high_precision_relation_candidates.jsonl`、`policy_relation_candidates/*.jsonl`、`reports/high_precision_relation_preview.html`。本 preview 不写资料库、不写 raw、不 apply、不调用模型;`supersedes` 已按高精度原则收紧为目标文号后近距离出现明确废止/停止执行/失效,不再把泛化"替代/取代"当废止。
+
 ## B11 · ②-B 人工确认池与全局硬化回流 — 新增
 
 **是什么**:②-B dry-run/apply 后留下的 `review_queue/queue.jsonl` 是**人工确认池**,不是待手工 apply 清单。当前 50 篇样本中 accepted 39 已按离线 scoped verify 写入,剩余 11 入队,暴露的是机制边界,不能逐条补丁处置。

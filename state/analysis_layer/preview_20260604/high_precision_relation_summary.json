@@ -1,0 +1,20 @@
+{
+  "tracked_policy_count": 935,
+  "untracked_policy_count": 1,
+  "official_number_targets": 399,
+  "candidate_count": 677,
+  "rows_by_relation": {
+    "references": 424,
+    "cites_basis": 161,
+    "supersedes": 5,
+    "clarifies": 87
+  },
+  "recommendation": "preview_only_no_apply",
+  "notes": [
+    "read_only_no_vault_write",
+    "raw_baseline_uses_git_tracked_files_only",
+    "untracked_raw_excluded_from_baseline",
+    "no_model_call",
+    "old_relations_not_used_as_accepted_input"
+  ]
+}
