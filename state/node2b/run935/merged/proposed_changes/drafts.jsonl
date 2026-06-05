@@ -1,0 +1,829 @@
+{"pid": "P_2026_GO_63fd5297", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 2, "gate": false}
+{"pid": "P_2024_GO_cbce5378", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2020_MEE_1230dbd8", "themes": ["carbon_market_theme"], "primary": "carbon_market_theme", "重要性": 2, "gate": true}
+{"pid": "P_2022_MEE_111", "themes": ["carbon_market_theme"], "primary": "carbon_market_theme", "重要性": 5, "gate": true}
+{"pid": "P_2021_GO_165c7a1a", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2023_QH_d184b5cf", "themes": ["power_market"], "primary": "power_market", "重要性": 2, "gate": true}
+{"pid": "P_2024_SH_61c2eb9e", "themes": ["residential_charging", "charging_infra"], "primary": "charging_infra", "重要性": 3, "gate": true}
+{"pid": "P_2026_NEA_4d012393", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2024_MEE_12_a", "themes": ["vpp_theme", "v2g", "energy_storage_theme", "green_power_trading_theme"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2024_NM_02060cb6", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_MEE_2", "themes": ["carbon_market_theme"], "primary": "carbon_market_theme", "重要性": 3, "gate": true}
+{"pid": "P_2024_QH_2457693a", "themes": ["power_market"], "primary": "power_market", "重要性": 1, "gate": true}
+{"pid": "P_2024_CPC_190327fb", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2024_CQ_2", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 3, "gate": true}
+{"pid": "P_2024_BJ_01265eb0", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2024_BJ_05312f8b", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2024_BJ_9", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2024_BJ_0126a2e6", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2025_BJ_3701c968", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2024_HE_08015615", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 4, "gate": true}
+{"pid": "P_2024_MOF_129", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2021_HN_53a5a019", "themes": ["charging_infra", "aggregator_access"], "primary": "charging_infra", "重要性": 3, "gate": true}
+{"pid": "P_2024_GZ_03841527", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_NDRC_04027ba8", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 3, "gate": true}
+{"pid": "P_2025_QH_a53ba53f", "themes": ["power_market"], "primary": "power_market", "重要性": 3, "gate": true}
+{"pid": "P_2025_SH_21_a", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 3, "gate": true}
+{"pid": "P_2025_SH_20", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2023_HA_d3dbf5b3", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_NDRC_0109842d", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_BJ_2", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 3, "gate": true}
+{"pid": "P_2025_SH_1352a528", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 3, "gate": true}
+{"pid": "P_2025_MOFCOM_0117488b", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_NEA_58", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_NEA_36", "themes": ["power_market", "distribution_grid_opening"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2024_FJ_1220060b", "themes": ["power_market", "green_power_trading_theme", "vpp_theme", "energy_storage_theme", "aggregator_access"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_MIIT_24_a", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2026_CPC_0305e288", "themes": ["energy_storage_theme", "green_power_trading_theme", "carbon_market_theme"], "primary": "energy_storage_theme", "重要性": 5, "gate": true}
+{"pid": "P_2025_MOFCOM_467", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 5, "gate": true}
+{"pid": "P_2026_CQ_02025d8d", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2026_NEA_0324cd2a", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2026_HL_0101ffa7", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 2, "gate": true}
+{"pid": "P_2024_SH_4d3c6620", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_GD_e3d626ae", "themes": ["v2g", "vpp_theme", "charging_infra"], "primary": "v2g", "重要性": 4, "gate": true}
+{"pid": "P_2026_AH_d6e1b5c7", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2022_QH_28f7d0d8", "themes": ["power_market"], "primary": "power_market", "重要性": 2, "gate": true}
+{"pid": "P_2025_GO_3560eda4", "themes": ["energy_storage_theme", "power_market"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_NEA_39a47213", "themes": ["v2g", "vpp_theme", "power_market", "charging_infra"], "primary": "v2g", "重要性": 4, "gate": true}
+{"pid": "P_2026_AH_bf27c18a", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2025_AH_be98ac7d", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2024_GO_2532ff54", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2020_HA_e96e48a2", "themes": ["charging_infra", "residential_charging", "gas_station_transition_theme", "distribution_grid_opening"], "primary": "charging_infra", "重要性": 5, "gate": true}
+{"pid": "P_2025_NEA_dc0e3eb5", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2026_BJ_8d4a952a", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_SH_a083b151", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 2, "gate": true}
+{"pid": "P_2024_QH_1183d8c1", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 2, "gate": true}
+{"pid": "P_2024_SH_55e80cf1", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_SX_02f1bbdd", "themes": ["vpp_theme", "aggregator_access"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2024_SN_6ad9c2a8", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2025_JX_d35b0ffb", "themes": ["distribution_grid_opening", "charging_infra", "vpp_theme", "energy_storage_theme"], "primary": "distribution_grid_opening", "重要性": 3, "gate": true}
+{"pid": "P_2024_BJ_750f0371", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2023_GO_1ff53dfa", "themes": ["charging_infra", "residential_charging"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2022_TJ_96d7cc03", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2019_GX_580a900b", "themes": ["distribution_grid_opening", "power_market"], "primary": "distribution_grid_opening", "重要性": 4, "gate": true}
+{"pid": "P_2026_JX_dd27cf9b", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 5, "gate": true}
+{"pid": "P_2025_HI_45faa5f8", "themes": ["vpp_theme", "aggregator_access"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2024_JX_db2c295e", "themes": ["power_market"], "primary": "power_market", "重要性": 5, "gate": true}
+{"pid": "P_2024_FJ_1f0dea35", "themes": ["vpp_theme", "aggregator_access"], "primary": "vpp_theme", "重要性": 3, "gate": true}
+{"pid": "P_2025_GD_87ca9043", "themes": ["energy_storage_theme", "green_power_trading_theme"], "primary": "energy_storage_theme", "重要性": 2, "gate": false}
+{"pid": "P_2017_SX_8bdfd02b", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2024_LN_0ab690ad", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2024_HA_33c70751", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 2, "gate": true}
+{"pid": "P_2024_HL_9ab2f7ce", "themes": ["power_market", "vpp_theme", "energy_storage_theme", "aggregator_access"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_HL_0d932b06", "themes": ["power_market", "vpp_theme", "energy_storage_theme"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2022_NDRC_032146fe", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2026_SD_09bacb8e", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2022_GO_878cc85c", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2024_GO_37d502f6", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2022_NDRC_311f906d", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2026_NDRC_abc95ba1", "themes": ["power_market", "vpp_theme", "v2g"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2022_NDRC_dae672c9", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2018_NDRC_ce8700fb", "themes": ["green_power_trading_theme", "power_market", "distribution_grid_opening"], "primary": "green_power_trading_theme", "重要性": 3, "gate": true}
+{"pid": "P_2023_NDRC_a523a75f", "themes": ["power_market", "vpp_theme", "aggregator_access"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_NDRC_e62ac29f", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2023_NDRC_1b2358a4", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2021_NDRC_9802552e", "themes": ["vpp_theme", "energy_storage_theme", "distribution_grid_opening", "power_market"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_NDRC_0f4f2da4", "themes": ["green_power_trading_theme", "power_market"], "primary": "green_power_trading_theme", "重要性": 4, "gate": true}
+{"pid": "P_2023_NDRC_076a418d", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2017_NDRC_d5bc4c87", "themes": ["green_power_trading_theme", "power_market"], "primary": "green_power_trading_theme", "重要性": 4, "gate": true}
+{"pid": "P_2022_GO_9af92105", "themes": ["carbon_market_theme", "green_power_trading_theme"], "primary": "carbon_market_theme", "重要性": 3, "gate": true}
+{"pid": "P_2024_AH_6258c339", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_GO_8ede3b49", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_SX_ab886dfd", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2020_LN_e3ff353a", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2022_HN_5a70e3f4", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2020_LN_7e8f80a9", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 3, "gate": true}
+{"pid": "P_2024_SH_242", "themes": ["carbon_market_theme"], "primary": "carbon_market_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_SH_01150bf2", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_SH_61", "themes": ["green_power_trading_theme", "energy_storage_theme", "carbon_market_theme"], "primary": "green_power_trading_theme", "重要性": 3, "gate": true}
+{"pid": "P_2021_SH_f5815abd", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2020_SH_7e065153", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 2, "gate": true}
+{"pid": "P_2022_SH_34824905", "themes": ["charging_infra", "residential_charging", "v2g", "distribution_grid_opening"], "primary": "charging_infra", "重要性": 5, "gate": true}
+{"pid": "P_2025_SH_21_b", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 5, "gate": true}
+{"pid": "P_2021_SH_112045fa", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2024_SH_14", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2024_SH_8_b", "themes": ["v2g", "vpp_theme", "energy_storage_theme"], "primary": "vpp_theme", "重要性": 3, "gate": true}
+{"pid": "P_2023_SH_ef0a56f5", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2026_SH_875645c5", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 3, "gate": true}
+{"pid": "P_2024_SH_41", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2023_SH_9c81df89", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2024_SH_355", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2024_SH_28", "themes": ["energy_storage_theme", "v2g", "charging_infra", "gas_station_transition_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_SH_5_c", "themes": ["vpp_theme", "v2g", "energy_storage_theme"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2026_SH_18_a", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_SH_407", "themes": ["vpp_theme", "charging_infra", "energy_storage_theme"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2022_SH_28", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2025_SH_870", "themes": ["power_market", "vpp_theme"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2020_SH_d3a442c8", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 4, "gate": true}
+{"pid": "P_2025_SH_2b4451dc", "themes": ["vpp_theme", "aggregator_access"], "primary": "vpp_theme", "重要性": 3, "gate": true}
+{"pid": "P_2024_SH_090255c2", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2023_SH_0203297d_b", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2025_SH_3", "themes": ["charging_infra", "residential_charging"], "primary": "charging_infra", "重要性": 5, "gate": true}
+{"pid": "P_2025_SH_16", "themes": ["carbon_market_theme"], "primary": "carbon_market_theme", "重要性": 4, "gate": true}
+{"pid": "P_2021_MEE_0922fb2b", "themes": [], "primary": "", "重要性": 3, "gate": false}
+{"pid": "P_2022_GZ_3e727dc2", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2024_HL_dd8e801c", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2026_NPC_03132f88", "themes": ["carbon_market_theme", "energy_storage_theme", "green_power_trading_theme"], "primary": "carbon_market_theme", "重要性": 3, "gate": true}
+{"pid": "P_2024_MEE_1101f119", "themes": ["carbon_market_theme", "green_power_trading_theme", "charging_infra"], "primary": "carbon_market_theme", "重要性": 2, "gate": true}
+{"pid": "P_2025_GO_be76ba46", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2021_GD_0416b7bf", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 3, "gate": true}
+{"pid": "P_2024_YN_f3824736", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2024_YN_f0d09d7d", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2025_YN_e0b3609f", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 2, "gate": true}
+{"pid": "P_2026_YN_b2d38b2c", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2025_YN_caa4f088", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2019_YN_f94e1e20", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2026_YN_04248a41", "themes": ["charging_infra", "residential_charging"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2022_HI_06a94475", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2023_GX_cb8cddbf", "themes": ["energy_storage_theme", "power_market"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2026_HA_30b37172", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2017_QH_07058af7", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_NDRC_262", "themes": ["green_power_trading_theme", "carbon_market_theme"], "primary": "green_power_trading_theme", "重要性": 5, "gate": true}
+{"pid": "P_2021_GX_29e0189e", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2026_AH_10dda71e", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2025_MOFCOM_8_a", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 5, "gate": true}
+{"pid": "P_2026_MEE_0209f3b1", "themes": ["carbon_market_theme"], "primary": "carbon_market_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_HI_9b2f7fea", "themes": ["distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 3, "gate": true}
+{"pid": "P_2023_SD_7dc033b0", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2025_MIIT_60", "themes": ["power_market", "vpp_theme", "energy_storage_theme", "green_power_trading_theme", "carbon_market_theme"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_HA_25fbc7b4", "themes": ["power_market", "green_power_trading_theme"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_AH_48dd3a22", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2024_HE_8b8b5a46", "themes": ["vpp_theme", "v2g"], "primary": "vpp_theme", "重要性": 2, "gate": false}
+{"pid": "P_2025_GO_9fb6ab59", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2021_AH_1001d59f", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 3, "gate": true}
+{"pid": "P_2023_HE_3c7a6037", "themes": ["power_market", "aggregator_access"], "primary": "power_market", "重要性": 5, "gate": true}
+{"pid": "P_2025_SX_8130d157", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2024_JX_857e2609", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_NDRC_13_b", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 5, "gate": true}
+{"pid": "P_2026_SX_bc54abd0", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2026_SX_1e4b199e", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 3, "gate": true}
+{"pid": "P_2025_MIIT_24_b", "themes": [], "primary": "", "重要性": 3, "gate": false}
+{"pid": "P_2025_SH_12317341", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_NDRC_1745_c", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 3, "gate": true}
+{"pid": "P_2024_SD_ecd2931e", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 2, "gate": false}
+{"pid": "P_2026_SH_18_b", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_MEE_9ba3131a", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2025_NDRC_1645", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2024_JL_232", "themes": ["energy_storage_theme", "vpp_theme", "power_market", "v2g"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2024_NEA_0528d977", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 5, "gate": true}
+{"pid": "P_2025_MEE_140", "themes": ["carbon_market_theme"], "primary": "carbon_market_theme", "重要性": 3, "gate": true}
+{"pid": "P_2025_AH_a970b007", "themes": ["charging_infra", "energy_storage_theme"], "primary": "charging_infra", "重要性": 3, "gate": true}
+{"pid": "P_2025_CQ_ff0b2e00", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2024_SH_09f07265", "themes": ["distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 4, "gate": true}
+{"pid": "P_2026_HI_2ed1e9e2", "themes": ["distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 2, "gate": true}
+{"pid": "P_2026_HI_58f0ea04", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2024_HA_947a826a", "themes": ["vpp_theme", "energy_storage_theme", "distribution_grid_opening", "green_power_trading_theme"], "primary": "vpp_theme", "重要性": 3, "gate": true}
+{"pid": "P_2025_JS_09e47793", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 4, "gate": true}
+{"pid": "P_2024_NDRC_0725ba17", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 5, "gate": true}
+{"pid": "P_2023_QH_d4d04d56", "themes": ["distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 2, "gate": true}
+{"pid": "P_2024_NDRC_01047553", "themes": ["v2g", "charging_infra", "vpp_theme", "energy_storage_theme", "power_market"], "primary": "charging_infra", "重要性": 5, "gate": true}
+{"pid": "P_2021_NDRC_0421ce4f", "themes": ["energy_storage_theme", "vpp_theme"], "primary": "energy_storage_theme", "重要性": 5, "gate": true}
+{"pid": "P_2025_NDRC_357_a", "themes": ["vpp_theme", "aggregator_access", "v2g"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_CQ_0515554e", "themes": ["gas_station_transition_theme"], "primary": "gas_station_transition_theme", "重要性": 2, "gate": true}
+{"pid": "P_2025_JS_1b505c7d", "themes": ["v2g", "charging_infra", "vpp_theme"], "primary": "charging_infra", "重要性": 5, "gate": true}
+{"pid": "P_2024_SH_dbaa3e11", "themes": ["equipment_renewal_theme", "charging_infra"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2023_SH_146aea94", "themes": ["distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 3, "gate": true}
+{"pid": "P_2024_GO_c5b25865", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2026_HN_1c02e10e", "themes": ["gas_station_transition_theme", "charging_infra", "energy_storage_theme", "green_power_trading_theme"], "primary": "gas_station_transition_theme", "重要性": 3, "gate": true}
+{"pid": "P_2025_SC_e6f57b26", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_SC_fb908e63", "themes": ["power_market", "distribution_grid_opening"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_SC_076e6fb9", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_SC_cc687c4e", "themes": ["vpp_theme", "aggregator_access", "power_market"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_NDRC_efca57ff", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_JX_97eb3f17", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2024_XJ_31441a14", "themes": ["vpp_theme", "power_market"], "primary": "vpp_theme", "重要性": 5, "gate": true}
+{"pid": "P_2021_HB_c3cc5cf4", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 3, "gate": true}
+{"pid": "P_2020_JX_505c9573", "themes": ["charging_infra", "residential_charging"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2023_HA_4b539d50", "themes": ["power_market", "energy_storage_theme", "distribution_grid_opening"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_HA_57f372bd", "themes": ["power_market", "green_power_trading_theme"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2023_HA_65ffb0c4", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_HI_924d5bb2", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_CQ_a9a5497c", "themes": ["power_market", "green_power_trading_theme"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2021_SN_e864072f", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2025_HL_33c10d7c", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 3, "gate": true}
+{"pid": "P_2024_HL_f08aa8e4", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_HL_1d366dd4", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_SX_8272555e", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2022_TJ_0e7ee855", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2021_JX_f3e6bcbc", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2019_HA_6e13fc6b", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2017_HI_dcd17e5c", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2020_SC_9e0a986d", "themes": ["power_market", "distribution_grid_opening"], "primary": "power_market", "重要性": 3, "gate": true}
+{"pid": "P_2019_HE_e4ed728a", "themes": ["distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 4, "gate": true}
+{"pid": "P_2025_GO_1201e389", "themes": ["power_market", "green_power_trading_theme", "vpp_theme", "aggregator_access"], "primary": "power_market", "重要性": 5, "gate": true}
+{"pid": "P_2026_HA_526c08ca", "themes": ["distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 3, "gate": true}
+{"pid": "P_2024_GO_dfdbe1c7", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2019_HA_1be4e1ce", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 3, "gate": true}
+{"pid": "P_2019_NDRC_0720b570", "themes": ["green_power_trading_theme", "power_market"], "primary": "green_power_trading_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_GS_24", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 4, "gate": true}
+{"pid": "P_2026_JX_02041c0b", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 4, "gate": true}
+{"pid": "P_2026_MIIT_13", "themes": [], "primary": "", "重要性": 3, "gate": false}
+{"pid": "P_2026_LN_b8af81b7", "themes": ["power_market"], "primary": "power_market", "重要性": 3, "gate": true}
+{"pid": "P_2026_SN_ab3d416b", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2019_SN_59fd4e53", "themes": ["distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 4, "gate": true}
+{"pid": "P_2022_HN_8a3cd18b", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2025_SD_07110176", "themes": ["gas_station_transition_theme", "charging_infra", "energy_storage_theme"], "primary": "gas_station_transition_theme", "重要性": 2, "gate": false}
+{"pid": "P_2025_HI_b93c4460", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2018_NDRC_364", "themes": ["energy_storage_theme", "vpp_theme", "aggregator_access"], "primary": "energy_storage_theme", "重要性": 5, "gate": true}
+{"pid": "P_2024_NDRC_187_a", "themes": ["distribution_grid_opening", "charging_infra", "energy_storage_theme", "vpp_theme", "v2g"], "primary": "distribution_grid_opening", "重要性": 4, "gate": true}
+{"pid": "P_2023_HE_12ba8d42", "themes": ["distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 4, "gate": true}
+{"pid": "P_2017_GZ_f47663f2", "themes": ["power_market"], "primary": "power_market", "重要性": 5, "gate": true}
+{"pid": "P_2024_SH_6591b967", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2022_CQ_92ee177e", "themes": ["vpp_theme"], "primary": "vpp_theme", "重要性": 3, "gate": true}
+{"pid": "P_2024_HA_58549614", "themes": ["power_market", "vpp_theme", "energy_storage_theme", "charging_infra", "aggregator_access"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_HA_83de916f", "themes": ["power_market", "energy_storage_theme", "vpp_theme", "aggregator_access"], "primary": "power_market", "重要性": 5, "gate": true}
+{"pid": "P_2025_LN_f11f501e", "themes": ["power_market", "green_power_trading_theme"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_NDRC_136", "themes": ["power_market", "green_power_trading_theme"], "primary": "power_market", "重要性": 5, "gate": true}
+{"pid": "P_2026_HN_0b238989", "themes": ["power_market"], "primary": "power_market", "重要性": 2, "gate": true}
+{"pid": "P_2024_HN_597791ba", "themes": ["power_market"], "primary": "power_market", "重要性": 2, "gate": true}
+{"pid": "P_2026_GX_352aeb29", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2026_HL_87aa22e2", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_TJ_9dbe2db1", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2026_HN_6d28716a", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2024_NEA_082065e7", "themes": ["green_power_trading_theme", "carbon_market_theme"], "primary": "green_power_trading_theme", "重要性": 4, "gate": true}
+{"pid": "P_2022_NX_58da6b09", "themes": ["vpp_theme", "aggregator_access"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_HI_4b282d7d", "themes": ["charging_infra", "vpp_theme", "green_power_trading_theme", "distribution_grid_opening"], "primary": "charging_infra", "重要性": 3, "gate": true}
+{"pid": "P_2026_AH_84c79734", "themes": ["vpp_theme", "aggregator_access", "power_market"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2016_NDRC_8890ad14", "themes": ["distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 5, "gate": true}
+{"pid": "P_2021_HL_cfced6fa", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2019_HA_1b201338", "themes": ["distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 4, "gate": true}
+{"pid": "P_2025_HI_8f9cf545", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2022_NDRC_475", "themes": ["energy_storage_theme", "power_market"], "primary": "energy_storage_theme", "重要性": 5, "gate": true}
+{"pid": "P_2022_SN_c3329f2b", "themes": ["charging_infra", "residential_charging", "distribution_grid_opening"], "primary": "charging_infra", "重要性": 5, "gate": true}
+{"pid": "P_2022_HN_2fc82605", "themes": ["power_market", "charging_infra"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2021_HL_850d9c6d", "themes": ["power_market", "distribution_grid_opening"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2026_SH_c7787466", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2024_NM_607", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2025_NM_f00c4428", "themes": ["power_market", "green_power_trading_theme"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2024_MOA_d3844837", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2025_GO_0c246ae8", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2024_NDRC_1721", "themes": ["v2g", "vpp_theme", "charging_infra"], "primary": "charging_infra", "重要性": 5, "gate": true}
+{"pid": "P_2026_NFA_0327e7ba", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2023_NEA_27", "themes": [], "primary": "", "重要性": 3, "gate": false}
+{"pid": "P_2025_NDRC_122951e0", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 3, "gate": true}
+{"pid": "P_2024_NDRC_0806117c", "themes": ["charging_infra", "distribution_grid_opening", "energy_storage_theme"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2024_MEE_39", "themes": ["carbon_market_theme"], "primary": "carbon_market_theme", "重要性": 3, "gate": true}
+{"pid": "P_2024_FJ_5", "themes": ["charging_infra", "residential_charging"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2015_NEA_73", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 5, "gate": true}
+{"pid": "P_2024_BJ_0325555c", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2024_BJ_af67d6fc", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 3, "gate": true}
+{"pid": "P_2026_BJ_02068c6d", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 1, "gate": true}
+{"pid": "P_2025_BJ_4", "themes": ["power_market", "green_power_trading_theme"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2022_BJ_aefbc355", "themes": ["green_power_trading_theme", "carbon_market_theme"], "primary": "green_power_trading_theme", "重要性": 2, "gate": true}
+{"pid": "P_2024_BJ_44cecd6c", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2024_BJ_859f2341", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2023_BJ_11237d18", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2024_BJ_1217fe41", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2024_BJ_08290099", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2024_BJ_082685cd", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_BJ_7efe36f3", "themes": ["charging_infra", "v2g"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2013_BJ_cee25b16", "themes": ["carbon_market_theme"], "primary": "carbon_market_theme", "重要性": 3, "gate": true}
+{"pid": "P_2024_BJ_4327ac6f", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2025_BJ_af4a930b", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2024_BJ_984b90fb", "themes": [], "primary": "", "重要性": 3, "gate": false}
+{"pid": "P_2026_BJ_9c711758", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2025_BJ_feef808f", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2024_BJ_12107444", "themes": [], "primary": "", "重要性": 4, "gate": false}
+{"pid": "P_2023_BJ_f2a3d39a", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2024_BJ_30979cba", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2026_BJ_35e1b4ff", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2024_BJ_07187684", "themes": ["gas_station_transition_theme"], "primary": "gas_station_transition_theme", "重要性": 3, "gate": true}
+{"pid": "P_2024_BJ_05281dc5", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2026_BJ_559a203d", "themes": ["carbon_market_theme"], "primary": "carbon_market_theme", "重要性": 3, "gate": true}
+{"pid": "P_2024_BJ_0427ca25", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 3, "gate": true}
+{"pid": "P_2024_BJ_4339ba17", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2023_BJ_53e939ef", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2024_BJ_04024e0d", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_BJ_b96ab999", "themes": ["vpp_theme"], "primary": "vpp_theme", "重要性": 2, "gate": true}
+{"pid": "P_2025_BJ_34f95264", "themes": ["vpp_theme", "green_power_trading_theme", "distribution_grid_opening", "aggregator_access"], "primary": "vpp_theme", "重要性": 2, "gate": true}
+{"pid": "P_2025_BJ_318c0582", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2024_NM_6d516857", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2022_NDRC_03213b6e_a", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 3, "gate": true}
+{"pid": "P_2025_CQ_122582ad", "themes": ["charging_infra", "gas_station_transition_theme"], "primary": "charging_infra", "重要性": 3, "gate": true}
+{"pid": "P_2025_GO_2360bcbc", "themes": ["v2g", "charging_infra", "vpp_theme"], "primary": "v2g", "重要性": 3, "gate": true}
+{"pid": "P_2024_NDRC_4e3d5520", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2024_SX_fb5c7f6c", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2025_QH_5906e70d", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_QH_eb5b785b", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2024_SD_0101d17a", "themes": ["green_power_trading_theme", "power_market"], "primary": "green_power_trading_theme", "重要性": 3, "gate": true}
+{"pid": "P_2025_NEA_107", "themes": ["green_power_trading_theme"], "primary": "green_power_trading_theme", "重要性": 4, "gate": true}
+{"pid": "P_2022_JL_11114fee", "themes": ["charging_infra", "residential_charging"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2024_JL_0208240d", "themes": ["charging_infra", "residential_charging", "gas_station_transition_theme"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2022_SX_0628e7d4", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2026_AH_70f9531d", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2023_GO_83600eab", "themes": ["charging_infra", "residential_charging", "energy_storage_theme", "vpp_theme", "v2g"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2019_BJ_2cbb47cf", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 4, "gate": true}
+{"pid": "P_2026_MOFCOM_01062e80", "themes": ["equipment_renewal_theme", "green_power_trading_theme"], "primary": "equipment_renewal_theme", "重要性": 3, "gate": true}
+{"pid": "P_2024_MOFCOM_392", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2019_BJ_7953e5fb", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 4, "gate": true}
+{"pid": "P_2025_SC_5b1e2868", "themes": ["power_market", "vpp_theme", "energy_storage_theme", "charging_infra", "v2g", "green_power_trading_theme"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2026_SC_47", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 3, "gate": true}
+{"pid": "P_2023_SC_08d6e691", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2026_GO_ae8c0768", "themes": ["charging_infra", "v2g"], "primary": "charging_infra", "重要性": 5, "gate": true}
+{"pid": "P_2025_MEE_0910a76d", "themes": ["carbon_market_theme", "green_power_trading_theme"], "primary": "carbon_market_theme", "重要性": 2, "gate": true}
+{"pid": "P_2026_HA_08a91cf9", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_HE_5", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 3, "gate": true}
+{"pid": "P_2026_HA_d8f71740", "themes": ["power_market", "green_power_trading_theme"], "primary": "power_market", "重要性": 5, "gate": true}
+{"pid": "P_2024_FJ_0531e8f3", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2025_NDRC_1360", "themes": ["power_market", "green_power_trading_theme", "distribution_grid_opening"], "primary": "power_market", "重要性": 3, "gate": true}
+{"pid": "P_2024_NDRC_02276bf1", "themes": ["energy_storage_theme", "vpp_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2021_LN_44c4b58c", "themes": ["energy_storage_theme", "vpp_theme", "charging_infra"], "primary": "energy_storage_theme", "重要性": 5, "gate": true}
+{"pid": "P_2023_NDRC_545", "themes": ["charging_infra", "residential_charging", "v2g", "distribution_grid_opening"], "primary": "charging_infra", "重要性": 5, "gate": true}
+{"pid": "P_2015_NDRC_3d821d6e", "themes": ["power_market"], "primary": "power_market", "重要性": 5, "gate": true}
+{"pid": "P_2025_NDRC_1192", "themes": ["green_power_trading_theme", "power_market", "distribution_grid_opening"], "primary": "green_power_trading_theme", "重要性": 3, "gate": true}
+{"pid": "P_2023_NDRC_1044_b", "themes": ["green_power_trading_theme"], "primary": "green_power_trading_theme", "重要性": 5, "gate": true}
+{"pid": "P_1900_SX_caf8e7eb", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2024_JX_53df8125", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2023_HA_6c0de10b", "themes": ["power_market", "vpp_theme", "aggregator_access"], "primary": "power_market", "重要性": 5, "gate": true}
+{"pid": "P_2025_NDRC_632_c", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2024_JX_91234f69", "themes": ["energy_storage_theme", "vpp_theme", "distribution_grid_opening"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2022_FJ_0b508215", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 5, "gate": true}
+{"pid": "P_2022_HN_21b7ac0a", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2027_NDRC_572b0ea8", "themes": ["power_market", "vpp_theme"], "primary": "power_market", "重要性": 5, "gate": true}
+{"pid": "P_2025_JX_a72fb42f", "themes": ["vpp_theme", "energy_storage_theme", "v2g", "distribution_grid_opening"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_JX_63772b05", "themes": ["distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 4, "gate": true}
+{"pid": "P_2026_FJ_87020078", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2020_LN_a4a7773c", "themes": ["power_market", "distribution_grid_opening"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2023_NDRC_178", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 3, "gate": true}
+{"pid": "P_2022_NDRC_53", "themes": ["charging_infra", "residential_charging"], "primary": "charging_infra", "重要性": 5, "gate": true}
+{"pid": "P_2026_SX_dfb899b7", "themes": ["power_market", "green_power_trading_theme", "vpp_theme", "energy_storage_theme"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2026_NDRC_02114da8", "themes": ["power_market"], "primary": "power_market", "重要性": 5, "gate": true}
+{"pid": "P_2024_SH_c05ca51f", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2026_SH_7ff5c81b", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2025_BJ_f63fbf84", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2024_GD_337", "themes": ["carbon_market_theme"], "primary": "carbon_market_theme", "重要性": 2, "gate": false}
+{"pid": "P_2022_STA_0729ac2b", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2026_NEA_0304ed54", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2025_NEA_bf090cf3", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2026_NEA_16", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2025_NEA_a9a42ce3", "themes": ["power_market", "distribution_grid_opening", "green_power_trading_theme", "carbon_market_theme"], "primary": "power_market", "重要性": 3, "gate": true}
+{"pid": "P_2024_NEA_0d11749b", "themes": ["green_power_trading_theme"], "primary": "green_power_trading_theme", "重要性": 4, "gate": true}
+{"pid": "P_2024_NEA_e255490e", "themes": ["power_market", "vpp_theme", "charging_infra", "v2g"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2024_NEA_93_a", "themes": ["vpp_theme", "aggregator_access", "energy_storage_theme", "distribution_grid_opening"], "primary": "aggregator_access", "重要性": 5, "gate": true}
+{"pid": "P_2025_NEA_08060ff3", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2024_NEA_d38b5cb4", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2021_JX_e3afc116", "themes": ["charging_infra", "distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 3, "gate": true}
+{"pid": "P_2025_LN_6517d63d", "themes": ["power_market", "green_power_trading_theme", "vpp_theme", "energy_storage_theme"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2026_JX_33d58f3b", "themes": ["charging_infra", "v2g", "residential_charging"], "primary": "charging_infra", "重要性": 5, "gate": true}
+{"pid": "P_2025_SN_1cd1e821", "themes": ["charging_infra", "residential_charging", "v2g", "distribution_grid_opening"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2025_SX_5d4f1dba", "themes": ["power_market", "green_power_trading_theme"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2022_NEA_1a899907", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_NEA_7bad0548", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 2, "gate": true}
+{"pid": "P_2024_NEA_08f1a069", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_GWY_4f82af00", "themes": [], "primary": "", "重要性": 4, "gate": false}
+{"pid": "P_2021_BJ_52a28aed", "themes": ["power_market"], "primary": "power_market", "重要性": 5, "gate": true}
+{"pid": "P_2024_BJ_04b2f71c", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2018_TJ_3f5fc84a", "themes": ["power_market", "distribution_grid_opening"], "primary": "power_market", "重要性": 2, "gate": true}
+{"pid": "P_2025_HL_d201db09", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2026_NX_0320e07e", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2022_NX_6ecf38b4", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 2, "gate": true}
+{"pid": "P_2022_NX_daf3d666", "themes": ["vpp_theme", "aggregator_access"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2022_NX_bcbdf716", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 3, "gate": true}
+{"pid": "P_2023_AH_7bfde159", "themes": ["vpp_theme", "aggregator_access"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2023_AH_13858e67", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2016_AH_ae5294fd", "themes": ["power_market", "distribution_grid_opening", "aggregator_access"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_CPC_37843c27", "themes": ["v2g", "vpp_theme", "charging_infra", "power_market", "residential_charging"], "primary": "charging_infra", "重要性": 5, "gate": true}
+{"pid": "P_2022_HE_b4920baa", "themes": ["distribution_grid_opening", "power_market", "vpp_theme", "energy_storage_theme", "charging_infra"], "primary": "distribution_grid_opening", "重要性": 4, "gate": true}
+{"pid": "P_2023_LN_77a1f682", "themes": ["energy_storage_theme", "vpp_theme", "distribution_grid_opening"], "primary": "vpp_theme", "重要性": 2, "gate": true}
+{"pid": "P_2023_LN_abbe550e", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 3, "gate": true}
+{"pid": "P_2025_LN_2ec89729", "themes": ["charging_infra", "residential_charging"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2025_LN_1b193457", "themes": ["distribution_grid_opening", "charging_infra"], "primary": "distribution_grid_opening", "重要性": 2, "gate": true}
+{"pid": "P_2025_HA_f7cdbaaf", "themes": ["power_market", "green_power_trading_theme"], "primary": "power_market", "重要性": 3, "gate": true}
+{"pid": "P_2024_LN_46ea47d4", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 3, "gate": true}
+{"pid": "P_2024_LN_1979cc90", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 3, "gate": true}
+{"pid": "P_2025_LN_5c2cc25a", "themes": ["charging_infra", "residential_charging"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2025_HA_ecfdb60b", "themes": ["distribution_grid_opening", "vpp_theme"], "primary": "distribution_grid_opening", "重要性": 2, "gate": true}
+{"pid": "P_2024_LN_af6aaab2", "themes": ["energy_storage_theme", "vpp_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2024_LN_73d5db86", "themes": ["energy_storage_theme", "green_power_trading_theme", "distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 3, "gate": true}
+{"pid": "P_2024_LN_7922d1c3", "themes": ["charging_infra", "residential_charging", "distribution_grid_opening"], "primary": "charging_infra", "重要性": 5, "gate": true}
+{"pid": "P_2025_SD_e6ccca2a", "themes": ["power_market", "green_power_trading_theme"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2026_SD_0401ca27", "themes": ["green_power_trading_theme", "vpp_theme", "power_market"], "primary": "green_power_trading_theme", "重要性": 3, "gate": true}
+{"pid": "P_2020_SD_5ad272e2", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2026_SD_03271ffc", "themes": ["vpp_theme", "v2g", "aggregator_access", "energy_storage_theme"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2026_SD_4899d9b5", "themes": ["energy_storage_theme", "vpp_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2026_SD_c4343e1d", "themes": ["green_power_trading_theme", "power_market"], "primary": "green_power_trading_theme", "重要性": 2, "gate": true}
+{"pid": "P_2024_SD_3363e0d7", "themes": ["vpp_theme", "v2g", "charging_infra"], "primary": "vpp_theme", "重要性": 3, "gate": true}
+{"pid": "P_2026_SD_d05e6fa9", "themes": ["power_market", "green_power_trading_theme"], "primary": "power_market", "重要性": 2, "gate": true}
+{"pid": "P_2022_SD_98db30b4", "themes": ["vpp_theme", "energy_storage_theme", "v2g", "charging_infra", "aggregator_access"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2021_SD_99a56a36", "themes": ["carbon_market_theme"], "primary": "carbon_market_theme", "重要性": 2, "gate": true}
+{"pid": "P_2020_SD_2e7cf9bf", "themes": ["charging_infra", "residential_charging"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2025_SD_638f3d3d", "themes": ["petroleum_retail_compliance", "gas_station_transition_theme"], "primary": "petroleum_retail_compliance", "重要性": 5, "gate": true}
+{"pid": "P_2022_SD_ef2e3f46", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 2, "gate": true}
+{"pid": "P_2026_SD_73db635b", "themes": ["power_market", "energy_storage_theme"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2017_SD_bca611a0", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2026_SD_7440c4a3", "themes": ["power_market", "vpp_theme", "energy_storage_theme", "v2g", "green_power_trading_theme", "residential_charging"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2024_SD_c6483716", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_SD_f695d0a7", "themes": ["vpp_theme"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2026_SD_735d02b6", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2025_SD_9b4233d8", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2025_SD_e5834863", "themes": ["carbon_market_theme"], "primary": "carbon_market_theme", "重要性": 2, "gate": true}
+{"pid": "P_2026_SD_2a71e689", "themes": ["power_market", "vpp_theme", "green_power_trading_theme"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2024_SD_d62a7386", "themes": ["carbon_market_theme"], "primary": "carbon_market_theme", "重要性": 2, "gate": true}
+{"pid": "P_2023_SD_b51963fe", "themes": ["carbon_market_theme"], "primary": "carbon_market_theme", "重要性": 2, "gate": true}
+{"pid": "P_2024_SD_c836e0f1", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 3, "gate": true}
+{"pid": "P_2024_SD_523c1a0a", "themes": ["power_market", "vpp_theme", "energy_storage_theme"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2024_SD_061b4a99", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 3, "gate": true}
+{"pid": "P_2025_SD_aaa33abe", "themes": ["charging_infra", "residential_charging"], "primary": "charging_infra", "重要性": 3, "gate": true}
+{"pid": "P_2026_SD_269db10a", "themes": ["power_market", "vpp_theme", "energy_storage_theme", "green_power_trading_theme"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2023_SD_b285d119", "themes": ["vpp_theme", "aggregator_access", "power_market", "green_power_trading_theme"], "primary": "vpp_theme", "重要性": 3, "gate": true}
+{"pid": "P_2022_SD_67a335e9", "themes": ["carbon_market_theme"], "primary": "carbon_market_theme", "重要性": 2, "gate": true}
+{"pid": "P_2022_SD_1e77c2d2", "themes": ["carbon_market_theme"], "primary": "carbon_market_theme", "重要性": 2, "gate": true}
+{"pid": "P_2023_SD_82423871", "themes": ["carbon_market_theme"], "primary": "carbon_market_theme", "重要性": 2, "gate": true}
+{"pid": "P_2026_SD_029765d6", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_SD_fb6fcdeb", "themes": ["v2g", "charging_infra", "energy_storage_theme", "vpp_theme", "power_market"], "primary": "v2g", "重要性": 4, "gate": true}
+{"pid": "P_2025_SD_4bcf1389", "themes": ["power_market", "vpp_theme", "green_power_trading_theme", "aggregator_access"], "primary": "power_market", "重要性": 5, "gate": true}
+{"pid": "P_2025_SD_b9d7cf01", "themes": ["power_market", "green_power_trading_theme"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2026_SX_04010841", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2026_SX_6f26eb5b", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2026_SX_b696f814", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2025_SX_51bb0b71", "themes": ["green_power_trading_theme", "power_market"], "primary": "green_power_trading_theme", "重要性": 4, "gate": true}
+{"pid": "P_2022_SX_1012250c", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2024_SX_ce9b782c", "themes": ["power_market", "green_power_trading_theme", "vpp_theme", "energy_storage_theme"], "primary": "power_market", "重要性": 5, "gate": true}
+{"pid": "P_2025_HB_0821a681", "themes": ["petroleum_retail_compliance", "gas_station_transition_theme"], "primary": "petroleum_retail_compliance", "重要性": 2, "gate": false}
+{"pid": "P_2024_MIIT_33", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 3, "gate": true}
+{"pid": "P_2022_MIIT_0802c974", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2020_TJ_95daac5a", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2015_TJ_9ec9c169", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2020_TJ_55280b8a", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2025_SN_73f3b419", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2024_BJ_f3da0370", "themes": ["v2g", "vpp_theme", "charging_infra", "residential_charging"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2025_CQ_a813b653", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2022_CQ_353802ae", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2024_GZ_4ec111f2", "themes": ["energy_storage_theme", "power_market"], "primary": "energy_storage_theme", "重要性": 2, "gate": true}
+{"pid": "P_2023_HA_b69028b4", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_GD_145", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_GD_0203ce87", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2024_GD_39077a3a", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_GD_b2876ecb", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_GD_399ed9f5", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_GD_1e47cd63", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 3, "gate": true}
+{"pid": "P_2025_GD_badbf18f", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 3, "gate": true}
+{"pid": "P_2026_GD_7da3dcc0", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2025_GD_b7cfd44d", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 2, "gate": true}
+{"pid": "P_2022_GD_4985b3f3", "themes": [], "primary": "", "重要性": 3, "gate": false}
+{"pid": "P_2020_GD_dd9cb639", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_GD_9031975f", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 3, "gate": true}
+{"pid": "P_2023_GD_3b63a79c", "themes": ["power_market"], "primary": "power_market", "重要性": 2, "gate": true}
+{"pid": "P_2024_GD_4c965452", "themes": ["equipment_renewal_theme", "charging_infra", "residential_charging", "gas_station_transition_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2024_GD_cbfa3283", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 2, "gate": true}
+{"pid": "P_2023_GD_6b3cf977", "themes": ["power_market", "vpp_theme", "energy_storage_theme", "aggregator_access"], "primary": "power_market", "重要性": 5, "gate": true}
+{"pid": "P_2023_GD_f52b2afe", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2024_GD_6416d7e9", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 4, "gate": true}
+{"pid": "P_2025_GD_ca851811", "themes": ["power_market"], "primary": "power_market", "重要性": 5, "gate": true}
+{"pid": "P_2023_GD_db18148c", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2020_GD_ec362319", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 4, "gate": true}
+{"pid": "P_2026_GD_b7dbe8a0", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2017_GD_406db0aa", "themes": ["carbon_market_theme"], "primary": "carbon_market_theme", "重要性": 3, "gate": true}
+{"pid": "P_2026_GD_0422", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 3, "gate": true}
+{"pid": "P_2025_GD_615cfb0e", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2024_GD_b2a74491", "themes": ["vpp_theme", "power_market"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2024_GD_4f183861", "themes": ["power_market", "vpp_theme", "energy_storage_theme"], "primary": "power_market", "重要性": 5, "gate": true}
+{"pid": "P_2025_GD_ef7c6087", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2024_GD_a8363ed7", "themes": ["equipment_renewal_theme", "charging_infra"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2021_GD_e369bf1c", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 4, "gate": true}
+{"pid": "P_2026_GD_063b6ddd", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2024_GD_8db6fb96", "themes": ["carbon_market_theme", "energy_storage_theme", "green_power_trading_theme", "vpp_theme"], "primary": "carbon_market_theme", "重要性": 2, "gate": false}
+{"pid": "P_2017_GD_70875d73", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2019_GD_781f09c6", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2023_GD_01f2a294", "themes": ["petroleum_retail_compliance", "gas_station_transition_theme"], "primary": "petroleum_retail_compliance", "重要性": 4, "gate": true}
+{"pid": "P_2024_GD_d62c53cf", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_GD_255", "themes": ["v2g", "charging_infra", "vpp_theme"], "primary": "v2g", "重要性": 4, "gate": true}
+{"pid": "P_2019_GD_0c52cbb8", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2025_GD_0f4d0834", "themes": ["charging_infra", "v2g"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2024_GX_594", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2024_GX_18226505", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2023_GX_8da1cac9", "themes": ["power_market", "distribution_grid_opening"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2026_GX_64d2bf01", "themes": ["power_market", "vpp_theme"], "primary": "power_market", "重要性": 3, "gate": true}
+{"pid": "P_2025_GX_583085e4", "themes": ["power_market", "green_power_trading_theme"], "primary": "power_market", "重要性": 5, "gate": true}
+{"pid": "P_2023_GX_5e248986", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2023_GX_a4e730e3", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2022_GX_5f7f82ef", "themes": ["energy_storage_theme", "power_market"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2019_GX_4c39e941", "themes": ["distribution_grid_opening", "power_market"], "primary": "distribution_grid_opening", "重要性": 4, "gate": true}
+{"pid": "P_2022_GX_69d99f4d", "themes": ["distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 3, "gate": true}
+{"pid": "P_2026_GX_031fa254", "themes": ["distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 4, "gate": true}
+{"pid": "P_2021_GX_65e8a8be", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_GX_a6b60bac", "themes": ["power_market", "green_power_trading_theme", "vpp_theme"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_GO_cfb56b55", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2023_CQ_e490adb4", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2024_BJ_05274abd", "themes": ["green_power_trading_theme"], "primary": "green_power_trading_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_BJ_2865590a", "themes": ["vpp_theme", "charging_infra"], "primary": "vpp_theme", "重要性": 2, "gate": true}
+{"pid": "P_2025_HB_061777d5", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 4, "gate": true}
+{"pid": "P_2024_HN_0921ac90", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 2, "gate": false}
+{"pid": "P_2025_SD_c945ed31", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 3, "gate": true}
+{"pid": "P_2026_SN_28b48cb2", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2021_ZJ_0000bc05", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_MOFCOM_4_a", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 4, "gate": true}
+{"pid": "P_2023_MOFCOM_0603e88a", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 4, "gate": true}
+{"pid": "P_2024_SC_537ff24a", "themes": ["residential_charging", "charging_infra"], "primary": "residential_charging", "重要性": 4, "gate": true}
+{"pid": "P_2025_SC_1490d316", "themes": ["vpp_theme", "energy_storage_theme"], "primary": "vpp_theme", "重要性": 5, "gate": true}
+{"pid": "P_2026_HA_d3b80320", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2020_CQ_f8a0db61", "themes": ["distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 4, "gate": true}
+{"pid": "P_2023_SD_0a818b21", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2023_HN_dc498608", "themes": ["energy_storage_theme", "power_market", "green_power_trading_theme"], "primary": "energy_storage_theme", "重要性": 3, "gate": true}
+{"pid": "P_2025_SN_fad607e4", "themes": ["charging_infra", "v2g"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2020_LN_b4f7b923", "themes": ["power_market"], "primary": "power_market", "重要性": 3, "gate": true}
+{"pid": "P_2025_GZ_98d4b413", "themes": ["power_market", "vpp_theme", "green_power_trading_theme", "aggregator_access"], "primary": "power_market", "重要性": 3, "gate": true}
+{"pid": "P_2025_LN_abd82781", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_SH_d8527ff1", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2024_JS_0619d6b7", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 2, "gate": false}
+{"pid": "P_2024_MEE_7", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 5, "gate": true}
+{"pid": "P_2024_MOFCOM_58_a", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2024_NDRC_718", "themes": ["v2g", "power_market", "aggregator_access", "charging_infra", "residential_charging"], "primary": "charging_infra", "重要性": 5, "gate": true}
+{"pid": "P_2024_SH_159", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 5, "gate": true}
+{"pid": "P_2025_YN_9eb91215", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_MOFCOM_697", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2026_AH_d8c28a5c", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2023_HE_fac80aa8", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2020_HE_6d08b05b", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_NM_00d42585", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2026_BJ_29c77bd2", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2024_HE_9c1b1a8f", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2026_FJ_7348ccb2", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2025_FJ_0091db8f", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2025_HN_97f39c45", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2026_SD_247f72d1", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2024_BJ_bb14b4c6", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2024_NEA_08098f4e", "themes": ["energy_storage_theme", "vpp_theme", "power_market"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2026_GO_096bba2c", "themes": ["power_market"], "primary": "power_market", "重要性": 1, "gate": true}
+{"pid": "P_2025_GX_a601541d", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2024_MOT_390", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 5, "gate": true}
+{"pid": "P_2020_SH_39_b", "themes": ["charging_infra", "v2g"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2023_AH_95eb685f", "themes": ["charging_infra", "residential_charging", "gas_station_transition_theme"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2024_BJ_aa3412b5", "themes": ["charging_infra", "gas_station_transition_theme"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2025_HE_a333cd23", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2026_AH_1f64a250", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2026_AH_cb4b09a2", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_HE_96193460", "themes": ["charging_infra", "residential_charging"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2025_BJ_9165b7e9", "themes": ["carbon_market_theme"], "primary": "carbon_market_theme", "重要性": 1, "gate": true}
+{"pid": "P_2025_GO_d433682b", "themes": ["charging_infra", "energy_storage_theme", "gas_station_transition_theme"], "primary": "charging_infra", "重要性": 3, "gate": true}
+{"pid": "P_2025_HA_8ee62cac", "themes": ["charging_infra", "v2g", "energy_storage_theme", "vpp_theme"], "primary": "charging_infra", "重要性": 3, "gate": true}
+{"pid": "P_2026_LN_02013fa8", "themes": ["gas_station_transition_theme"], "primary": "gas_station_transition_theme", "重要性": 3, "gate": true}
+{"pid": "P_2026_BJ_99ffa774", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 2, "gate": true}
+{"pid": "P_2024_BJ_8d88dcd3", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 3, "gate": true}
+{"pid": "P_2024_BJ_75ed9421", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_SH_c83e41d1", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2026_ZJ_d2e50b48", "themes": ["equipment_renewal_theme", "charging_infra"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2026_SH_03132bad", "themes": ["distribution_grid_opening", "charging_infra"], "primary": "distribution_grid_opening", "重要性": 2, "gate": false}
+{"pid": "P_2026_AH_7dc9d8d2", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2025_GX_e062e74d", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2023_SH_d77eb078", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 2, "gate": true}
+{"pid": "P_2021_BJ_927cc52e", "themes": ["carbon_market_theme"], "primary": "carbon_market_theme", "重要性": 2, "gate": true}
+{"pid": "P_2025_HB_9", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2021_NEA_90633c79", "themes": ["power_market"], "primary": "power_market", "重要性": 3, "gate": true}
+{"pid": "P_2025_JS_56", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 4, "gate": true}
+{"pid": "P_2025_JS_0208e0bb_b", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2017_JS_a3e9260f", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2023_JS_eeda02f4", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2025_JS_a62dfcad", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2026_JS_7a927b0e", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2022_GO_0ae1a2cc", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 5, "gate": true}
+{"pid": "P_2025_JX_b6890180", "themes": ["energy_storage_theme", "power_market"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_JX_4e08a81b", "themes": ["power_market", "distribution_grid_opening", "vpp_theme", "energy_storage_theme", "charging_infra"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_JX_d7975d50", "themes": ["vpp_theme", "power_market", "aggregator_access"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_JX_b32efb76", "themes": ["vpp_theme", "aggregator_access", "power_market"], "primary": "vpp_theme", "重要性": 3, "gate": true}
+{"pid": "P_2024_MOFCOM_75_b", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2026_SH_6e089c0e", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2026_SH_583bbba6", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2022_HE_182d4944", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 2, "gate": true}
+{"pid": "P_2025_HE_45c64ffa", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2024_HE_eccce40a", "themes": ["vpp_theme", "power_market", "charging_infra"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_HE_0ba39595", "themes": ["power_market", "green_power_trading_theme"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_HE_cac09487", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2021_HE_900a18f5", "themes": ["power_market"], "primary": "power_market", "重要性": 5, "gate": true}
+{"pid": "P_2026_HE_c2a55f64", "themes": ["vpp_theme"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_HE_2408ff90", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_HE_9a2d5057", "themes": ["vpp_theme", "power_market", "aggregator_access"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2022_HA_3232e2ef", "themes": ["power_market", "vpp_theme"], "primary": "power_market", "重要性": 3, "gate": true}
+{"pid": "P_2025_HA_dda7fc36", "themes": [], "primary": "", "重要性": 3, "gate": false}
+{"pid": "P_2023_HA_1894bc86", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2026_HA_14403c6f", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2023_HA_711d8e82", "themes": ["energy_storage_theme", "power_market"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2023_HA_0fb19725", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2025_HA_d4946859", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2023_HA_dc653cc1", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2022_HA_01b43580", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2024_HA_06118c6d", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 3, "gate": true}
+{"pid": "P_2025_HA_0908b9ef", "themes": ["charging_infra", "residential_charging", "gas_station_transition_theme"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2025_HA_2a26e652", "themes": ["vpp_theme"], "primary": "vpp_theme", "重要性": 2, "gate": true}
+{"pid": "P_2024_SD_53c79e41", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 3, "gate": true}
+{"pid": "P_2015_SD_af076ca3", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 4, "gate": true}
+{"pid": "P_2023_SD_ab7afa77", "themes": ["power_market"], "primary": "power_market", "重要性": 3, "gate": true}
+{"pid": "P_2025_ZJ_9913d312", "themes": ["power_market"], "primary": "power_market", "重要性": 5, "gate": true}
+{"pid": "P_2025_ZJ_9272e674", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2024_ZJ_ac3b36be", "themes": ["carbon_market_theme", "green_power_trading_theme"], "primary": "carbon_market_theme", "重要性": 3, "gate": true}
+{"pid": "P_2022_SH_171", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2025_HI_5", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 2, "gate": true}
+{"pid": "P_2023_HI_0e896708", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 3, "gate": true}
+{"pid": "P_2016_HI_3bac5b3a", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2024_HI_e92db1eb", "themes": ["power_market"], "primary": "power_market", "重要性": 3, "gate": true}
+{"pid": "P_2025_HI_32950aa0", "themes": ["distribution_grid_opening", "power_market"], "primary": "distribution_grid_opening", "重要性": 4, "gate": true}
+{"pid": "P_2024_HI_0adc6a74", "themes": ["charging_infra", "residential_charging", "v2g"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2022_HI_b04ccb3c", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 2, "gate": true}
+{"pid": "P_2020_HI_5b94d4bc", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2026_HI_f8e2dcd1", "themes": ["distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 2, "gate": true}
+{"pid": "P_2018_HI_bdeeb7db", "themes": ["distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 4, "gate": true}
+{"pid": "P_2025_GO_dca47220", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2024_CQ_1023dd1b", "themes": ["gas_station_transition_theme", "charging_infra", "v2g"], "primary": "gas_station_transition_theme", "重要性": 3, "gate": true}
+{"pid": "P_2024_HL_5ae7295b", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2026_GD_5c0cf20a", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2024_GD_378cdbce", "themes": ["vpp_theme", "v2g", "energy_storage_theme", "charging_infra", "equipment_renewal_theme"], "primary": "charging_infra", "重要性": 5, "gate": true}
+{"pid": "P_2025_GD_22391573", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 3, "gate": true}
+{"pid": "P_2024_GD_060777c1", "themes": ["vpp_theme", "aggregator_access"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2024_GD_324", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2026_SX_bfc68419", "themes": ["charging_infra", "v2g", "vpp_theme", "distribution_grid_opening"], "primary": "charging_infra", "重要性": 3, "gate": true}
+{"pid": "P_2025_GO_a3388811", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_HN_830", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_HN_4c6d1c45", "themes": ["power_market", "green_power_trading_theme"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_HN_72fc216c", "themes": ["power_market", "green_power_trading_theme"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2023_HN_4ff67fd4", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2024_HN_139", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 3, "gate": true}
+{"pid": "P_2025_HN_289", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2023_HN_848", "themes": ["charging_infra", "residential_charging"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2025_GO_1826afdc", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_BJ_54c00899", "themes": ["vpp_theme"], "primary": "vpp_theme", "重要性": 2, "gate": true}
+{"pid": "P_2019_GX_03dd61d7", "themes": ["distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 3, "gate": true}
+{"pid": "P_2020_NDRC_889", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2020_NDRC_06306aac", "themes": ["power_market"], "primary": "power_market", "重要性": 5, "gate": true}
+{"pid": "P_2024_NDRC_1123_a", "themes": ["green_power_trading_theme", "power_market"], "primary": "green_power_trading_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_NDRC_1656_a", "themes": ["power_market"], "primary": "power_market", "重要性": 5, "gate": true}
+{"pid": "P_2025_NDRC_1810", "themes": ["power_market"], "primary": "power_market", "重要性": 5, "gate": true}
+{"pid": "P_2024_NDRC_20", "themes": ["power_market", "vpp_theme", "aggregator_access"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2024_NDRC_15", "themes": ["power_market", "aggregator_access", "vpp_theme"], "primary": "power_market", "重要性": 5, "gate": true}
+{"pid": "P_2025_NDRC_0106e7c2", "themes": ["vpp_theme", "energy_storage_theme", "power_market", "aggregator_access"], "primary": "vpp_theme", "重要性": 5, "gate": true}
+{"pid": "P_2023_NDRC_0915531d", "themes": ["power_market", "vpp_theme", "aggregator_access"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_NDRC_411", "themes": ["power_market", "vpp_theme", "aggregator_access"], "primary": "power_market", "重要性": 5, "gate": true}
+{"pid": "P_2017_NDRC_09206e37", "themes": ["vpp_theme", "green_power_trading_theme"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2023_NDRC_092751f2_a", "themes": ["vpp_theme", "aggregator_access", "power_market", "green_power_trading_theme", "carbon_market_theme", "energy_storage_theme", "v2g"], "primary": "vpp_theme", "重要性": 5, "gate": true}
+{"pid": "P_2023_NDRC_0519539e", "themes": ["vpp_theme", "aggregator_access", "power_market", "energy_storage_theme", "v2g"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2023_NDRC_0704ee90", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2025_NDRC_101520b2", "themes": ["charging_infra", "residential_charging", "v2g", "distribution_grid_opening", "vpp_theme"], "primary": "charging_infra", "重要性": 5, "gate": true}
+{"pid": "P_2025_AH_367b47df", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2024_HN_8fa9634d", "themes": ["energy_storage_theme", "vpp_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2026_GZ_2dad70b3", "themes": ["vpp_theme", "energy_storage_theme"], "primary": "vpp_theme", "重要性": 2, "gate": true}
+{"pid": "P_2021_LN_1ce1fce9", "themes": ["distribution_grid_opening", "power_market"], "primary": "distribution_grid_opening", "重要性": 4, "gate": true}
+{"pid": "P_2026_HL_d1f6fbc5", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2024_ZJ_65c18e53", "themes": ["power_market", "aggregator_access"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_LN_4f5b9e7c", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2020_ZJ_da16f2fb", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2020_LN_193563de", "themes": ["power_market"], "primary": "power_market", "重要性": 2, "gate": true}
+{"pid": "P_2024_GZ_a13805ca", "themes": ["power_market", "charging_infra", "energy_storage_theme"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2017_LN_54de50fa", "themes": ["power_market"], "primary": "power_market", "重要性": 2, "gate": true}
+{"pid": "P_2021_GZ_449c8d68", "themes": ["power_market", "distribution_grid_opening"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2024_GZ_abd188fb", "themes": ["charging_infra", "residential_charging"], "primary": "charging_infra", "重要性": 5, "gate": true}
+{"pid": "P_2024_GZ_ee0e15a2", "themes": ["distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 4, "gate": true}
+{"pid": "P_2024_GZ_9e711af1", "themes": ["distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 5, "gate": true}
+{"pid": "P_2019_FJ_99e4d508", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 4, "gate": true}
+{"pid": "P_2025_HN_ad769c90", "themes": ["green_power_trading_theme", "power_market"], "primary": "green_power_trading_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_AH_16e70d4c", "themes": ["charging_infra", "v2g", "vpp_theme", "green_power_trading_theme"], "primary": "charging_infra", "重要性": 2, "gate": true}
+{"pid": "P_2023_QH_8bd87efd", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_SD_bd00feab", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2024_QH_af736607", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2021_MEE_19", "themes": ["carbon_market_theme"], "primary": "carbon_market_theme", "重要性": 4, "gate": true}
+{"pid": "P_2024_GWY_L775", "themes": ["carbon_market_theme"], "primary": "carbon_market_theme", "重要性": 5, "gate": true}
+{"pid": "P_2019_MEE_04038d15", "themes": ["carbon_market_theme"], "primary": "carbon_market_theme", "重要性": 4, "gate": true}
+{"pid": "P_2026_CCGO_041241d4", "themes": ["carbon_market_theme"], "primary": "carbon_market_theme", "重要性": 3, "gate": true}
+{"pid": "P_2023_GO_06dd3d71", "themes": ["vpp_theme", "aggregator_access", "power_market", "charging_infra"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_FJ_0126e451", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 2, "gate": true}
+{"pid": "P_2026_FJ_160", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 2, "gate": true}
+{"pid": "P_2024_FJ_a37c3fb4", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2021_FJ_d8cdf3d5", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_FJ_fbf45d27", "themes": ["power_market", "green_power_trading_theme", "energy_storage_theme", "vpp_theme"], "primary": "power_market", "重要性": 3, "gate": true}
+{"pid": "P_2025_FJ_759b106d", "themes": ["power_market", "aggregator_access"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2018_FJ_2a98830b", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 5, "gate": true}
+{"pid": "P_2024_FJ_21c28996", "themes": ["equipment_renewal_theme", "charging_infra"], "primary": "equipment_renewal_theme", "重要性": 3, "gate": true}
+{"pid": "P_2024_FJ_89cec6cc", "themes": ["vpp_theme", "power_market", "distribution_grid_opening", "charging_infra"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2023_FJ_648b1b75", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_FJ_2b5d229a", "themes": ["power_market", "green_power_trading_theme"], "primary": "power_market", "重要性": 5, "gate": true}
+{"pid": "P_2025_FJ_28bc7851", "themes": ["power_market", "green_power_trading_theme"], "primary": "power_market", "重要性": 3, "gate": true}
+{"pid": "P_2024_FJ_9748c83a", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2024_FJ_11297401", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2022_NEA_0819bb07", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2026_AH_df1977d1", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2026_AH_615cf1aa", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2023_NDRC_08223fec", "themes": ["vpp_theme", "energy_storage_theme", "v2g", "green_power_trading_theme"], "primary": "vpp_theme", "重要性": 3, "gate": true}
+{"pid": "P_2026_BJ_4", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2021_SX_b8cbd968", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 3, "gate": true}
+{"pid": "P_2025_HL_591d8f69", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2024_NDRC_08218f52", "themes": ["equipment_renewal_theme", "charging_infra", "distribution_grid_opening"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_HL_4d095b58", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2022_NX_0d7f402e", "themes": ["vpp_theme", "power_market"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_NX_14aa4fad", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2022_NX_f86c8310", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 5, "gate": true}
+{"pid": "P_2025_NX_6eea1796", "themes": ["vpp_theme", "aggregator_access"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2023_NX_d9e9793c", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2026_NX_87795ba9", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_NX_d2e2946b", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2025_NX_8bcb0521", "themes": ["power_market", "green_power_trading_theme"], "primary": "power_market", "重要性": 3, "gate": true}
+{"pid": "P_2023_NX_504ff671", "themes": ["power_market", "distribution_grid_opening", "charging_infra"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2024_NX_359f10fd", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 3, "gate": true}
+{"pid": "P_2025_NX_f985ec97", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2023_NX_1a31dfe0", "themes": ["distribution_grid_opening", "power_market"], "primary": "distribution_grid_opening", "重要性": 3, "gate": true}
+{"pid": "P_2023_NX_3df3969b", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2020_NX_36697757", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2026_MIIT_44", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2024_JS_33", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 3, "gate": true}
+{"pid": "P_2024_JS_34", "themes": ["carbon_market_theme", "green_power_trading_theme"], "primary": "carbon_market_theme", "重要性": 2, "gate": false}
+{"pid": "P_2024_NM_0101e295", "themes": ["energy_storage_theme", "power_market", "vpp_theme", "charging_infra", "distribution_grid_opening"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2023_SX_edac199a", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2022_HA_8a7df234", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2026_SH_6bf9be53", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2022_SH_47385a82", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 2, "gate": true}
+{"pid": "P_2022_HI_40d79bb4", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2022_BJ_d4768883", "themes": ["residential_charging"], "primary": "residential_charging", "重要性": 3, "gate": true}
+{"pid": "P_2023_HL_6ad69af6", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 2, "gate": true}
+{"pid": "P_2023_MOF_10", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2019_GZ_64193177", "themes": ["distribution_grid_opening", "charging_infra", "residential_charging"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2024_GO_6b9f90df", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_NX_dd322c66", "themes": ["charging_infra", "v2g"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2024_NM_2227524e", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2024_HL_f14f037c", "themes": ["power_market", "energy_storage_theme", "vpp_theme"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_HA_cb386c18", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2025_MOT_381b8d69", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2020_TJ_8b3b418c", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2019_HE_c8a289f5", "themes": ["distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 4, "gate": true}
+{"pid": "P_2017_LN_f1e981bf", "themes": ["power_market"], "primary": "power_market", "重要性": 3, "gate": true}
+{"pid": "P_2025_LN_12038a1a", "themes": ["charging_infra", "distribution_grid_opening"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2026_LN_adff469f", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2021_LN_08ba4b25", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2024_LN_9_b", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2023_LN_0626600d", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2019_LN_f504873e", "themes": ["distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 3, "gate": true}
+{"pid": "P_2025_SN_ee83cfd7", "themes": ["vpp_theme", "aggregator_access"], "primary": "vpp_theme", "重要性": 3, "gate": true}
+{"pid": "P_2023_NHC_19_b", "themes": ["charging_infra", "v2g"], "primary": "charging_infra", "重要性": 5, "gate": true}
+{"pid": "P_2026_SX_28f29a2b", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2023_SX_a1d4818e", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2023_NX_94608c71", "themes": ["vpp_theme", "aggregator_access"], "primary": "aggregator_access", "重要性": 4, "gate": true}
+{"pid": "P_2025_HI_5302a73a", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2018_LN_a4df10d7", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2025_NX_f2592a7e", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2019_TJ_5d65c150", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2025_HA_1201deda", "themes": ["charging_infra", "v2g"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2025_GO_3c6a426f", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2023_HA_714f16d4", "themes": ["charging_infra", "v2g", "green_power_trading_theme", "carbon_market_theme"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2025_HI_be0bfa3b", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2024_CQ_162", "themes": ["carbon_market_theme"], "primary": "carbon_market_theme", "重要性": 3, "gate": true}
+{"pid": "P_2025_CQ_01267b4b", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2025_CQ_0126e838", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_CQ_061697f2", "themes": ["charging_infra", "v2g"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2025_CQ_22_b", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2025_CQ_22_c", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2026_CQ_16", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2026_CQ_0130f748", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_CQ_388", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2022_CQ_8301cef1", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2022_CQ_6eb1b10a", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2022_CQ_953ad2db", "themes": ["power_market", "charging_infra"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2022_CQ_3c8f1eea", "themes": ["energy_storage_theme", "vpp_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2022_CQ_229620a1", "themes": ["v2g", "charging_infra", "energy_storage_theme", "vpp_theme", "residential_charging", "power_market"], "primary": "charging_infra", "重要性": 3, "gate": true}
+{"pid": "P_2024_CQ_e7997102", "themes": ["power_market", "green_power_trading_theme", "vpp_theme", "distribution_grid_opening"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_CQ_f2034a09", "themes": ["distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 2, "gate": true}
+{"pid": "P_2022_CQ_7be6b9f2", "themes": ["distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 3, "gate": true}
+{"pid": "P_2025_CQ_413d5fdc", "themes": ["power_market", "green_power_trading_theme"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2026_CQ_7", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2022_CQ_08252433", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2023_CQ_120401b0", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 3, "gate": true}
+{"pid": "P_2022_CQ_18", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2024_CQ_07251b11", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 3, "gate": true}
+{"pid": "P_2024_CQ_020739ff", "themes": ["vpp_theme", "green_power_trading_theme", "distribution_grid_opening"], "primary": "vpp_theme", "重要性": 2, "gate": true}
+{"pid": "P_2024_CQ_86", "themes": ["v2g", "charging_infra", "vpp_theme"], "primary": "v2g", "重要性": 4, "gate": true}
+{"pid": "P_2024_CQ_0101a5e5", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2024_CQ_15", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2024_CQ_0cae0427", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_CQ_d4e84b6f", "themes": ["energy_storage_theme", "vpp_theme", "charging_infra"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_CQ_683486a9", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2023_CQ_7615d6ad", "themes": ["energy_storage_theme", "vpp_theme", "charging_infra"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2016_CQ_58e17873", "themes": ["distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 3, "gate": true}
+{"pid": "P_2017_CQ_c8d99857", "themes": ["distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 4, "gate": true}
+{"pid": "P_2026_CQ_f1af9d5e", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_CQ_84593d49", "themes": ["v2g", "green_power_trading_theme", "charging_infra", "distribution_grid_opening"], "primary": "v2g", "重要性": 3, "gate": true}
+{"pid": "P_2025_CQ_d2578cbc", "themes": ["distribution_grid_opening"], "primary": "distribution_grid_opening", "重要性": 3, "gate": true}
+{"pid": "P_2026_NX_c0ed9989", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2026_SH_04015bfb", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_SN_5f4dd35d", "themes": ["charging_infra", "v2g", "residential_charging", "distribution_grid_opening"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2025_SN_336cc2f4", "themes": ["power_market", "vpp_theme", "energy_storage_theme", "aggregator_access"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2024_SN_6a3d7fdd", "themes": ["charging_infra", "residential_charging"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2024_SN_468da6ab", "themes": ["charging_infra", "residential_charging"], "primary": "charging_infra", "重要性": 5, "gate": true}
+{"pid": "P_2025_SN_928ea799", "themes": ["power_market"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2025_SN_61007026", "themes": ["charging_infra"], "primary": "charging_infra", "重要性": 4, "gate": true}
+{"pid": "P_2025_SN_cea944a1", "themes": ["vpp_theme", "aggregator_access", "power_market", "energy_storage_theme"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_SN_5037e616", "themes": ["vpp_theme", "aggregator_access"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_SN_21047ac7", "themes": ["power_market", "aggregator_access"], "primary": "power_market", "重要性": 4, "gate": true}
+{"pid": "P_2024_SN_49483d5d", "themes": ["equipment_renewal_theme", "charging_infra"], "primary": "equipment_renewal_theme", "重要性": 3, "gate": true}
+{"pid": "P_2024_SN_0e8bc123", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2024_SN_3246b829", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2020_SX_a009034f", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2024_QH_72", "themes": ["equipment_renewal_theme"], "primary": "equipment_renewal_theme", "重要性": 4, "gate": true}
+{"pid": "P_2023_QH_d24ac57d", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2024_QH_bf07bb8c", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 4, "gate": true}
+{"pid": "P_2025_QH_76788bb0", "themes": ["vpp_theme", "aggregator_access"], "primary": "vpp_theme", "重要性": 4, "gate": true}
+{"pid": "P_2026_QH_ab4dcbb6", "themes": ["vpp_theme"], "primary": "vpp_theme", "重要性": 0, "gate": true}
+{"pid": "P_2024_NM_bcdbd603", "themes": [], "primary": "", "重要性": 0, "gate": false}
+{"pid": "P_2025_HL_54f37818", "themes": [], "primary": "", "重要性": 2, "gate": false}
+{"pid": "P_2012_BJ_466935e2", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 2, "gate": true}
+{"pid": "P_2015_BJ_c5505b70", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 2, "gate": true}
+{"pid": "P_2025_ZJ_FGW_fffdce43", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2026_ZJ_FGW_31c272e5", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_ZJ_FGW_f79c7a04", "themes": [], "primary": "", "重要性": 1, "gate": false}
+{"pid": "P_2025_ZJ_FGW_64b2dbc2", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 3, "gate": true}
+{"pid": "P_2024_ZJ_FGW_19a96076", "themes": ["energy_storage_theme"], "primary": "energy_storage_theme", "重要性": 3, "gate": true}
+{"pid": "P_2026_ZJ_FGW_8c0e425c", "themes": ["petroleum_retail_compliance"], "primary": "petroleum_retail_compliance", "重要性": 2, "gate": false}

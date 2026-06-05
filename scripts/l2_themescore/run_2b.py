@@ -272,7 +272,14 @@ def plan(vault, registry_path, scoring_text, gen_client, judge_client, gen_pass2
             if on_item:
                 on_item(("queue", qr))
             continue
-        v = judge_draft(judge_client, rec.title, rec.body_head, draft)
+        try:
+            v = judge_draft(judge_client, rec.title, rec.body_head, draft)
+        except Exception as e:
+            qr = QueueRecord(pid=rec.pid, stage="judge_error", reason=str(e)[:200])
+            queue.append(qr)
+            if on_item:
+                on_item(("queue", qr))
+            continue
         if v.verdict != "accept":
             qr = QueueRecord(pid=rec.pid, stage="judge_reject", reason=v.reason,
                              detail={"dim": v.dim, "confidence": v.confidence})

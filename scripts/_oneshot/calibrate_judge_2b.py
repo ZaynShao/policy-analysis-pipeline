@@ -94,7 +94,7 @@ def judge_calibration_draft(client, rec_title: str, rec_body: str, draft) -> Jud
             f"待审归属:themes={draft.themes} primary={draft.primary_theme} "
             f"comprehensive={draft.comprehensive} scores={draft.scores.to_dict()} "
             f"重要性={draft.importance} 影响分析={draft.影响分析}")
-    txt = client.complete(system=CALIBRATION_JUDGE_SYSTEM, user=user, max_tokens=1024)
+    txt = client.complete(system=CALIBRATION_JUDGE_SYSTEM, user=user, max_tokens=2048)
     try:
         d = parse_json_block(txt)
     except Exception:

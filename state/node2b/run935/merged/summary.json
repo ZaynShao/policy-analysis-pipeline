@@ -1,0 +1,6 @@
+{
+  "accepted": 829,
+  "queued": 107,
+  "gen_model": "MiniMax-M2.7-highspeed",
+  "judge_model": "deepseek-v4-flash"
+}

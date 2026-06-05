@@ -72,9 +72,19 @@ class OpenAICompatClient:
 
     @staticmethod
     def _http_post(url: str, payload: dict, api_key: str) -> dict:
-        import urllib.request
-        req = urllib.request.Request(
-            url, data=json.dumps(payload).encode("utf-8"),
-            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"})
-        with urllib.request.urlopen(req, timeout=180) as r:
-            return json.loads(r.read())
+        import urllib.request, urllib.error, http.client, time as _t
+        data = json.dumps(payload).encode("utf-8")
+        last = None
+        for attempt in range(4):  # 重试瞬时网络错误(SSL EOF / IncompleteRead),并发下常见
+            try:
+                req = urllib.request.Request(
+                    url, data=data,
+                    headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"})
+                with urllib.request.urlopen(req, timeout=180) as r:
+                    return json.loads(r.read())
+            except (urllib.error.URLError, http.client.IncompleteRead, ConnectionError,
+                    TimeoutError, OSError) as e:
+                last = e
+                if attempt < 3:
+                    _t.sleep(2 * (attempt + 1))
+        raise last

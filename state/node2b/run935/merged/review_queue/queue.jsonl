@@ -1,0 +1,107 @@
+{"pid": "P_2024_TJ_82ee75cd", "stage": "judge_reject", "reason": "正文多次明确提及抽水蓄能项目（储能），属于13主题的energy_storage_theme，待审遗漏此重要主题，违反规则5。", "detail": {"dim": "theme", "confidence": 0.9}}
+{"pid": "P_2024_BJ_0531d5e0", "stage": "judge_reject", "reason": "政策正文仅为页面导航框架，不是正式政策条款，属于零相关/问答页，不应挂equipment_renewal_theme。", "detail": {"dim": "theme", "confidence": 1.0}}
+{"pid": "P_2025_ZJ_0126106a", "stage": "judge_reject", "reason": "政策正文节选无实质条款，仅为网页导航，不属于13个滴滴业务主题，应themes=[]/primary=''；挂equipment_renewal_theme属于主题错误。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2026_SH_24", "stage": "judge_reject", "reason": "judge 返回非JSON", "detail": {"dim": "overall", "confidence": 0.0}}
+{"pid": "P_2021_MEE_23", "stage": "judge_reject", "reason": "政策覆盖充电基础设施、绿色电力交易等多项13主题，但themes仅挂carbon_market_theme，严重漏挂。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2023_BJ_de72bdca", "stage": "judge_reject", "reason": "政策内容为老旧小区传统配电网改造工程，不涉及配电网开放、分布式接入或市场化机制，误挂 distribution_grid_opening 主题，应归零主题。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2021_MOT_ddaaa0d2", "stage": "judge_reject", "reason": "正文为综合交通运输规划，节选未涉及充电基础设施具体内容，挂charging_infra主题缺乏文本依据，属于明显业务主题错。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2021_CQ_be42c719", "stage": "judge_reject", "reason": "政策仅涉及燃煤发电上网电价市场化改革，未包含充电基础设施任何直接条款或机制，挂 charging_infra 属于明显业务主题错误。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2024_GO_9ad1220b", "stage": "judge_reject", "reason": "正文未明确提及虚拟电厂或绿色电力交易机制，仅涉及清洁能源发电和外送，挂 vpp_theme 和 green_power_trading_theme 属于明显错挂。", "detail": {"dim": "theme", "confidence": 0.9}}
+{"pid": "P_2024_SH_8_a", "stage": "judge_reject", "reason": "政策聚焦产品碳足迹标准与绿色供应链建设，未涉及碳排放权交易配额、抵消或交易机制，不属于carbon_market_theme，应themes=[]/primary=\"\"。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2012_SH_020", "stage": "judge_reject", "reason": "政策为居民阶梯电价实施方案，属于政府定价的目录电价管理，不涉及电力市场交易机制，挂power_market主题错误，应判零主题。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2023_SH_07077c12", "stage": "judge_reject", "reason": "judge 返回非JSON", "detail": {"dim": "overall", "confidence": 0.0}}
+{"pid": "P_2021_MOFCOM_092282d6", "stage": "judge_reject", "reason": "政策为宏观碳达峰碳中和顶层设计，正文未出现充电基础设施、V2G、虚拟电厂、电力市场、绿电交易、分布式电网开放等13个业务主题的具体机制，待审将不相关政策挂到这些主题属明显错误，应挂零主题。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2024_JS_0321c2fe", "stage": "judge_reject", "reason": "影响分析中'电力_储能_V2G_交易'部分将设备更新政策中提及的储能项目夸大为'直接政策驱动'，编造了政策未写的V2G、交易等业务影响，属于硬伤。", "detail": {"dim": "impact", "confidence": 0.95}}
+{"pid": "P_2024_NEA_26", "stage": "judge_reject", "reason": "judge 返回非JSON", "detail": {"dim": "overall", "confidence": 0.0}}
+{"pid": "P_2018_GD_3e8388c2", "stage": "program_gate", "reason": "深档:有深档=False 但 gate=True", "detail": {}}
+{"pid": "P_2024_HA_8dd8800e", "stage": "judge_reject", "reason": "正文仅为征求意见稿的过程说明，无任何充电基础设施规划内容，属于零相关政策，不应挂 charging_infra。", "detail": {"dim": "theme", "confidence": 1.0}}
+{"pid": "P_2025_NDRC_1710", "stage": "judge_reject", "reason": "正文多次明确提及'建设全国统一电力市场'，属于power_market主题的明确且重要内容，待审themes漏挂该主题，构成明显错误。", "detail": {"dim": "theme", "confidence": 0.9}}
+{"pid": "P_2024_GX_9ed6edd6", "stage": "judge_reject", "reason": "政策为售电公司目录公示，属电力市场主体准入，挂 power_market 合理；但正文未涉及聚合商/虚拟电厂，挂 aggregator_access 且设为 primary 属于明显业务主题错置。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2025_HN_97082d60", "stage": "judge_reject", "reason": "政策正文明确包含车网互动、绿色电力交易、电力市场等13主题内容，待审themes=[]明显漏挂正文明确且重要的主题。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2024_NEA_77", "stage": "judge_reject", "reason": "政策正文仅提及光储充一体化，未涉及绿电交易或绿证交易机制，挂 green_power_trading_theme 无文本依据，属于明显错挂。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2024_SH_121049df", "stage": "judge_reject", "reason": "政策聚焦国际航运燃料绿色转型（LNG、绿色甲醇、绿氨等港口加注），不属于13主题中的‘加油站转型’（gas_station_transition_theme）——该主题针对陆上加油站综合能源改造，与航运燃料体系无直接关联，属明显业务主题错挂。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2022_JS_68e2ddd3", "stage": "generation_error", "reason": "pass2:Expecting value: line 1 column 1 (char 0)", "detail": {}}
+{"pid": "P_2023_HA_5133e527", "stage": "judge_reject", "reason": "judge 返回非JSON", "detail": {"dim": "overall", "confidence": 0.0}}
+{"pid": "P_2024_HN_42bc022c", "stage": "judge_reject", "reason": "该政策为锂电池及先进储能材料产业规划，与滴滴13个业务主题零相关，themes=[]正确；但D1=5明显过高，与实际重要性严重不符，属于D1/D2明显颠倒，应reject。", "detail": {"dim": "score", "confidence": 0.95}}
+{"pid": "P_2021_HA_1ae8d6fa", "stage": "judge_reject", "reason": "该政策为省级'十三五'电力发展规划，内容主要为电源电网建设和电力体制改革方向，未明确涉及配电网开放或具体电力市场机制，而primary被设为distribution_grid_opening，与政策主旨明显不符，属于明显主题错挂。", "detail": {"dim": "theme", "confidence": 0.9}}
+{"pid": "P_2024_HA_15a936f0", "stage": "judge_reject", "reason": "正文明确涉及储能技术应用（增量配电网内开展大容量、中长时间尺度储能、研发固态电池等），属于energy_storage_theme的核心内容，待审未挂该主题构成明显漏挂。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2024_HA_2824bc55", "stage": "judge_reject", "reason": "政策正文明确要求‘加快新能源汽车充换电基础设施建设和车网互动智能化改造’，属于charging_infra和v2g_theme的直接部署条款，待审主题却遗漏了这两个重要13主题，构成明显漏挂错误。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2019_HA_2591fc6a", "stage": "judge_reject", "reason": "政策仅为充电设施运营商准入公示，无任何聚合商、虚拟电厂或负荷聚合商内容，挂aggregator_access无文本依据，属明显错挂。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2025_NDRC_910", "stage": "judge_reject", "reason": "正文明确要求‘科学配置储能等调节性资源’，属于重要的13主题energy_storage_theme，待审themes未包含该主题，构成漏挂明显业务主题。", "detail": {"dim": "theme", "confidence": 0.9}}
+{"pid": "P_2021_SASAC_93", "stage": "judge_reject", "reason": "正文节选未提及V2G、虚拟电厂或具体建设要求，影响分析声称政策要求推进V2G技术应用及虚拟电厂建设，属于编造政策未写的业务影响。", "detail": {"dim": "impact", "confidence": 0.95}}
+{"pid": "P_2024_AH_f703ba60", "stage": "judge_reject", "reason": "正文仅涉及工商业用户进入电力市场及代理购电机制，未提及配电网开放（distribution_grid_opening）的任何条款或含义，属于把不相关主题挂到13主题内的明显错误。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2019_NM_5e96460c", "stage": "judge_reject", "reason": "政策是政府网站域名变更公告和项目公示列表，属于非单篇政策正文的目录页/索引页，不应挂charging_infra/energy_storage_theme等13主题", "detail": {"dim": "theme", "confidence": 1.0}}
+{"pid": "P_2023_TJ_23242c1b", "stage": "judge_reject", "reason": "正文仅涉及新型储能和可再生能源开发，未提及电力市场、绿色电力交易或配电网开放机制，挂green_power_trading_theme、power_market、distribution_grid_opening是明显业务主题错误。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_1990_NEA_1162", "stage": "judge_reject", "reason": "政策仅涉及电网调峰与省网联络线交易，未提及配电网开放任何内容，挂distribution_grid_opening属明显业务主题错。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2025_BJ_c643af20", "stage": "judge_reject", "reason": "gas_station_transition_theme完全无关，正文未涉及加油站转型或油气业务调整，属于明显错挂主题", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2022_BJ_0401c3a9", "stage": "judge_reject", "reason": "北京市‘十四五’能源发展规划为综合性宏观规划，涉及电力系统、可再生能源、节能降碳、绿色交通等多领域，原模型仅挂green_power_trading_theme并将primary设置为该窄主题，与政策主旨明显不符，属严重错挂。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2022_BJ_0222542b", "stage": "judge_reject", "reason": "正文节选仅为网页导航信息，无实际政策内容，属于目录/索引页而非单篇政策正文，不应挂任何滴滴业务主题，应themes=[]/primary=\"\"", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2025_BJ_06173e1c", "stage": "judge_reject", "reason": "该政策为消费品以旧换新补贴扩围公告，完全不属于13个滴滴业务主题中的任何一个，挂equipment_renewal_theme属于明显主题错挂；零相关政策应使用themes=[], primary=空。", "detail": {"dim": "theme", "confidence": 1.0}}
+{"pid": "P_2025_SX_21_b", "stage": "judge_reject", "reason": "政策正文仅定义充电（换电），未提及车网互动、V2G或双向充放电，待审挂v2g主题属于明显业务主题错。", "detail": {"dim": "theme", "confidence": 1.0}}
+{"pid": "P_2024_SH_d99b1af3", "stage": "judge_reject", "reason": "政策正文仅围绕碳市场（carbon_market_theme）和绿色金融，未涉及电力市场机制（如电力交易、输配电价等），挂 power_market 违反规则：只讲碳排放权交易的政策不得因“交易”二字挂 power_market，除非正文明确电力市场或绿电交易机制，此处不满足。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2025_GX_08cee9cc", "stage": "judge_reject", "reason": "政策正文仅提及虚拟电厂、车网互动、清洁能源车辆供给站点（充电）、绿电直供等场景，未涉及电力市场交易、碳市场、加油站转型、配电网开放、聚合商准入等主题；待审挂入power_market/carbon_market/gas_station_transition/distribution_grid_opening/aggregator_access缺乏任何文本依据，属于明显业务主题错误。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2022_GO_6a4cc949", "stage": "judge_reject", "reason": "政策明确要求'推动新型储能快速发展'，属energy_storage_theme，但待审主题未挂；同时政策未涉及充电基础设施，charging_infra为误挂，因此主题明显错误。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2023_NDRC_920", "stage": "judge_reject", "reason": "政策正文明确提及“因地制宜通过合理配置分布式光伏和风电、储能、柴油发电机等建设改造可再生能源局域网”，储能作为建设内容直接命中energy_storage_theme，但themes未挂该主题，属于漏挂正文明确且重要的13主题。", "detail": {"dim": "theme", "confidence": 0.85}}
+{"pid": "P_2023_NDRC_1294_b", "stage": "judge_reject", "reason": "政策正文明确提及‘有序推动储能与可再生能源协同发展’、‘构建源网荷储结构与布局’，直接涉及储能发展，属于energy_storage_theme，待审仅挂power_market，漏挂明确且重要的13主题，且primary设为power_market与主旨不匹配。", "detail": {"dim": "theme", "confidence": 0.9}}
+{"pid": "P_2024_NDRC_06275d0d", "stage": "judge_reject", "reason": "政策正文仅笼统提及碳市场、绿色交通、新型电力系统，未明确涉及绿电交易机制、充电基础设施具体部署或配电网开放运营，待审挂的green_power_trading_theme、charging_infra、distribution_grid_opening属于明显误挂13主题；且primary carbon_market_theme虽有一定依据但整体主题错误严重。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2025_NEA_93", "stage": "judge_reject", "reason": "政策正文明确提及'车网互动'，属于vpp_theme/v2g的明确业务主题，待审漏挂vpp_theme；同时primary设置为green_power_trading_theme，正文无绿电交易机制支撑，与主旨明显不符，构成主题选择错误；影响分析称未涉及V2G与正文矛盾，亦为硬伤。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2025_NEA_53_a", "stage": "judge_reject", "reason": "待审挂载了charging_infra、v2g、distribution_grid_opening、green_power_trading_theme四个主题，但正文仅明确虚拟电厂和储能相关试点，未提及充电基础设施、V2G、配电网开放或绿电交易等具体机制，属于无文本依据的挂靠，构成明显主题错误。", "detail": {"dim": "theme", "confidence": 0.9}}
+{"pid": "P_2023_NEA_bed9e918", "stage": "judge_reject", "reason": "green_power_trading_theme与生物柴油推广政策完全无关，属于明显业务主题错误", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2020_HN_7de5ab8e", "stage": "judge_reject", "reason": "政策正文明确提及参与电力现货市场、绿证交易、碳交易，属于power_market和green_power_trading_theme的明确依据，待审themes漏挂这两个重要主题，属明显错漏。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2024_TJ_01010970", "stage": "judge_reject", "reason": "政策正文为通用交通提质增效方案，全文未涉及充电设施具体机制，属于零相关政策，不应挂charging_infra主题。", "detail": {"dim": "theme", "confidence": 1.0}}
+{"pid": "P_2025_AH_f6d75f7f", "stage": "judge_reject", "reason": "政策明确为绿色电力交易实施方案，应挂green_power_trading_theme，但themes为空，明显漏挂。", "detail": {"dim": "theme", "confidence": 1.0}}
+{"pid": "P_2025_GX_db65ac0c", "stage": "judge_reject", "reason": "正文明确提及新型储能项目配套送出工程纳入电网规划，应挂energy_storage_theme，待审漏挂该重要主题，只挂了distribution_grid_opening。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2022_HE_cfff06fb", "stage": "judge_reject", "reason": "政策正文明确提及电力现货市场交易、分时电价、新型储能作为独立市场主体参与电力市场，属于power_market主题，待审漏挂了这一明确且重要的13主题。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2025_LN_a33780f8", "stage": "judge_reject", "reason": "政策正文明确提及“统筹电力现货市场和辅助服务市场建设，推动新能源项目有序参与市场交易”，属于power_market直接内容，待审themes漏挂了power_market，违反了规则5中关于明显漏挂业务主题的严格审查要求。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2025_HA_a875c8cc", "stage": "judge_reject", "reason": "政策正文聚焦于电网规划、配电网投资升级和新能源机组涉网性能管理，未涉及分布式电网开放（如分布式电源接入、隔墙售电、增量配电网等）的具体机制，挂distribution_grid_opening主题缺乏文本依据，属于明显业务主题错挂。", "detail": {"dim": "theme", "confidence": 0.9}}
+{"pid": "P_2026_SD_6d1acd2f", "stage": "judge_reject", "reason": "政策全文为消费品以旧换新、促消费活动，未涉及13个滴滴业务主题中的设备更新（工业/能源设备更新），应属于零相关政策，不应挂equipment_renewal_theme。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2026_SD_10aaa42f", "stage": "judge_reject", "reason": "政策为消费品以旧换新（汽车、家电、数码），正文未涉及充电、储能、V2G、设备更新（能源领域）等13个滴滴业务主题；挂equipment_renewal_theme属于明显错挂，应归属零主题（themes=[]）。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2026_SD_e7bae4b7", "stage": "judge_reject", "reason": "政策内容是德州市消费市场以旧换新（汽车、家电、数码）等消费促进，未涉及充电基础设施、储能设备、V2G等滴滴13业务主题中的设备更新机制，属于零相关政策，不应挂equipment_renewal_theme。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2022_SD_385097d9", "stage": "judge_reject", "reason": "正文明确提及‘负荷聚合商’并详细描述其代理参与需求响应，属于13主题中的aggregator_access，待审漏挂该主题，构成明显漏挂。", "detail": {"dim": "theme", "confidence": 1.0}}
+{"pid": "P_2025_SX_281cbdab", "stage": "program_gate", "reason": "深档:有深档=False 但 gate=True", "detail": {}}
+{"pid": "P_2026_GD_2c7d52ac", "stage": "judge_reject", "reason": "政策正文仅涉及设备更新和消费品以旧换新，未提及任何充电基础设施、充电桩、换电站等具体内容，挂 charging_infra 主题缺乏文本依据，属于明显错挂。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2024_GD_4b24a659", "stage": "judge_reject", "reason": "正文属于媒体系列报道，非正式政策文件，待审模型误判为省级政策并给出D1=4、D2=3，分数明显颠倒，影响重要性判断。", "detail": {"dim": "score", "confidence": 0.95}}
+{"pid": "P_2024_GD_3003c1bb", "stage": "judge_reject", "reason": "政策为产品碳足迹认证试点建设，不涉及碳排放权交易市场、碳排放配额或抵消机制，carbon_market_theme 不属于13个滴滴业务主题，属于不相关政策被挂靠主题，应 themes=[]/primary=\"\"。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2023_GD_8ec12248", "stage": "judge_reject", "reason": "正文为电力零售市场管理办法，通篇未涉及聚合商准入或定义，挂aggregator_access属于将不相关政策挂到13主题，明显错误。", "detail": {"dim": "theme", "confidence": 0.9}}
+{"pid": "P_2024_GD_c45bd924", "stage": "judge_reject", "reason": "judge 返回非JSON", "detail": {"dim": "overall", "confidence": 0.0}}
+{"pid": "P_2025_GX_ba534527", "stage": "judge_reject", "reason": "政策正文仅涉及电力市场保底售电公司名单，未提及聚合商/负荷聚合商接入机制，挂aggregator_access属于明显业务主题错。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2023_BJ_6389add2", "stage": "judge_reject", "reason": "政策仅涉及老旧小区配电网改造，未提及配电网开放、分布式能源接入或充电设施，挂 distribution_grid_opening 和 residential_charging 属于将不相关政策硬挂到13主题", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2025_NDRC_0718bc02", "stage": "generation_error", "reason": "Error code: 500 - {'type': 'error', 'error': {'type': 'api_error', 'message': 'output new_sensitive (1027)'}, 'request_id': '0671a5fa16a45dc3989ce75f5857f40f'}", "detail": {}}
+{"pid": "P_2024_MIIT_53", "stage": "judge_reject", "reason": "D1=2低于D2=3，与equipment_renewal_theme直接政策核心明显颠倒，影响重要性判断。", "detail": {"dim": "score", "confidence": 0.95}}
+{"pid": "P_2024_SN_941d7abc", "stage": "judge_reject", "reason": "judge 返回非JSON", "detail": {"dim": "overall", "confidence": 0.0}}
+{"pid": "P_2025_NDRC_0912b2a5", "stage": "judge_reject", "reason": "政策正文明确提及虚拟电厂、负荷聚合商、车网互动、参与电力市场、需求响应等，属于vpp_theme、v2g、power_market、aggregator_access等13主题，待审仅挂energy_storage_theme，漏挂明显。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2026_GO_53b1ddc3", "stage": "judge_reject", "reason": "政策正文明确鼓励配置储能（第五条）并要求项目参与电力市场交易（第六条），待审漏挂了 energy_storage_theme 和 power_market 两个重要 13 主题，属于明显业务主题错漏。", "detail": {"dim": "theme", "confidence": 1.0}}
+{"pid": "P_2025_JX_b87eea72", "stage": "judge_reject", "reason": "政策为‘获得电力’营商环境优化，聚焦办电流程和服务，正文未涉及配电网公平开放、分布式新能源接入或增量配电网运营等核心机制，挂distribution_grid_opening属于明显主题错误。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2025_JX_493b9f65", "stage": "judge_reject", "reason": "政策明确公布电力需求响应参与用户名单，包含4家负荷聚合商，属于power_market和aggregator_access的核心内容，待审仅挂vpp_theme，明显遗漏这两个13主题，违反规则5。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2025_HE_79c43f8b", "stage": "judge_reject", "reason": "政策全文以虚拟电厂建设运营为主旨，primary 应设为 vpp_theme 而非 charging_infra，属于 13 主题主旨明显颠倒。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2025_SH_1", "stage": "judge_reject", "reason": "政策正文是节能低碳专项资金管理办法，只涉及宏观节能碳达峰目标，未明确提及绿色电力交易或碳排放权交易机制，挂green_power_trading_theme和carbon_market_theme无正文依据，属于明显主题错挂。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2022_HI_4eac1187", "stage": "judge_reject", "reason": "正文节选未出现碳市场或绿电交易具体机制，挂carbon_market_theme和green_power_trading_theme缺乏文本依据；属于宏观碳达峰政策，应归为13主题之外。", "detail": {"dim": "theme", "confidence": 0.9}}
+{"pid": "P_2020_HI_0e998358", "stage": "generation_error", "reason": "pass2:Extra data: line 1 column 296 (char 295)", "detail": {}}
+{"pid": "P_2020_HI_4d5e23a0", "stage": "judge_reject", "reason": "政策聚焦电动汽车充电基础设施建设与运营，未涉及虚拟电厂、负荷聚合商或电力市场，挂vpp_theme属于明显主题错误。", "detail": {"dim": "theme", "confidence": 1.0}}
+{"pid": "P_2025_GD_1", "stage": "judge_reject", "reason": "正文节选及标题仅针对新型储能产业扶持，无任何虚拟电厂或配电网开放的具体内容，多挂vpp_theme和distribution_grid_opening属于明显业务主题错（把不相关政策挂到13主题），违反规则3的‘明显业务主题错’审查要求。", "detail": {"dim": "theme", "confidence": 0.9}}
+{"pid": "P_2023_HN_2a956bbf", "stage": "judge_reject", "reason": "政策正文明确提及“电价改革不断深化，市场机制不断完善”和“创新开展电化学储能容量交易”，属于power_market和energy_storage_theme的明确子机制，但themes为空，漏挂重要主题。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2025_HN_3958e51f", "stage": "judge_reject", "reason": "政策仅涉及分时电价优化，正文未提及充电基础设施、虚拟电厂、车网互动等13主题内容，待审硬挂charging_infra/vpp_theme/v2g属于明显主题错误", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2022_HN_70420f94", "stage": "judge_reject", "reason": "政策正文明确部署抽水蓄能电站（13个、2030年装机2000万千瓦）及应急备用电源，应挂energy_storage_theme；同时未涉及配电网络开放机制，挂distribution_grid_opening属于明显主题错配，且漏挂正文核心的储能主题。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2024_NEA_76", "stage": "program_gate", "reason": "registry:未知 theme ['storage_vpp']", "detail": {}}
+{"pid": "P_2025_GZ_154a4cf4", "stage": "judge_reject", "reason": "政策全文聚焦降低用电成本、电煤机制和电力市场化改革，未涉及配电网开放的具体措施（如分布式接入、增量配电网等），distribution_grid_opening属明显误挂。", "detail": {"dim": "theme", "confidence": 0.9}}
+{"pid": "P_2024_JS_0ad28ad7", "stage": "judge_reject", "reason": "政策为省级电网输配电价监管周期文件，正文未提及充电基础设施，挂charging_infra属于明显无关主题，违反规则5中零相关主题不得挂载且重要性≥3的严格规定。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2025_NM_09231fde", "stage": "judge_reject", "reason": "政策为政策汇编/知识包，实质是索引页，不属于单篇政策正文，应挂空主题 (themes=[]/primary='')，挂任何13主题均违反规则。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2024_FJ_4c5c6902", "stage": "judge_reject", "reason": "judge 返回非JSON", "detail": {"dim": "overall", "confidence": 0.0}}
+{"pid": "P_2023_HA_6c92aeb2", "stage": "judge_reject", "reason": "正文为河南发改委新闻宣传稿，非正式政策文件，不属于13个滴滴业务主题，挂主题及写具体业务影响均属明显错误。", "detail": {"dim": "overall", "confidence": 0.95}}
+{"pid": "P_2023_NX_448b672e", "stage": "judge_reject", "reason": "政策正文未涉及配电网开放（distribution_grid_openning）相关内容，该主题属于明显误挂。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2023_NX_bec9553d", "stage": "judge_reject", "reason": "judge 返回非JSON", "detail": {"dim": "overall", "confidence": 0.0}}
+{"pid": "P_2026_NX_c1e77fe3", "stage": "program_gate", "reason": "深档:有深档=False 但 gate=True", "detail": {}}
+{"pid": "P_2025_JS_1009d2cd", "stage": "judge_reject", "reason": "政策核心为虚拟电厂管理平台上线，primary应设vpp_theme而非charging_infra，明显颠倒。", "detail": {"dim": "theme", "confidence": 1.0}}
+{"pid": "P_2025_AH_769c3992", "stage": "judge_reject", "reason": "该文件是政府信息公开答复函（回复选登），针对具体个人咨询，不具备政策效力或普遍约束力，不属于单篇政策正文，应挂零主题（themes=[]/primary=''），挂power_market属于明显误挂。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2021_NDRC_12084984", "stage": "judge_reject", "reason": "judge 返回非JSON", "detail": {"dim": "overall", "confidence": 0.0}}
+{"pid": "P_2026_GZ_4dcaa9cb", "stage": "judge_reject", "reason": "政策为贵州省十五五规划纲要，属于综合性宏观规划，正文节选仅提及“电力市场化”等宏观表述，无充电、V2G、虚拟电厂、绿电交易等具体机制，待审归属四个具体主题缺乏文本依据，属于明显错挂，应归零主题。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2024_NDRC_1046_b", "stage": "judge_reject", "reason": "政策正文仅围绕碳排放权交易与碳核算标准，未明确提及绿色电力交易或绿证机制，挂green_power_trading_theme属于明显主题错挂。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2022_GX_f1d94d34", "stage": "judge_reject", "reason": "judge 返回非JSON", "detail": {"dim": "overall", "confidence": 0.0}}
+{"pid": "P_2024_TJ_968c0a38", "stage": "judge_reject", "reason": "该文为部门动态会议纪要，非政策正文，不属于13个滴滴业务主题，应作零主题处理（themes=[]，primary=\"\"）", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2025_CQ_734bd346", "stage": "judge_reject", "reason": "正文明确包含‘完善价格与需求响应机制’、‘聚合参与电力市场交易’、‘全面推广智能有序充电’等条款，涉及power_market、vpp_theme、aggregator_access、charging_infra等多个13主题，待审仅挂v2g一处，漏挂多个明确且重要的业务主题，且comprehensive应为true却被设false，属于明显漏挂错误。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2025_CQ_1a0d5778", "stage": "judge_reject", "reason": "政策正文仅明确提及充电基础设施（‘便捷超充之城’、电动化目标），未涉及绿电交易、绿证交易或相关市场机制，green_power_trading_theme为错误归属。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2023_CQ_0406f829", "stage": "judge_reject", "reason": "政策全文为居民分时电价释疑，属于居民电价机制，不涉及充电基础设施建设或电力市场交易，挂charging_infra和power_market属于主题明显错误，且D1=3达到重要性阈值，按规则应reject。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2026_CQ_0275a8b2", "stage": "judge_reject", "reason": "政策核心为新型储能产业发展，充电基础设施仅为融合应用之一，primary设为charging_infra与正文主旨明显颠倒，应改为energy_storage_theme。", "detail": {"dim": "theme", "confidence": 0.9}}
+{"pid": "P_2024_QH_e197e5d1", "stage": "judge_reject", "reason": "正文明确提到推动充换电设施建设、支持老旧充电桩更新改造等充电基础设施内容，属于13主题中的charging_infra，待审仅挂equipment_renewal_theme构成漏挂。", "detail": {"dim": "theme", "confidence": 0.8}}
+{"pid": "P_2022_CQ_11", "stage": "judge_reject", "reason": "政策是地方能源保障规划，仅涉及电网建设、新能源发展等泛能源内容，未明确配电网开放（distribution_grid_opening）的具体机制，挂该主题属明显业务主题错判，应归零主题。", "detail": {"dim": "theme", "confidence": 0.95}}
+{"pid": "P_2023_ZJ_FGW_0c4be674", "stage": "judge_reject", "reason": "该政策仅为征求意见通知，正文无具体政策条款，属于零相关文件，不应挂任何13主题。", "detail": {"dim": "theme", "confidence": 0.95}}
