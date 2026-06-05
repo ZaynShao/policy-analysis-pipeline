@@ -80,6 +80,8 @@ def _to_golden_row(c, stratum: str, is_planted: bool,
         "gold_decision": gold_decision,
         "from_title": c.evidence.get("from_title", ""),
         "to_title": c.evidence.get("to_title", ""),
+        "from_window": c.evidence.get("from_window", ""),
+        "to_window": c.evidence.get("to_window", ""),
         "candidate_basis": list(c.candidate_basis),
     }
 

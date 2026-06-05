@@ -1,4 +1,5 @@
 from __future__ import annotations
+import re
 from .models import SemanticCandidate, canonical_pair
 from .loaders import PolicyView
 
@@ -6,6 +7,23 @@ TOP_K = 8
 WINDOW_YEARS = 3
 REGION_RANK = {"国": 3, "省": 2, "市": 1, "区": 0, "县": 0, "": 0}
 EXTEND_WORDS = ("扩大", "扩围", "推广", "全面实施", "由试点", "适用范围", "新增")
+
+WINDOW_ANCHORS = ("为贯彻", "为落实", "根据", "依据", "贯彻", "落实", "按照", "结合",
+                  "扩大", "扩围", "推广", "全面实施", "由试点")
+WINDOW_LEN = 160
+
+
+def _window(body: str) -> str:
+    """从正文取一段有界证据:优先以承接/范围锚点起头,否则取开头;空白归一、限长。"""
+    text = body or ""
+    idx = -1
+    for kw in WINDOW_ANCHORS:
+        j = text.find(kw)
+        if j != -1 and (idx == -1 or j < idx):
+            idx = j
+    start = idx if idx != -1 else 0
+    chunk = text[start:start + WINDOW_LEN]
+    return re.sub(r"\s+", " ", chunk).strip()
 
 
 def _rank(level: str) -> int:
@@ -18,7 +36,7 @@ def _window_ok(a: PolicyView, b: PolicyView) -> bool:
 
 def _evidence(a: PolicyView, b: PolicyView, basis: list) -> dict:
     return {"from_title": a.title, "to_title": b.title,
-            "from_window": "", "to_window": "",
+            "from_window": _window(a.body), "to_window": _window(b.body),
             "theme_context": [a.primary_theme] if a.primary_theme else []}
 
 

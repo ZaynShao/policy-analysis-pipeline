@@ -22,6 +22,7 @@ class PolicyView:
     themes: list
     primary_theme: str
     importance: int | None
+    body: str = ""
 
 
 def _year_of(date_str: str) -> int | None:
@@ -58,6 +59,7 @@ def _raw_views(vault: Path) -> list[PolicyView]:
             themes=[],
             primary_theme="",
             importance=None,
+            body=rec.body_head or "",
         ))
     return out
 

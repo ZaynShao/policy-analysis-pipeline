@@ -2,10 +2,10 @@ from scripts.analysis_semantic_relations.loaders import PolicyView
 from scripts.analysis_semantic_relations.candidates import generate_candidates, TOP_K, WINDOW_YEARS
 
 
-def V(pid, year, theme, level="省", region="广东", issuer="发改委", title="方案"):
+def V(pid, year, theme, level="省", region="广东", issuer="发改委", title="方案", body=""):
     return PolicyView(pid=pid, title=title, region_level=level, region_name=region,
                       issuer=issuer, year=year, themes=[theme], primary_theme=theme,
-                      importance=3)
+                      importance=3, body=body)
 
 
 def test_iterates_same_issuer_theme_year_increasing():
@@ -55,3 +55,26 @@ def test_topk_bound():
     from_src = [c for c in cands if c.from_id == "SRC" or c.to_id == "SRC"]
     aligns_touching_src = [c for c in from_src if c.rel == "aligns_with"]
     assert len(aligns_touching_src) <= TOP_K
+
+
+def test_evidence_window_uses_body_anchor():
+    """from_window/to_window 取正文锚点截段;无锚点则退回正文开头。"""
+    body_with_anchor = "为贯彻落实国家某文件精神,现就本市新能源管理制定本方案。"
+    body_no_anchor = "本方案旨在推进本市电力市场建设。"
+
+    views = {
+        "A": V("A", 2021, "power_market", region="广东", body=body_with_anchor),
+        "B": V("B", 2021, "power_market", region="江苏", body=body_no_anchor),
+    }
+    cands = generate_candidates(views, basis_pairs=set())
+    aligns = [c for c in cands if c.rel == "aligns_with"]
+    assert len(aligns) == 1
+    c = aligns[0]
+
+    # from_window must be non-empty and contain an anchor substring
+    assert c.evidence["from_window"], "from_window should be non-empty when body has anchor"
+    assert "贯彻" in c.evidence["from_window"] or "落实" in c.evidence["from_window"]
+
+    # to_window falls back to head (non-empty when body non-empty, no anchor)
+    assert c.evidence["to_window"], "to_window should be non-empty when body is non-empty"
+    assert c.evidence["to_window"] == body_no_anchor[:160].strip()
