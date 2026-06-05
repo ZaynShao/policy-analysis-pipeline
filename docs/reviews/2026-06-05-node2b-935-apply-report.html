@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<title>②-B 全量重生晨间报告 · 2026-06-05</title>
+<style>
+body{font:15px/1.7 -apple-system,"PingFang SC",sans-serif;margin:0;background:#f5f7fa;color:#1c2530}
+.wrap{max-width:960px;margin:0 auto;padding:32px 20px 80px}
+h1{font-size:24px;margin:0 0 4px} .sub{color:#667; margin:0 0 24px}
+h2{font-size:18px;margin:30px 0 10px;padding-bottom:6px;border-bottom:2px solid #e3e8ef}
+.card{background:#fff;border:1px solid #e1e6ee;border-radius:10px;padding:16px 20px;margin:14px 0}
+.big{display:flex;gap:14px;flex-wrap:wrap;margin:8px 0}
+.stat{background:#fff;border:1px solid #e1e6ee;border-radius:10px;padding:12px 18px;min-width:120px}
+.stat b{display:block;font-size:26px;color:#0f766e} .stat span{color:#667;font-size:13px}
+table{width:100%;border-collapse:collapse;margin:8px 0;font-size:14px}
+th,td{padding:8px 10px;border-bottom:1px solid #eef1f4;text-align:left}
+th{background:#eef2f7;color:#4a5667} tr:hover td{background:#fafbfc}
+.win{color:#0f766e;font-weight:700} .bad{color:#b42318} .mut{color:#788}
+code{background:#f0f3f7;padding:1px 6px;border-radius:4px;font-size:13px}
+.ok{color:#0f766e} .warn{color:#b54708}
+ul{margin:8px 0;padding-left:22px} li{margin:4px 0}
+.note{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 16px;margin:10px 0}
+</style></head><body><div class="wrap">
+
+<h1>②-B 节点:全量 935 重生 · 晨间报告</h1>
+<p class="sub">2026-06-05 · gen = MiniMax-M2.7-highspeed · judge = deepseek-v4-flash · 全程自主执行</p>
+
+<div class="big">
+  <div class="stat"><b>50 → 836</b><span>business_view 覆盖(/936)</span></div>
+  <div class="stat"><b>89%</b><span>覆盖率</span></div>
+  <div class="stat"><b>829</b><span>本次写入</span></div>
+  <div class="stat"><b>107</b><span>入队待复核</span></div>
+  <div class="stat"><b>0</b><span>verify 失败 / 分布告警 / 乡村key</span></div>
+</div>
+
+<h2>一句话结论</h2>
+<div class="card">②-B 全量归属(主题+评分)<b>从 50 篇样本扩到 836 篇(89%)</b>,全部通过确定性重算自洽,已 commit+push 两仓。<b>③-C 语义关系层的覆盖率前提已满足、解锁。</b>余 100 篇进人工复核队列(judge 拦下或生成失败,可补)。</div>
+
+<h2>成果与凭据</h2>
+<div class="card">
+<ul>
+<li>vault <code>energy-policy-analysis</code> @ <code>1b0cad04</code> — 836 篇 business_view;回滚点 tag <code>pre-node2b-935-apply-2026-06-05</code></li>
+<li>pipeline <code>policy-analysis-pipeline</code> @ <code>da6cd81</code> — 驱动器/重试/选型 + 全套证据</li>
+<li>两仓均已 push,<code>main...origin/main</code> 干净</li>
+<li>验证:<code>run_2b verify</code> → 836 篇确定性重算全自洽;程序门 0 失败;分布告警 0;0 乡村 key;无 key 落盘</li>
+</ul>
+</div>
+
+<h2>模型选型(实测定,非"听说最强")</h2>
+<div class="card">
+<p><b>judge</b> 用同一套 59 题 golden(9 个埋错)实测三个候选——你点名的 v4-pro 反而最差(判官 ≠ 通用能力):</p>
+<table>
+<tr><th>judge 候选</th><th>放宽 recall(6必须抓)</th><th>误拒 FP(真)</th><th>裁决</th></tr>
+<tr><td class="win">deepseek-v4-flash ✅</td><td class="win">67%</td><td class="win">6%</td><td>最高 recall + 最低 FP + 最快 → 选它</td></tr>
+<tr><td>deepseek-v4-pro</td><td class="bad">50%</td><td class="bad">30%</td><td class="mut">过度严格:漏更多 + 误拒淹没复核堆 + 最慢</td></tr>
+<tr><td>deepseek-r1(DashScope)</td><td>67%</td><td>12%</td><td class="mut">recall 同 flash,FP 翻倍</td></tr>
+</table>
+<p class="mut">注:<code>deepseek-reasoner</code> 官方已下线,现 API 只有 v4-pro / v4-flash;key 已存入 <code>models.env</code>(out-of-git)。</p>
+<p><b>gen</b> 用 MiniMax-M2.7-highspeed(10.6s/call)而非最新 M3(19.8s/call):带闸门批处理里 gen 速度 ≫「最强」,生成的错会被 judge+程序门拦进复核堆(安全方向),不污染库。</p>
+</div>
+
+<h2>过程复盘(诚实:夭折两次)</h2>
+<div class="card">
+<ul>
+<li><b>第一次(昨夜):</b>用 MiniMax-M3 + 后台任务跑,02:51 被<b>机器睡眠</b>冻死,仅 17/936。且 M3 ~80s/篇 → 全量需 ~10h,本就跑不完。<span class="mut">我的错:启动前只 2 篇 smoke,没测 M3 真实延迟。</span></li>
+<li><b>第二次(上午):</b>换 highspeed + 并行,但 <code>run_in_background</code> 任务有 <b>~20 分钟回收</b>,跑到 658/936 被回收。</li>
+<li><b>第三次(修复后):</b>① 进程<b>完全孤儿化 + caffeinate</b> 防睡防回收;② judge 的 HTTP 客户端在并发下出 <code>SSL EOF / IncompleteRead</code> 崩了整块 → 加 <b>HTTP 重试</b> + 包裹 judge 调用(单篇失败入队、不崩块);③ 分块·可断点续跑。→ 一气跑完,FAILED=0。</li>
+</ul>
+</div>
+
+<h2>残留与诚实披露</h2>
+<div class="note">
+<ul>
+<li><b>judge 有已知盲区(67% 必须抓):</b>它漏「地方政策被低估 / 漏个别主题」这类<b>细微判断</b>——便宜模型的天花板,再硬 prompt 收益递减。按你定的「<b>低分飘过</b>」接受;且 <b>整文件重生</b>意味着将来换更强模型重跑即可整体修正,无永久损伤。</li>
+<li><b>Lever B 尚未实施(留给 ③/④):</b>要让「飘过」真正安全,需把下游<b>深档准入做宽</b>(被低估的政策照样进重点圈),让「低估」不致「埋没」。这是 ③/④ 消费层的设置,今晚未擅自改 ②-B 闸门语义。</li>
+<li><b>100 篇待人工复核:</b>queue = 100 judge_reject + 4 program_gate + <b>3 generation_error</b>(瞬时网络,retry 后仍失败,0.3%,可补跑)。</li>
+<li><b>1 个未跟踪 raw</b>(汕尾设备更新方案)仍未提交——它被本次处理了但 raw 本身游离;属另一议题,未并入本次提交。</li>
+</ul>
+</div>
+
+<h2>下一步(建议)</h2>
+<div class="card">
+<ol>
+<li><b>③-C 语义关系生成</b>:覆盖率前提已满足,机制 spec 已存在(<code>2026-06-04-analysis-semantic-relations-design.md</code>);可补我之前指出的 3 个缺口(候选爆炸边界 / ③-C golden / 对称去重)后开跑。</li>
+<li><b>Lever B</b>:在 ③/④ 设计里落实「宽进深档」。</li>
+<li><b>清 100 篇复核队列</b>:多为 judge_reject,可走引导式复核;3 个 generation_error 补跑。</li>
+<li><b>收尾</b>:汕尾 raw 决定提交/隔离;轮换对话里明文贴过的 deepseek key。</li>
+</ol>
+</div>
+
+<p class="mut" style="margin-top:30px">报告生成 2026-06-05 · 数字均取自实跑 state/git,可逐条复核。</p>
+</div></body></html>
