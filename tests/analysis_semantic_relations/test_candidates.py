@@ -78,3 +78,28 @@ def test_evidence_window_uses_body_anchor():
     # to_window falls back to head (non-empty when body non-empty, no anchor)
     assert c.evidence["to_window"], "to_window should be non-empty when body is non-empty"
     assert c.evidence["to_window"] == body_no_anchor[:160].strip()
+
+
+def test_aligns_evidence_matches_canonical_order():
+    # P_Z sorts AFTER P_A lexicographically, so when the inner loop hits (a=P_Z, b=P_A)
+    # canonical_pair swaps to (P_A, P_Z).  The bug: _evidence(a, b) is still built from
+    # a=P_Z as "from" even though fp="P_A" is now from_id.  Distinct titles expose the swap.
+    views = {
+        "P_Z": PolicyView("P_Z", "ZED政策", "省", "江苏", "发改委甲", 2021,
+                          ["power_market"], "power_market", 3),
+        "P_A": PolicyView("P_A", "AYE政策", "省", "广东", "发改委乙", 2021,
+                          ["power_market"], "power_market", 3),
+    }
+    cands = generate_candidates(views, basis_pairs=set())
+    aligns = [c for c in cands if c.rel == "aligns_with"]
+    assert len(aligns) == 1
+    c = aligns[0]
+    # Canonical order: P_A < P_Z lexicographically
+    assert (c.from_id, c.to_id) == ("P_A", "P_Z"), f"expected ('P_A','P_Z'), got {(c.from_id, c.to_id)}"
+    title_by_pid = {"P_A": "AYE政策", "P_Z": "ZED政策"}
+    assert c.evidence["from_title"] == title_by_pid[c.from_id], (
+        f"from_title '{c.evidence['from_title']}' does not match from_id '{c.from_id}'"
+    )
+    assert c.evidence["to_title"] == title_by_pid[c.to_id], (
+        f"to_title '{c.evidence['to_title']}' does not match to_id '{c.to_id}'"
+    )

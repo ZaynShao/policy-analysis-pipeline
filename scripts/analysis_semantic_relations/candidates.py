@@ -94,7 +94,8 @@ def generate_candidates(views: dict, basis_pairs: set) -> list:
                 seen_symmetric.add(key)
                 sym_degree[fp] = sym_degree.get(fp, 0) + 1
                 sym_degree[tp] = sym_degree.get(tp, 0) + 1
-                out.append(SemanticCandidate(fp, tp, rel, tags, _evidence(a, b, tags), symmetric=True))
+                fa, fb = (a, b) if a.pid == fp else (b, a)        # evidence in canonical order
+                out.append(SemanticCandidate(fp, tp, rel, tags, _evidence(fa, fb, tags), symmetric=True))
             else:
                 out.append(SemanticCandidate(a.pid, b.pid, rel, tags, _evidence(a, b, tags)))
             kept += 1
