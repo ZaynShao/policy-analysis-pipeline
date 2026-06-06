@@ -29,10 +29,12 @@
 
 ## 执行顺序
 
-### 第 0 步 · 建本地库
+### 第 0 步 · 建本地库 ✅ 已完成(Claude 已建)
+
+`heng_dev` 库已建好(`localhost:5432`,owner shaoziyuan)。PG15 内置 `gen_random_uuid()` 已验证可用,无需装 pgcrypto。Codex 跳过本步,直接从第 1 步开始。
 
 ```bash
-createdb -h localhost -U shaoziyuan heng_dev
+# 已执行,无需重复:createdb -h localhost -U shaoziyuan heng_dev
 ```
 
 ### 第 1 步 · Plan A(pipeline 仓,Python)
