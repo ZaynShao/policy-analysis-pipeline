@@ -1,0 +1,34 @@
+{
+  "candidate_count": 3075,
+  "gate_failed": 0,
+  "judged": 3075,
+  "accepted_count": 689,
+  "manual_count": 2386,
+  "accepted_by_relation": {
+    "aligns_with": 568,
+    "derives_from": 89,
+    "extends": 16,
+    "iterates": 16
+  },
+  "manual_by_relation": {
+    "aligns_with": 1720,
+    "derives_from": 77,
+    "extends": 316,
+    "iterates": 273
+  },
+  "decision_dist": {
+    "reject": 2112,
+    "manual_review": 274,
+    "accept": 689
+  },
+  "model": "deepseek-v4-flash",
+  "recommendation": "preview_only_no_apply",
+  "notes": [
+    "no_vault_write",
+    "no_raw_write",
+    "no_apply",
+    "manual_review_not_in_accepted",
+    "old_relations_not_used_as_accepted",
+    "judge=cycle1_locked_conservative_aligns"
+  ]
+}
