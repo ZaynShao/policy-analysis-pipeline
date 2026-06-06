@@ -1,0 +1,78 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<title>L1 抓取质量体检(2026-06-06)</title>
+<style>
+*{box-sizing:border-box}
+body{font:15px/1.7 -apple-system,"PingFang SC",sans-serif;margin:0;background:#f4f6fa;color:#1c2530}
+.wrap{max-width:960px;margin:0 auto;padding:28px 22px 70px}
+h1{font-size:22px;margin:0 0 4px}.sub{color:#677;font-size:13px;margin-bottom:18px}
+h2{font-size:17px;margin:28px 0 10px;padding-bottom:6px;border-bottom:2px solid #e1e7f0}
+.verdict{background:#fff;border:2px solid #b4451f;border-radius:12px;padding:16px 20px;margin:16px 0;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.verdict h2{margin:0 0 8px;border:0;color:#b4451f}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13.5px;background:#fff;border-radius:8px;overflow:hidden}
+th,td{padding:8px 11px;text-align:left;border-bottom:1px solid #eef1f6;vertical-align:top}th{background:#f3f6fb;color:#46546a}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+.pill{display:inline-block;border-radius:5px;padding:1px 9px;font-size:12px;font-weight:600}
+.green{background:#eafaf0;color:#0a6b35}.amber{background:#fff8e6;color:#8a5a00}.red{background:#fdecea;color:#b4451f}
+code{background:#eef1f6;border-radius:4px;padding:1px 5px;font-size:12.5px;font-family:ui-monospace,monospace}
+ul{margin:6px 0;padding-left:22px}li{margin:5px 0}.small{color:#8a98ad;font-size:12px}
+.flag{background:#fdecea;border-left:3px solid #b4451f;padding:10px 14px;border-radius:0 6px 6px 0;margin:10px 0;font-size:13.5px}
+.note{background:#eef5ff;border-left:3px solid #2563eb;padding:10px 14px;border-radius:0 6px 6px 0;margin:10px 0;font-size:13.5px}
+</style></head><body><div class="wrap">
+<h1>L1 抓取质量体检</h1>
+<div class="sub">2026-06-06 · 体检主体 = vault 0_raw/policies 873 篇 · 只读 · 五维:保真/纯度/来源/覆盖/方法</div>
+
+<div class="verdict">
+<h2>核心裁决:来源很干净,但覆盖是天花板</h2>
+<p><b>L1 的"质"不差(98% gov 直源),但"量"和"完整度"是真短板</b>,而下游一切(②③ + 我们刚修牢靠的关系图谱)<b>只能好到 L1 抓进来的程度</b>。两句话punchline:</p>
+<ul>
+<li>🔴 <b>覆盖是天花板</b>:5/19 后<b>18 天零增量</b>,声称的自动采集 skill <b>根本不存在</b>;江苏7/浙江6/四川9 篇 vs 山东河南广东 40+ —— <b>政策大省结构性盲区</b>。我们把图谱修"牢靠"了,但它牢靠地覆盖着一个<b>不完整</b>的语料,对决策层"全国态势"是缺口。</li>
+<li>🔴 <b>国家级母文件"只抓到封面"</b>:~18 篇地标规章(电力市场信披规则/抽蓄管理办法/绿证核发交易规则/电力需求侧管理办法…)正文残缺,只下来印发通知封面。而省市文件正是 derive_from 它们 —— 母文件残缺,误差放大到一大批子文件。</li>
+</ul>
+</div>
+
+<h2>五维评级</h2>
+<table>
+<tr><th>维度</th><th>评级</th><th>关键数字</th></tr>
+<tr><td>3 来源</td><td><span class="pill green">健康</span></td><td><b>98.3% gov 直源</b>(*.gov.cn 858/873);媒体(in-en)仅 13(1.5%);污染源头规模小</td></tr>
+<tr><td>1 保真</td><td><span class="pill amber">基本健康·一处贵重短板</span></td><td>正文中位 3021 字;&lt;500字 110(12.6%) 多为真短;但 <b>~18 国家级母文件封面级残缺 + ~8 篇抓错对象</b>(索引页/信息图/PDF壳)</td></tr>
+<tr><td>5 方法</td><td><span class="pill amber">半健康</span></td><td>采集脚本 <code>scripts/l1_collect/</code> 完整可跑;但 SOP 是混入加工逻辑的化石 / 增量 runbook 缺 / 渠道 <b>705/784 未验证</b> / 抓取闸门 <code>MIN_BODY_LEN=200</code> 挡不住门户壳</td></tr>
+<tr><td>2 纯度</td><td><span class="pill amber">轻度短板</span></td><td>退役 58 后仍 <b>~43 篇(4.9%)非政策残留</b>:索引页9/答复8/新闻8/公示征求8/解读7…多为旧批遗留(news_filter 5/19 才上线)</td></tr>
+<tr><td>4 覆盖</td><td><span class="pill red">重大短板</span></td><td><b>5/19 后零增量(18天)</b> + policy-watch skill 不存在 + 大省盲区(见下)</td></tr>
+</table>
+
+<h2>覆盖盲区(B7 实证·已量化)</h2>
+<table>
+<tr><th>region</th><th class="n">充电/车网</th><th class="n">电力/电网/市场</th><th class="n">加油/成品油</th><th class="n">总篇</th></tr>
+<tr><td>山东/河南/广东(对照)</td><td class="n">1–4</td><td class="n">13–18</td><td class="n">0–11</td><td class="n">42–46</td></tr>
+<tr><td><b>江苏</b></td><td class="n">0</td><td class="n">1</td><td class="n">1</td><td class="n red">7</td></tr>
+<tr><td><b>浙江</b></td><td class="n">0</td><td class="n">4</td><td class="n">0</td><td class="n red">6</td></tr>
+<tr><td><b>四川</b></td><td class="n">0</td><td class="n">6</td><td class="n">0</td><td class="n red">9</td></tr>
+</table>
+<div class="small">江浙川三个能源/电动车大省覆盖量只有同级省的 ~1/6;江苏 0 充电、浙江 0 充电 0 加油。且江苏 7 篇里还混着"对口帮扶""招标投标条例"等与三业务无关的 —— 真正相关的更少。这是采集缺口(文件不在库),非归属错标。</div>
+
+<h2>保真:抓取失败的两类(非"真短")</h2>
+<ul>
+<li><b>抓错对象 ~8 篇</b>:武汉充电办法(正文是 PDF 附件,只抓到门户导航碎片)、重庆/海南"通知公告"(抓成了栏目<b>索引页</b>=一串发布日期列表)、山东"一图读懂"(内容是<b>信息图</b>)、陕西/江西"政策解读"(只剩门户 chrome)。</li>
+<li><b>国家级母文件封面级 ~18 篇</b>:地标规章正文(PDF/独立页)没下来,只有印发通知封面。技术根因:firecrawl 需 key(默认无)→ 主力是免费 trafilatura(612篇),PDF/独立正文页抓不全;闸门 200 字挡不住门户壳。</li>
+</ul>
+
+<h2>方法/资产现状</h2>
+<ul>
+<li><b>脚本健在</b>:<code>scripts/l1_collect/</code>(run_pipeline 编排 + step2扫/step3过滤/step4抓/step4.5抽/step5入库 + fetcher 三级兜底 + news_filter 确定性纯度门 + dedup + channel_catalog 批驱动)。资产完整可跑。</li>
+<li><b>八步采集法</b>已贴"过时待重生"header;诊断清楚=把 ②③ 加工逻辑焊进了采集 SOP;纯采骨架仍有效,待拆成独立"纯 L1 SOP"。</li>
+<li><b>增量缺位</b>:fetched_at 全在 4/25–5/19 几次 bulk;collected_mode 一半 build-phase-manual;声称的 policy-watch 自动 skill 在 ~/.claude 与仓里都找不到 = B6 警告的"①收口≠采齐"成真。</li>
+<li><b>渠道未通</b>:channel_catalog 784 渠道仅 79 验证、705 候选。</li>
+</ul>
+
+<h2>按"对决策层价值"排序的待修项</h2>
+<table>
+<tr><th>#</th><th>项</th><th>类</th><th>为什么排这</th></tr>
+<tr><td>1</td><td>政策大省盲区补采(江苏/浙江/四川…)</td><td>补采</td><td>直接决定"全国态势"能不能说全;先验证 channel_catalog 候选渠道</td></tr>
+<tr><td>2</td><td>~18 国家级母文件重抓(PDF/独立正文页)</td><td>重抓</td><td>它们是 ②theme/③关系 的母文件,残缺放大误差到子文件;走 pdfplumber + 补 firecrawl key</td></tr>
+<tr><td>3</td><td>重启增量采集 + 落 B6.1 runbook</td><td>补采+SOP</td><td>18天零新增、自动 skill 不存在;先强模型端到端跑硬化,再做 2 线手册+闸门</td></tr>
+<tr><td>4</td><td>加固抓取闸门 + 清退 ~43 残留非政策</td><td>SOP+纯度</td><td>MIN_BODY_LEN 升级为门户壳/索引页/PDF壳结构化检测;43 篇解读/答复/新闻清退</td></tr>
+<tr><td>5</td><td>13 篇 in-en 媒体源换源/退役</td><td>换源</td><td>media 转载混新闻、issuer 未知;能找 gov 原文则换,找不到退役</td></tr>
+</table>
+
+<div class="note"><b>这次插曲的意义</b>:我们顺着 L2/③ 一路把下游修到"牢靠",但 L1 体检说明 —— <b>牢靠 ≠ 完整</b>。决策层要的"全国政策态势",当前被 L1 的覆盖天花板卡着(江浙川盲区 + 18天零增量)。修下游是把已有的用好;补 L1 才是把盘子做全。</div>
+</div></body></html>
