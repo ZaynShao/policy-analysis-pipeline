@@ -74,3 +74,14 @@ def resolve_cuid(conn, pipeline_pid: str) -> str | None:
 def execute(conn, sql: str, params) -> None:
     with conn.cursor() as cur:
         cur.execute(sql, params)
+
+
+def execute_with_savepoint(conn, sql, params, name="sp") -> None:
+    with conn.cursor() as cur:
+        cur.execute(f"SAVEPOINT {name}")
+        try:
+            cur.execute(sql, params)
+            cur.execute(f"RELEASE SAVEPOINT {name}")
+        except Exception:
+            cur.execute(f"ROLLBACK TO SAVEPOINT {name}")
+            raise

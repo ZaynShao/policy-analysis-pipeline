@@ -63,7 +63,7 @@ def run(vault: Path, state_dir: Path, pipeline_version: int, database_url: str) 
         for row in policy_rows:
             try:
                 sql, params = pg_writer.build_policy_upsert(row)
-                pg_writer.execute(conn, sql, params)
+                pg_writer.execute_with_savepoint(conn, sql, params)
                 synced += 1
             except Exception as e:  # 单篇失败不崩整批
                 errors.append(f"policy {row.get('pipeline_pid')}: {e}")
@@ -75,7 +75,7 @@ def run(vault: Path, state_dir: Path, pipeline_version: int, database_url: str) 
                 continue  # 关系两端必须已存在为 Policy
             try:
                 sql, params = pg_writer.build_relation_upsert(row, from_cuid, to_cuid)
-                pg_writer.execute(conn, sql, params)
+                pg_writer.execute_with_savepoint(conn, sql, params)
                 rel_synced += 1
             except Exception as e:
                 errors.append(f"relation {row['from_pid']}->{row['to_pid']}: {e}")
