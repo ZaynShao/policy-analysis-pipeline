@@ -224,6 +224,23 @@ Apply 必须只消费 preview 输出,整文件写入派生层。
 
 (实施时机:③-C accepted 关系产出后,"关系枢纽"信号才完整;在此之前下游门退化为原 `重要性≥3 OR 国省级`。)
 
+## 10.6 关系层落地:canonical + OB/API 双视图〔2026-06-06 补〕
+
+③ 关系是派生 canonical 数据(结构化 jsonl),**不写进 raw 政策 md**(raw immutable)。从 canonical **单向投影**出两个视图,每次 ③ 重生时整文件重生、永不手编:
+
+| 视图 | 形态 | 消费方 |
+|---|---|---|
+| API/数据视图 | `1_extracted/relations/*.jsonl`(或其上的 API/索引) | **服务器/前端读这个** |
+| OB 双链视图 | `_index_by_policy/_rev_<pid>.md` 反链页 | 人(Obsidian 图谱 / 可下载) |
+
+**消费契约(服务化线必须遵守)**:服务器/前端**读结构化 jsonl/API,绝不 parse markdown 双链**——title 式 wikilink 随文件名变就断、丢 rel 类型/置信度/证据等结构字段、解析脆。md 是人类视图,不是机器读项。这是 charter「文件为源 + OB/API 双视图」在关系层的落地。
+
+**不是双向 sync**:canonical 唯一,两视图都是它的单向投影,无 drift(md 永非源)。人要纠正某条关系 → 改**结构化 override/裁决层**(如 ③-C 人审 HAND_DROP 钉快照),③ 读它再重生两视图,**绝不手编 md**(守整文件重生 / 零补丁)。
+
+**OB 投影器现状**:当前干净 pipeline **无此投影器**(旧的在 legacy `build_reverse_links.py`,产物 = vault 现存 721 个 `_rev_*.md`,5/8 stale)。重建时**必须复刻其图谱兜底配方**(见 SCHEMA §5.3:`_rev_` 前缀 + 页内显式 `[[stem|pid]]` + body 顶 raw 文件名锚点),否则重踩 raw 政策图谱孤岛坑(2026-04~05 血泪,实测 P_2026_MIIT_13)。从当前 raw 现读 file_stem 全量重生,勿引 pid→stem 缓存表。
+
+**次序**:② 源头收口重生完 → ③-C 在干净语料重跑 → 重建投影器生成两视图(换掉 5/8 stale)→ 服务器接 API 视图。**排在 Lever B 之前**(Lever B 的"关系枢纽"门本身也依赖可靠的关系数据)。
+
 ## 11. 验收门
 
 ③ preview 必须证明:

@@ -294,7 +294,7 @@ archive: low_score
 
 **`derives_from` 扩展字段**:`linkage_type` ∈ {直接落地, 借鉴框架, 主题对应},`to_title`(LLM 原文,即使 to=null)。
 
-### 5.3 反链页 `1_extracted/relations/_index_by_policy/{pid}.md`
+### 5.3 反链页 `1_extracted/relations/_index_by_policy/_rev_{pid}.md`
 
 每个有入向或出向边的政策一份。结构:
 
@@ -331,6 +331,8 @@ last_updated: ...
 | conflicts_with | conflicts_with_by |
 | cites_basis | cited_as_basis_by |
 | derives_from | landed_by |
+
+**⚠ 命名与图谱兜底(2026-04~05 血泪经验,勿擅改回 `{pid}.md`)**:文件名必须 `_rev_<pid>.md` 前缀。原因:Obsidian 解析 `[[P_xxx]]` 时**文件名优先于 alias**——若反链页命名裸 `{pid}.md`,它会截胡所有本应指向 raw 政策的 `[[P_xxx]]`,使 raw 政策在 graph view 显示为孤岛(2026-05-06 实测案例 P_2026_MIIT_13)。配套两层兜底(同源 legacy `build_reverse_links.py`,已验证):① 页内每条链接用显式式 `[[<file_stem>|<pid>]]`(file_stem=raw 文件名,与 id 解耦、不随 id 漂移);② body 顶部塞一行 `[[<raw file_stem>|显示名]]` 作图谱边锚点(alias 在 graph view 不建边)。重生时从当前 raw **现读 file_stem 全量重生**,勿引入 `pid→stem` 缓存表(当年回归放大器)。
 
 ### 5.4 实体 `1_extracted/entities/`
 
