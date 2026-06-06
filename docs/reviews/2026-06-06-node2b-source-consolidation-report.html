@@ -1,0 +1,65 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<title>② 源头收口 pass 收口报告(2026-06-06)</title>
+<style>
+*{box-sizing:border-box}
+body{font:15px/1.7 -apple-system,"PingFang SC",sans-serif;margin:0;background:#f4f6fa;color:#1c2530}
+.wrap{max-width:940px;margin:0 auto;padding:28px 22px 60px}
+h1{font-size:22px;margin:0 0 4px}.sub{color:#677;font-size:13px;margin-bottom:20px}
+h2{font-size:17px;margin:28px 0 10px;padding-bottom:6px;border-bottom:2px solid #e1e7f0}
+.ok{background:#eafaf0;border-left:3px solid #0a8a44;padding:12px 16px;border-radius:0 6px 6px 0;margin:14px 0}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13.5px;background:#fff;border-radius:8px;overflow:hidden}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid #eef1f6}th{background:#f3f6fb;color:#46546a}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+.pill{display:inline-block;border-radius:5px;padding:1px 9px;font-size:12px;font-weight:600}
+.green{background:#eafaf0;color:#0a6b35}.gray{background:#eef1f6;color:#677}.amber{background:#fff8e6;color:#8a5a00}
+code{background:#eef1f6;border-radius:4px;padding:1px 5px;font-size:12.5px;font-family:ui-monospace,monospace}
+ul{margin:6px 0;padding-left:22px}li{margin:4px 0}.small{color:#8a98ad;font-size:12px}
+.arrow{color:#0a8a44;font-weight:700}
+</style></head><body><div class="wrap">
+<h1>② 源头收口 pass · 收口报告</h1>
+<div class="sub">2026-06-06 · 目标=把 ③-C 暴露的 22% L1 源头污染从源头清掉,让 ②-B business_view 干净 · worktree feat/node2b-source-consolidation · vault tag 回滚锚 pre-node2b-rerun-2026-06-06</div>
+
+<div class="ok"><b>结果</b>:raw <b>935 <span class="arrow">→</span> 873</b>(退役 58 非政策 + 迁出 4 评论);business_view <b>836 <span class="arrow">→</span> 768</b>(干净 873 语料整文件重生,GC 清尽污染残留,确定性 verify 全过)。<b>22% 污染从 business_view 彻底清除。</b></div>
+
+<h2>各 Phase</h2>
+<table>
+<tr><th>Phase</th><th>动作</th><th>结果</th></tr>
+<tr><td>0 安全</td><td>vault commit 汕尾隔离 + tag</td><td><span class="pill green">✓</span> tag <code>pre-node2b-rerun-2026-06-06</code>@a4d9833f 回滚锚</td></tr>
+<tr><td>1 B3 迁评论</td><td>4 篇政策解读/学习文迁出 policies/</td><td><span class="pill green">✓</span> → <code>commentaries/_migrated_from_policies_2026-06-06/</code></td></tr>
+<tr><td>2 退役非政策</td><td>65 重核 → 退 58 / 留 6 / 迁 1</td><td><span class="pill green">✓</span> → <code>0_raw/_archive/policies/b7_nonpolicy_2026-06-06/</code>(可逆+apply_log);GC 62 孤儿 bv</td></tr>
+<tr><td>3 ②-A 修 region</td><td>dry-run 实测</td><td><span class="pill gray">no-op</span> ②-A 已在确定性不动点(写0/一致率100%);region 残留全 defer</td></tr>
+<tr><td>4 ②-B 全量重生</td><td>873 篇 MiniMax+deepseek 孤儿化</td><td><span class="pill green">✓</span> 9 chunk · accepted 768 / queued 105</td></tr>
+<tr><td>5 apply+GC+verify</td><td>写 bv → GC bv∉accepted → 全量 verify</td><td><span class="pill green">✓</span> bv=768 · GC 79 旧拒 bv · verify 768 全自洽</td></tr>
+</table>
+
+<h2>退役 58 篇重核(动 raw 比剔关系门更严)</h2>
+<p>b7 的 65 污染端点,在退役前逐条按"是不是一份该留在源语料的政策文件"重核:</p>
+<ul>
+<li><b>退役 58</b>:人大政协答复/提案/建议 26、新闻稿/动态/座谈/框架协议/报告 19、政策解读/问答/访谈 10、门户FAQ 2、资讯 1。3 篇边界(国务院报告空壳/绿证信箱问答/in-en媒体转载)读原文确认后退。</li>
+<li><b>保留 6</b>(真政策,差点误退):**救回国家级《全国统一电力市场体系实施意见》**(b7 记错边 bug)+ 3 篇成品油调价通知 + 1 征求意见公告 + 1 抽取失败待修。</li>
+<li><b>迁评论 1</b>:安徽储能实施方案【文字解读】(随 B3)。</li>
+</ul>
+<div class="small">退役=物理移动归档(可逆)+ apply_log 留痕,非删除。判据=triage NONPOLICY 通则 + 人核钉快照,零 pid 补丁。</div>
+
+<h2>守住的纪律</h2>
+<ul>
+<li><b>整文件重生</b>:②-B 全量重生 873,非增量打补丁;bv GC 用"无对应 accepted 即删"通则(纪律C)。</li>
+<li><b>raw immutable + §C</b>:退役只移动不改 raw 内容;LLM 判定不写 raw;22 篇 §C-blocked region 按 D1 defer(不强写 raw)。</li>
+<li><b>分支隔离</b>:全程独立 worktree,服务化线 <code>feat/service-deploy</code> 原封不动。</li>
+<li><b>零 pid 补丁</b>:NONPOLICY 通则 + 人核钉快照(KEEP/MIGRATE)分清,不进 program_gate。</li>
+</ul>
+
+<h2>顺带落地(本 pass 之外的设计护栏)</h2>
+<ul>
+<li><b>SCHEMA §5.3 拆埋雷</b>:反链页 <code>{pid}.md</code> → <code>_rev_{pid}.md</code> + 图谱兜底配方写进 SCHEMA(vault+pipeline 同步),防新投影器重踩 raw 图谱孤岛坑。</li>
+<li><b>analysis-layer §10.6 双视图契约</b>:③ 关系 canonical → 单向投影 OB双链(人)+ API/jsonl(服务器读·不 parse md);③-apply 排 Lever B 前。</li>
+</ul>
+
+<h2>deferred(挂单,不阻塞本 pass)</h2>
+<ul>
+<li>22 篇 §C-blocked region 错标 + ②-A 42 queue 残留(扩 registry 或接受兜底)。</li>
+<li><b>③-apply(含 Obsidian 双链)</b>:②regen 完(本 pass)→ ③-C 干净 873 重跑 → 重建 OB 投影器(复刻 legacy 配方)→ 生成两视图换掉 5/8 stale → 服务器接 API。**这是下一站,排 Lever B 前。**</li>
+<li>结晶支柱去留决定;③ 旧 jsonl 5/12 stale 清退随 ③-apply。</li>
+</ul>
+<div class="small">本 pass 仍未碰 ③/④:关系层(③)还是 preview;Lever B(L3 消费门)仍 out-of-scope,排在 ③-apply 之后。</div>
+</div></body></html>
