@@ -1,5 +1,7 @@
 from scripts.analysis_semantic_relations.loaders import PolicyView
-from scripts.analysis_semantic_relations.candidates import generate_candidates, TOP_K, WINDOW_YEARS
+from scripts.analysis_semantic_relations.candidates import (
+    generate_candidates, TOP_K, WINDOW_YEARS, WINDOW_LEN,
+)
 
 
 def V(pid, year, theme, level="省", region="广东", issuer="发改委", title="方案", body=""):
@@ -77,7 +79,41 @@ def test_evidence_window_uses_body_anchor():
 
     # to_window falls back to head (non-empty when body non-empty, no anchor)
     assert c.evidence["to_window"], "to_window should be non-empty when body is non-empty"
-    assert c.evidence["to_window"] == body_no_anchor[:160].strip()
+    assert c.evidence["to_window"] == body_no_anchor[:WINDOW_LEN].strip()
+
+
+# 长正文:开头是点题句(主题),引用词"根据"在后面 → 拿来区分两种窗口策略
+_LONG_BODY = ("广州市某某委员会通知。各有关单位:为进一步规范本市电动汽车充电设施的规划建设、"
+              "运营管理工作。根据《国务院办公厅关于加快电动汽车充电基础设施建设的指导意见》"
+              "(国办发〔2015〕73号)等有关文件,现制定本办法。")
+
+
+def test_directed_window_anchors_on_citation():
+    """有向关系(iterates/extends/derives_from)的窗口应锚在引用句,跳过开头套话。"""
+    views = {
+        "P1": V("P1", 2018, "power_market", issuer="发改委甲", body=_LONG_BODY),
+        "P2": V("P2", 2021, "power_market", issuer="发改委甲", body="后续年度文件正文。"),
+    }
+    cands = generate_candidates(views, basis_pairs=set())
+    it = [c for c in cands if c.rel == "iterates"]
+    assert it, "应生成 iterates"
+    fw = it[0].evidence["from_window"]
+    assert fw.startswith("根据《国务院办公厅"), f"有向窗口应从引用句起头, got: {fw[:30]}"
+
+
+def test_aligns_window_uses_head_not_citation():
+    """aligns_with 不互引,窗口应取开头点题句(主题/范围),不得跳到引用列表。"""
+    views = {
+        "A": V("A", 2021, "power_market", region="广东", issuer="发改委甲", body=_LONG_BODY),
+        "B": V("B", 2021, "power_market", region="江苏", issuer="发改委乙", body="江苏方案正文。"),
+    }
+    cands = generate_candidates(views, basis_pairs=set())
+    aligns = [c for c in cands if c.rel == "aligns_with"]
+    assert len(aligns) == 1
+    # A 是字典序在前的 from
+    fw = aligns[0].evidence["from_window"]
+    assert fw.startswith("广州市某某委员会通知"), f"aligns 窗口应取正文开头, got: {fw[:30]}"
+    assert "为进一步规范本市电动汽车充电设施" in fw, "aligns 窗口应含点题/范围句"
 
 
 def test_aligns_evidence_matches_canonical_order():

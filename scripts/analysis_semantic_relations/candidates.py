@@ -10,18 +10,27 @@ EXTEND_WORDS = ("扩大", "扩围", "推广", "全面实施", "由试点", "适�
 
 WINDOW_ANCHORS = ("为贯彻", "为落实", "根据", "依据", "贯彻", "落实", "按照", "结合",
                   "扩大", "扩围", "推广", "全面实施", "由试点")
-WINDOW_LEN = 160
+WINDOW_LEN = 280
 
 
-def _window(body: str) -> str:
-    """从正文取一段有界证据:优先以承接/范围锚点起头,否则取开头;空白归一、限长。"""
+def _window(body: str, anchored: bool = True) -> str:
+    """从正文取一段有界证据。
+
+    anchored=True(有向关系 derives_from/extends/iterates):锚在承接/范围引用句起头
+      (跳过开头套话),因为这类关系的证据="根据《…》文号"的引用句。
+    anchored=False(对称关系 aligns_with):取正文开头的点题/范围句,**不**跳到引用列表
+      ——对齐对互不引用,要比的是主题/方向,引用列表是噪声(否则跳过点题句、判官看不出主题)。
+    """
     text = body or ""
-    idx = -1
-    for kw in WINDOW_ANCHORS:
-        j = text.find(kw)
-        if j != -1 and (idx == -1 or j < idx):
-            idx = j
-    start = idx if idx != -1 else 0
+    if anchored:
+        idx = -1
+        for kw in WINDOW_ANCHORS:
+            j = text.find(kw)
+            if j != -1 and (idx == -1 or j < idx):
+                idx = j
+        start = idx if idx != -1 else 0
+    else:
+        start = 0
     chunk = text[start:start + WINDOW_LEN]
     return re.sub(r"\s+", " ", chunk).strip()
 
@@ -34,9 +43,11 @@ def _window_ok(a: PolicyView, b: PolicyView) -> bool:
     return a.year is not None and b.year is not None and abs(a.year - b.year) <= WINDOW_YEARS
 
 
-def _evidence(a: PolicyView, b: PolicyView, basis: list) -> dict:
+def _evidence(a: PolicyView, b: PolicyView, basis: list, rel: str) -> dict:
+    anchored = rel != "aligns_with"  # 有向关系锚引用句;对称关系取开头点题句
     return {"from_title": a.title, "to_title": b.title,
-            "from_window": _window(a.body), "to_window": _window(b.body),
+            "from_window": _window(a.body, anchored=anchored),
+            "to_window": _window(b.body, anchored=anchored),
             "theme_context": [a.primary_theme] if a.primary_theme else []}
 
 
@@ -95,8 +106,8 @@ def generate_candidates(views: dict, basis_pairs: set) -> list:
                 sym_degree[fp] = sym_degree.get(fp, 0) + 1
                 sym_degree[tp] = sym_degree.get(tp, 0) + 1
                 fa, fb = (a, b) if a.pid == fp else (b, a)        # evidence in canonical order
-                out.append(SemanticCandidate(fp, tp, rel, tags, _evidence(fa, fb, tags), symmetric=True))
+                out.append(SemanticCandidate(fp, tp, rel, tags, _evidence(fa, fb, tags, rel), symmetric=True))
             else:
-                out.append(SemanticCandidate(a.pid, b.pid, rel, tags, _evidence(a, b, tags)))
+                out.append(SemanticCandidate(a.pid, b.pid, rel, tags, _evidence(a, b, tags, rel)))
             kept += 1
     return sorted(out, key=lambda c: (c.rel, c.from_id, c.to_id))

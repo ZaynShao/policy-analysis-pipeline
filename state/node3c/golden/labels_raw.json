@@ -1,0 +1,998 @@
+{
+  "count": 35,
+  "by_level": {
+    "high": 28,
+    "mid": 0,
+    "low": 7,
+    "failed": 0
+  },
+  "results": [
+    {
+      "from": "P_2016_AH_ae5294fd",
+      "to": "P_2015_NDRC_3d821d6e",
+      "rel": "derives_from",
+      "stratum": "derives_from",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "accept",
+        "vote": {
+          "accept": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "accept",
+          "reason": "from政策正文通知及两个附件第一条均明确引用\"中发〔2015〕9号\"为上位依据（\"为贯彻落实……（中发〔2015〕9号）……制定本规则/细则\"），属于省级文件落实/细化国家文件的典型derives_from关系，方向（安徽省2016→国家2015）正确。",
+          "confidence": 0.98
+        },
+        {
+          "model": "haiku",
+          "decision": "accept",
+          "reason": "Anhui provincial policy (P_2016_AH_ae5294fd) explicitly states at the outset \"为贯彻落实...中共中央、国务院《关于进一步深化电力体制改革的若干意见》（中发〔2015〕9号）\", directly citing the national NDRC/NEA reform directive (P_2015_NDRC_3d821d6e, 中发〔2015〕9号) as its authoritative basis and foundation. The provincial rules operationalize the national framework for Anhui's electricity market—a textbook derives_from relationship with clear directional hierarchy (provincial→national).",
+          "confidence": 0.95
+        }
+      ]
+    },
+    {
+      "from": "P_2017_CQ_c8d99857",
+      "to": "P_2016_NDRC_8890ad14",
+      "rel": "derives_from",
+      "stratum": "derives_from",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "accept",
+        "vote": {
+          "accept": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "accept",
+          "reason": "from 政策（渝能源电〔2017〕61号）正文明确援引 to 政策（发改经体〔2016〕2480号）作为执行依据：「请各区县按照国家发展改革委、国家能源局《关于规范开展增量配电业务改革试点的通知》（发改经体〔2016〕2480号）……要求，认真组织第二批增量配电业务改革试点项目申报」，属于下级地方政策落实上位国家政策的标准 derives_from 关系，方向正确（重庆市 → 国家发改委）。",
+          "confidence": 0.97
+        },
+        {
+          "model": "haiku",
+          "decision": "accept",
+          "reason": "重庆市2017年通知在第2段明确\"按照...《关于规范开展增量配电业务改革试点的通知》（发改经体〔2016〕2480号）...要求\"，直接引用国家2016年通知作为申报依据，体现了下级承接上位文件的典型特征。",
+          "confidence": 0.95
+        }
+      ]
+    },
+    {
+      "from": "P_2017_GD_70875d73",
+      "to": "P_2015_NEA_73",
+      "rel": "derives_from",
+      "stratum": "derives_from",
+      "agreement": "low",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "manual_review",
+        "vote": {
+          "accept": 1,
+          "reject": 1
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "accept",
+          "reason": "from 政策正文明确引用\"根据《国务院办公厅关于加快电动汽车充电基础设施建设的指导意见》（国办发〔2015〕73号）……等有关文件\"，以 to 政策为上位依据，方向为广州市级地方文件承接国家级指导意见，完全符合 derives_from 定义。",
+          "confidence": 0.98
+        },
+        {
+          "model": "haiku",
+          "decision": "reject",
+          "reason": "方向反了。广州2017文件明确写\"根据《国务院办公厅...指导意见》（国办发〔2015〕73号）\"实施，说明广州2017落实国办2015；而题目要求from(2017)→to(2015)的derives_from关系逻辑颠倒。实际关系应为P_2017_GD derives_from P_2015_NEA（反向）。",
+          "confidence": 0.98
+        }
+      ]
+    },
+    {
+      "from": "P_2019_GD_0c52cbb8",
+      "to": "P_2019_GD_781f09c6",
+      "rel": "derives_from",
+      "stratum": "derives_from",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "accept",
+        "vote": {
+          "accept": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "accept",
+          "reason": "from政策（海珠区级，0c52cbb8）正文在\"申报条件\"部分明确援引to政策\"《广州市工业和信息化局关于印发进一步加强电动汽车充电基础设施建设运营管理的通知》（穗工信规字〔2019〕1号）\"为上位依据，并直接照搬其产品合格报告要求、建设登记要求、2000千瓦功率门槛等条款，属于区级政策承接/细化市级政策的典型 derives_from，方向（区级→市级）正确。",
+          "confidence": 0.97
+        },
+        {
+          "model": "haiku",
+          "decision": "accept",
+          "reason": "P_2019_GD_0c52cbb8(海珠区)正文明确\"根据...穗工信规字〔2019〕1号\"声明P_2019_GD_781f09c6(广州市)为上位依据,区级政策承接市级框架并细化补贴申报条件。方向正确(区→市)。",
+          "confidence": 0.98
+        }
+      ]
+    },
+    {
+      "from": "P_2019_GD_781f09c6",
+      "to": "P_2015_NEA_73",
+      "rel": "derives_from",
+      "stratum": "derives_from",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "accept",
+        "vote": {
+          "accept": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "accept",
+          "reason": "from 政策正文开篇明确写明\"根据《国务院办公厅关于加快电动汽车充电基础设施建设的指导意见》（国办发〔2015〕73号）…等有关文件\"，直接将 to 政策列为上位依据，方向为市级→国家级，符合 derives_from 定义。",
+          "confidence": 0.98
+        },
+        {
+          "model": "haiku",
+          "decision": "accept",
+          "reason": "广州2019政策正文明确表述\"根据《国务院办公厅关于加快电动汽车充电基础设施建设的指导意见》（国办发〔2015〕73号）...制定\"，直接声明以国办2015为上位文件依据；广州2019的产品管理、规划建设、信息管理等具体规范均承接并细化了国办2015的总体指导方向。方向正确(下级→上级)。",
+          "confidence": 0.98
+        }
+      ]
+    },
+    {
+      "from": "P_2019_HA_6e13fc6b",
+      "to": "P_2015_NDRC_3d821d6e",
+      "rel": "derives_from",
+      "stratum": "derives_from",
+      "agreement": "low",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "manual_review",
+        "vote": {
+          "reject": 1,
+          "accept": 1
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "reject",
+          "reason": "P_2015_NDRC_3d821d6e 并非 P_2019_HA_6e13fc6b 所引用的上位文件。from 政策正文第一条明确以\"中发〔2015〕9号\"（即《中共中央 国务院关于进一步深化电力体制改革的若干意见》）为依据，而 P_2015_NDRC_3d821d6e 是国家发改委/能源局\"为贯彻落实中发〔2015〕9号\"而印发的配套文件通知，其本身也是中发〔2015〕9号的下游执行文件，两者是同一上位文件的不同层级承接，不构成 derives_from 关系。",
+          "confidence": 0.88
+        },
+        {
+          "model": "haiku",
+          "decision": "accept",
+          "reason": "河南省2019年电力市场交易规则（第87行）明确引用中发〔2015〕9号作为法律依据，声称\"依据《中共中央 国务院关于进一步深化电力体制改革的若干意见》（中发〔2015〕9号）...制定本规则\"，是对国家体制改革方案在省级层面的具体落实与细化，方向正确。",
+          "confidence": 0.98
+        }
+      ]
+    },
+    {
+      "from": "P_2020_HI_5b94d4bc",
+      "to": "P_2020_NDRC_889",
+      "rel": "derives_from",
+      "stratum": "derives_from",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "accept",
+        "vote": {
+          "accept": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "accept",
+          "reason": "from 政策正文明确写明\"结合《电力中长期交易基本规则》（发改能源规〔2020〕889号）……制定本方案\"，直接引用 to 政策文号作为上位依据，方向正确（海南省级方案→国家级基本规则）。",
+          "confidence": 0.97
+        },
+        {
+          "model": "haiku",
+          "decision": "accept",
+          "reason": "海南省2021方案（P_2020_HI_5b94d4bc）在第83行明确\"结合《电力中长期交易基本规则》（发改能源规〔2020〕889号）...制定本方案\"，确立了以国家基本规则为上位依据的承接关系。方向正确：下级(海南)→上级(国家)。",
+          "confidence": 0.95
+        }
+      ]
+    },
+    {
+      "from": "P_2021_AH_1001d59f",
+      "to": "P_2019_BJ_2cbb47cf",
+      "rel": "derives_from",
+      "stratum": "derives_from",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "accept",
+        "vote": {
+          "accept": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "accept",
+          "reason": "六安市规划（from）在\"第2条 规划依据\"第12项明确列出\"《商务部关于做好石油成品油流通管理'放管服'改革工作的通知》（商运函〔2019〕659号）\"，即 to 政策，作为上位依据；方向正确（市级地方规划 → 商务部部级通知），符合 derives_from 定义。",
+          "confidence": 0.97
+        },
+        {
+          "model": "haiku",
+          "decision": "accept",
+          "reason": "六安市政策在「规划依据」第12条明确列举商务部通知（商运函〔2019〕659号）作为规划基础；从发布时间（2019→2021）、层级（全国→地市）看方向正确，符合下级政策落实承接上级文件的derives_from定义。",
+          "confidence": 0.95
+        }
+      ]
+    },
+    {
+      "from": "P_2019_BJ_2cbb47cf",
+      "to": "P_2021_GD_e369bf1c",
+      "rel": "extends",
+      "stratum": "extends",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "reject",
+        "vote": {
+          "reject": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "reject",
+          "reason": "两篇政策主题不构成\"范围扩展\"关系：P_2019 是商务部针对成品油流通管理\"放管服\"改革的全国性通知，P_2021 是广州市推广加油站智能税控系统的地方通知，其依据为\"省工作部署要求\"，未引用商运函〔2019〕659号；二者议题不同（行政简化改革 vs. 税控系统强制推广），P_2021 并非对 P_2019 适用范围/试点对象的扩展，更可能是 aligns_with（同属成品油监管大主题、跨部门跨地区方向对齐）或与省级文件存在 derives_from 关系，而非 extends。",
+          "confidence": 0.85
+        },
+        {
+          "model": "haiku",
+          "decision": "reject",
+          "reason": "P_2021_GD_e369bf1c (Guangzhou smart tax control system mandate) does not extend P_2019_BJ_2cbb47cf's scope. The 2019 policy addresses petroleum retail \"放管服\" (deregulation/service) reform at national level; the 2021 policy mandates specific tax control technology at city level without citing the 2019 policy as basis or demonstrating expanded coverage of the 2019 policy's scope. They are parallel policies in the petroleum sector, not a extends relationship.",
+          "confidence": 0.85
+        }
+      ]
+    },
+    {
+      "from": "P_2019_BJ_7953e5fb",
+      "to": "P_2021_GD_e369bf1c",
+      "rel": "extends",
+      "stratum": "extends",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "reject",
+        "vote": {
+          "reject": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "reject",
+          "reason": "两篇政策主题不同：from政策（商运函〔2019〕659号）是商务部关于成品油流通管理\"放管服\"行政审批改革的通知，to政策（穗府办函〔2021〕63号）是广州市推广加油站智能税控系统的通知，后者援引的上位依据是\"省工作部署要求\"而非from政策；to政策并未扩大from政策的适用范围或试点对象，两者既不符合extends方向（旧→新、范围扩大），也无明确的文本依据链接，不构成extends关系。",
+          "confidence": 0.88
+        },
+        {
+          "model": "haiku",
+          "decision": "reject",
+          "reason": "P_2019是商务部国家级放管服改革指导（简化审批、优化监管），P_2021是广州市级强制措施（要求加油站安装税控系统、加强数据采集），两者同为加油行业政策但理念相反（放 vs 管），P_2021未扩大P_2019的适用范围而是引入新监管义务，不符合extends定义。",
+          "confidence": 0.92
+        }
+      ]
+    },
+    {
+      "from": "P_2019_FJ_99e4d508",
+      "to": "P_2021_GD_e369bf1c",
+      "rel": "extends",
+      "stratum": "extends",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "reject",
+        "vote": {
+          "reject": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "reject",
+          "reason": "两篇政策主题完全不同：P_2019_FJ_99e4d508 涉及成品油经营资质审批权下放（准入改革），P_2021_GD_e369bf1c 涉及加油站智能税控系统推广（涉税监管），后者并未扩大前者的适用范围或试点对象，不满足 extends 关系定义，亦无任何文本依据显示两者存在承接或扩展关系。",
+          "confidence": 0.95
+        },
+        {
+          "model": "haiku",
+          "decision": "reject",
+          "reason": "P_2021_GD 与 P_2019_FJ 虽同属成品油市场管理,但涉及不同主题:P_2019_FJ 处理零售经营资格审批权的下放与市县层级划分,P_2021_GD 推进智能税控系统部署与监管数据采集。P_2021_GD 未扩大 P_2019_FJ 的适用范围、试点范围或对象范围,反而是在同一产业的不同规制维度进行推进,更符合「aligns_with」而非「extends」定义。",
+          "confidence": 0.92
+        }
+      ]
+    },
+    {
+      "from": "P_2019_GD_0c52cbb8",
+      "to": "P_2022_NX_6ecf38b4",
+      "rel": "extends",
+      "stratum": "extends",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "reject",
+        "vote": {
+          "reject": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "reject",
+          "reason": "两篇政策来自不同省级区域（广州市海珠区 vs 宁夏回族自治区）、不同发文机构，内容上一篇是针对具体充电桩补贴的申报通知，另一篇是宁夏\"十四五\"扩大内需综合方案；宁夏方案中仅在\"绿色消费\"条款下泛提\"加快充电桩建设\"，并未扩大海珠区补贴政策的适用范围或试点对象，两者之间不存在\"to 政策扩大 from 政策适用范围\"的 extends 关系，方向与定义均不符。",
+          "confidence": 0.95
+        },
+        {
+          "model": "haiku",
+          "decision": "reject",
+          "reason": "Guangzhou Haizhu (2019) is a specific district-level EV charging subsidy program with standardized rates (120-300元/kW for DC, 20-60元/kW for AC, 600-800元/kW for battery swap). Ningxia (2022) is a broad provincial 14th Five-Year Plan for expanded domestic demand with only generic language about \"accelerating charging station construction\" (加快停车场、充电桩、换电站等配套设施建设) as one consumer amenity. Ningxia neither references Guangzhou/Haizhu nor extends its subsidy mechanism to new regions. The policies cover different geographic scopes, different policy depths, and no expansion language or causal chain appears. Not an extends relationship.",
+          "confidence": 0.95
+        }
+      ]
+    },
+    {
+      "from": "P_2019_GD_781f09c6",
+      "to": "P_2022_NX_6ecf38b4",
+      "rel": "extends",
+      "stratum": "extends",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "reject",
+        "vote": {
+          "reject": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "reject",
+          "reason": "两篇政策无 extends 关系：P_2019_GD_781f09c6 是广州市专项充电基础设施管理通知，P_2022_NX_6ecf38b4 是宁夏回族自治区扩大内需综合方案，后者仅在\"释放出行类消费需求\"条款中一笔带过\"充电桩、换电站等配套设施建设\"，并非对前者适用范围的扩大；两文发文机构、地区、主题均不同，不存在范围扩展的逻辑关系，更无任何文本引用依据。",
+          "confidence": 0.95
+        },
+        {
+          "model": "haiku",
+          "decision": "reject",
+          "reason": "两篇政策不存在extends关系。广州政策(2019)为市级专项政策，规范充电基础设施建设运营；宁夏政策(2022)为省级综合内需方案，仅在消费投资部分提及充电桩建设，但非基于广州政策的地域扩展，而是国家顶层战略下的独立实施方案。关系更近似aligns_with(同国家战略框架下的同向政策)或无直接关系。",
+          "confidence": 0.92
+        }
+      ]
+    },
+    {
+      "from": "P_2019_GZ_64193177",
+      "to": "P_2022_NX_6ecf38b4",
+      "rel": "extends",
+      "stratum": "extends",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "reject",
+        "vote": {
+          "reject": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "reject",
+          "reason": "两篇政策无实质关联：from（P_2019_GZ_64193177）是贵州省2019年电网建设专项行动方案，to（P_2022_NX_6ecf38b4）是宁夏回族自治区2022年\"十四五\"扩大内需实施方案，两者发布主体不同（贵州省发改委 vs 宁夏发改委）、主题不同（省级电网建设 vs 区域扩大内需），to 文件未引用或扩展 from 文件的适用范围/试点/对象，不符合 extends 关系定义；两者顶多在能源基础设施建设上有主题交叉，但不构成\"to 扩大了 from 的适用范围\"的 extends 关系。",
+          "confidence": 0.97
+        },
+        {
+          "model": "haiku",
+          "decision": "reject",
+          "reason": "两篇政策属于不同地区、不同机构的独立发展规划,不构成 extends 关系。Guizhou 2019电网建设专项方案针对贵州省电网基础设施;Ningxia 2022扩大内需实施方案是自治区层面的综合发展计划,仅将电网作为能源支撑体系的一个组成部分,未扩展 Guizhou 方案的适用范围或试点。两者是并列的地方性政策而非递进关系。",
+          "confidence": 0.92
+        }
+      ]
+    },
+    {
+      "from": "P_2019_TJ_5d65c150",
+      "to": "P_2022_NX_6ecf38b4",
+      "rel": "extends",
+      "stratum": "extends",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "reject",
+        "vote": {
+          "reject": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "reject",
+          "reason": "两篇政策主题和发文机构完全不同：P_2019_TJ_5d65c150 是天津市发改委针对充电桩运营企业的安全专项自查通知，P_2022_NX_6ecf38b4 是宁夏\"十四五\"扩大内需综合实施方案，两者既无共同主题（新能源汽车充电安全 vs. 宏观内需扩大），也无同机构承继关系，后者并未扩大前者的适用范围或试点对象，不满足 extends 定义。",
+          "confidence": 0.97
+        },
+        {
+          "model": "haiku",
+          "decision": "reject",
+          "reason": "不成立。P_2019_TJ是天津市针对新能源汽车充电基础设施安全的专项自查通知，P_2022_NX是宁夏自治区的\"十四五\"扩大内需实施方案。两篇政策地区不同（天津vs宁夏）、主题不同（充电安全专项vs宏观经济战略）、机构不同，P_2022_NX并未在任何领域扩展P_2019_TJ的适用范围或对象。",
+          "confidence": 0.95
+        }
+      ]
+    },
+    {
+      "from": "P_2020_GD_ec362319",
+      "to": "P_2021_GD_e369bf1c",
+      "rel": "extends",
+      "stratum": "extends",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "reject",
+        "vote": {
+          "reject": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "reject",
+          "reason": "两篇政策主题完全不同：from（ec362319）是注销加油站成品油零售经营资格的具体行政行为，to（e369bf1c）是推广加油站智能税控系统的监管信息化通知；to并未扩大from的适用范围或试点对象，两者既无主题延续性，也无依据引用关系，不符合extends定义。",
+          "confidence": 0.95
+        },
+        {
+          "model": "haiku",
+          "decision": "reject",
+          "reason": "两篇政策主题完全不同:from(2020)是个案许可证注销,to(2021)是加油站智能税控系统强制推广。P_2021未以P_2020为依据,也未扩展其适用范围。不符合extends关系定义。",
+          "confidence": 0.95
+        }
+      ]
+    },
+    {
+      "from": "P_2012_BJ_466935e2",
+      "to": "P_2015_BJ_c5505b70",
+      "rel": "iterates",
+      "stratum": "iterates",
+      "agreement": "low",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "manual_review",
+        "vote": {
+          "reject": 1,
+          "accept": 1
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "reject",
+          "reason": "两文件均为北京市发改委转发国家发改委成品油调价通知,结构相同、主题相同,但各自独立响应不同的国家发改委电价通知(发改电〔2012〕154号 vs 发改电〔2015〕477号),属于离散的价格调整事件,并非同一政策文件的年度续作或版本迭代;P_2015 未承接、修订或升级 P_2012 作为政策框架,不符合 iterates 定义(\"年度续作/版本迭代/升级\")。",
+          "confidence": 0.85
+        },
+        {
+          "model": "haiku",
+          "decision": "accept",
+          "reason": "同机构（北京市发改委）、同主题（成品油价格调整）、年度间隔（2012→2015）、结构完全对应、管理框架继承（批发价格扣减300元标准保持一致），符合「年度续作/版本迭代」定义，虽缺显式承继语言但属政策框架的例行延续。",
+          "confidence": 0.72
+        }
+      ]
+    },
+    {
+      "from": "P_2016_CQ_58e17873",
+      "to": "P_2017_CQ_c8d99857",
+      "rel": "iterates",
+      "stratum": "iterates",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "reject",
+        "vote": {
+          "reject": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "reject",
+          "reason": "to 文件（第二批增量配电试点项目申报通知）与 from 文件（第一批试点咨询机构征集）均属重庆增量配电改革，但两者事务性质不同（咨询招募 vs. 项目申报），to 并非 from 的年度续作或版本迭代，而是同一改革进程中扩展到第二批次的新动作；若有向关系成立，更近似 extends（trial scope expanded）而非 iterates。",
+          "confidence": 0.78
+        },
+        {
+          "model": "haiku",
+          "decision": "reject",
+          "reason": "P_2016 is about recruiting consulting institutions to design the owner-selection methodology; P_2017 is about collecting second-batch pilot project applications—these are sequential phases of policy execution rather than policy iteration. The \"iterates\" definition requires same-theme annual follow-ups/version upgrades of the same policy document, but here P_2017 \"第二批\" refers to implementing subsequent rounds, not revising the 2016 policy itself. The relationship is more accurately \"derives_from\" (P_2017 derives from implementing the framework P_2016 helped establish).",
+          "confidence": 0.85
+        }
+      ]
+    },
+    {
+      "from": "P_2016_HI_3bac5b3a",
+      "to": "P_2017_HI_dcd17e5c",
+      "rel": "iterates",
+      "stratum": "iterates",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "reject",
+        "vote": {
+          "reject": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "reject",
+          "reason": "两文件同属海南省充电基础设施主题，但性质截然不同：from（2016）是「专项规划」，to（2017）是「省级补贴实施暂行办法」，并非同一类型文件的年度续作或版本迭代；且2017年文件联署方增加了财政厅，发文机关也不完全相同；to文件正文未声明以from为依据。iterates要求\"同机构同主题的年度续作/版本升级\"，此处不满足。",
+          "confidence": 0.88
+        },
+        {
+          "model": "haiku",
+          "decision": "reject",
+          "reason": "P_2016为总体规划文件，P_2017为补贴实施办法。虽同机构同主题，但性质不同（规划vs执行办法），P_2017未明确自述为P_2016的版本迭代/升级，更像是互补的配套政策工具，不符合iterates\"年度续作/版本迭代\"的定义。",
+          "confidence": 0.75
+        }
+      ]
+    },
+    {
+      "from": "P_2017_CQ_c8d99857",
+      "to": "P_2020_CQ_f8a0db61",
+      "rel": "iterates",
+      "stratum": "iterates",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "reject",
+        "vote": {
+          "reject": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "reject",
+          "reason": "2017文件是征集第二批增量配电试点项目的通知(征集令),2020文件是长寿试点项目成功落地的部门动态(成果报道),两者文件性质不同,后者并非前者的年度续作或版本迭代,而更接近前者所推动试点的实施成果报告;iterates要求同类型文件的年度/版本升级,此处不满足。",
+          "confidence": 0.88
+        },
+        {
+          "model": "haiku",
+          "decision": "reject",
+          "reason": "文档1(2017年7月)是第二批试点项目征集通知,文档2(2020年2月)是长寿项目成功落地的部门动态;两者非同机构同主题的版本迭代关系,而是前者为征集框架、后者为征集结果的报告,更符合derives_from而非iterates定义。iterates需同类文件形式的年度续作或升级版,此处不成立。",
+          "confidence": 0.92
+        }
+      ]
+    },
+    {
+      "from": "P_2017_LN_54de50fa",
+      "to": "P_2020_LN_193563de",
+      "rel": "iterates",
+      "stratum": "iterates",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "reject",
+        "vote": {
+          "reject": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "reject",
+          "reason": "两篇政策主题不同：P_2017是组建电力市场管理委员会（机构设置），P_2020是深化燃煤发电上网电价形成机制改革（价格机制），不构成\"同机构同主题的年度续作/版本迭代\"；P_2020正文亦未援引P_2017，而是以国家发改委发改价格规〔2019〕1658号为上位依据，更符合derives_from（P_2020派生自国家文件），而非对P_2017的iterates。",
+          "confidence": 0.92
+        },
+        {
+          "model": "haiku",
+          "decision": "reject",
+          "reason": "P_2017 addresses power market committee organization; P_2020 addresses coal power price mechanism reform — different policy topics despite same institution. Iterates requires same subject matter and version succession; these lack both.",
+          "confidence": 0.95
+        }
+      ]
+    },
+    {
+      "from": "P_2017_LN_f1e981bf",
+      "to": "P_2020_LN_193563de",
+      "rel": "iterates",
+      "stratum": "iterates",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "reject",
+        "vote": {
+          "reject": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "reject",
+          "reason": "两篇政策主题完全不同：P_2017（from）是关于辽宁电力市场管理委员会成立的新闻公告，P_2020（to）是根据国家发改委发改价格规〔2019〕1658号印发的燃煤发电上网电价形成机制改革实施方案；同一发文机关但议题毫无延续关系，不满足\"同主题年度续作/版本迭代\"的 iterates 定义。",
+          "confidence": 0.97
+        },
+        {
+          "model": "haiku",
+          "decision": "reject",
+          "reason": "不成立。两篇政策虽同源于辽宁省发改委,但主题不同:2017年政策为电力市场管理委员会成立(行政治理结构);2020年政策为燃煤电价改革实施方案(定价机制改革),2020年政策明确依据为国家发改委2019年指导意见(发改价格规〔2019〕1658号),而非2017年委员会文件。两政策虽均涉及电力市场化改革主题,但无承继迭代关系,更无\"版本升级\"或\"年度续作\"特征。",
+          "confidence": 0.95
+        }
+      ]
+    },
+    {
+      "from": "P_2017_NDRC_d5bc4c87",
+      "to": "P_2018_NDRC_ce8700fb",
+      "rel": "iterates",
+      "stratum": "iterates",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "reject",
+        "vote": {
+          "reject": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "reject",
+          "reason": "两篇政策主题不同：P_2017_NDRC_d5bc4c87聚焦\"可再生能源绿色电力证书核发及自愿认购交易制度\"（证书机制建立），P_2018_NDRC_ce8700fb聚焦\"清洁能源消纳行动计划（2018-2020年）\"（消纳问题综合行动计划），并非同一主题的年度续作/版本迭代，不满足iterates定义中\"同机构同主题\"的核心要件。",
+          "confidence": 0.9
+        },
+        {
+          "model": "haiku",
+          "decision": "reject",
+          "reason": "政策1(2017年绿色电力证书制度)与政策2(2018-2020清洁能源消纳行动计划)虽同为国家能源主题,但主题范围与层级不同:政策1聚焦可再生能源绿色电力证书这一具体交易机制,政策2是解决清洁能源消纳问题的综合行动计划,覆盖范围更广。政策2并非政策1的年度版本迭代或升级,而是独立的战略性综合方案,更符合aligns_with关系。",
+          "confidence": 0.85
+        }
+      ]
+    },
+    {
+      "from": "P_2018_NDRC_364",
+      "to": "P_2021_NDRC_0421ce4f",
+      "rel": "iterates",
+      "stratum": "iterates",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "reject",
+        "vote": {
+          "reject": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "reject",
+          "reason": "两篇政策虽同为国家发改委、国家能源局发布，但主题不同：P_2018_NDRC_364 的核心主题是\"电力系统调节能力提升\"（新型储能仅为其第三条下的一个子议题），P_2021 的核心主题是专门针对\"新型储能发展\"的独立专项意见；iterates 要求\"同机构同主题的版本迭代/续作\"，而 P_2021 是对 P_2018 新型储能子议题的专项深化拆分，更符合 extends 关系而非 iterates，且 P_2021 正文未声明以 P_2018 为前作/前版本。",
+          "confidence": 0.82
+        },
+        {
+          "model": "haiku",
+          "decision": "reject",
+          "reason": "不成立iterates关系。两篇政策由同机构发布，但2018-364是电力系统调节能力综合指导（储能为其一部分），2021政策是对储能领域的专项深化，不属于同一主题政策的版本迭代，而是从整体政策派生出的专项政策。",
+          "confidence": 0.92
+        }
+      ]
+    },
+    {
+      "from": "P_2012_BJ_466935e2",
+      "to": "P_2015_SD_af076ca3",
+      "rel": "aligns_with",
+      "stratum": "aligns_with",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "reject",
+        "vote": {
+          "reject": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "reject",
+          "reason": "两篇政策主题不同质：P_2012_BJ_466935e2 是北京转发国家发改委的成品油价格上调通知（单次调价行政行为），P_2015_SD_af076ca3 是济南市成品油市场监管综合治理通知（质量监管、执法追责、质量升级等治理框架），二者均涉及\"成品油\"但分属\"价格调整\"与\"市场监管\"两个不同政策维度，不构成同一主题方向对齐的 aligns_with 关系，且两文之间无任何引用或呼应。",
+          "confidence": 0.88
+        },
+        {
+          "model": "haiku",
+          "decision": "reject",
+          "reason": "两篇政策虽同涉成品油领域，但侧重完全不同：P_2012_BJ重点是价格行政管制（汽柴油最高零售价、批发价定价），P_2015_SD重点是市场全链条监管与质量升级（监管体系、质量检测、违法打击）。P_2015_SD明确源自\"山东省人民政府通知\"而非北京价格政策。两者在成品油主题下无方向对齐。",
+          "confidence": 0.92
+        }
+      ]
+    },
+    {
+      "from": "P_2012_SH_020",
+      "to": "P_2015_NDRC_3d821d6e",
+      "rel": "aligns_with",
+      "stratum": "aligns_with",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "reject",
+        "vote": {
+          "reject": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "reject",
+          "reason": "两篇政策主题不对齐：P_2012_SH_020 聚焦居民零售侧阶梯电价定价机制（上位依据为单独的国家发改委阶梯电价指导意见），P_2015_NDRC_3d821d6e 是电力体制市场化改革配套文件（输配电价改革、电力市场建设、售电侧市场化等），二者分属\"管制定价执行\"与\"电力市场化结构改革\"两个不同政策议题，不构成\"同主题方向对齐\"，故 aligns_with 关系不成立。",
+          "confidence": 0.88
+        },
+        {
+          "model": "haiku",
+          "decision": "reject",
+          "reason": "P_2012_SH_020 主题为上海市居民阶梯电价实施细节,P_2015_NDRC_3d821d6e 主题为国家电力体制改革框架(涉及输配电价、市场建设、交易机构等);两篇不在同一主题上,虽涉及电价但范围和层级差异过大,不符合 aligns_with(同主题方向对齐)的定义。",
+          "confidence": 0.85
+        }
+      ]
+    },
+    {
+      "from": "P_2015_BJ_c5505b70",
+      "to": "P_2015_SD_af076ca3",
+      "rel": "aligns_with",
+      "stratum": "aligns_with",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "reject",
+        "vote": {
+          "reject": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "reject",
+          "reason": "两篇政策虽同涉成品油领域，但主题根本不同：P_2015_BJ（京发改〔2015〕1668号）是转发国家发改委的成品油**降价通知**，核心内容为北京市汽柴油最高零售/批发价格调整；P_2015_SD（鲁政办字〔2015〕194号）是济南市关于成品油**市场监管**（质量监督、全链条管控、执法追责）的通知，明确依据山东省同名文件。二者分属价格管理与市场监管两个不同政策主题，无共同政策方向对齐，不构成 aligns_with。",
+          "confidence": 0.9
+        },
+        {
+          "model": "haiku",
+          "decision": "reject",
+          "reason": "北京政策为成品油价格调整（京发改〔2015〕1668号转发国务院降价通知），济南政策为成品油监管质量升级（鲁政办字〔2015〕194号），主题方向完全不同；济南政策明确依据是省级政策而非北京，不存在同主题对齐关系。",
+          "confidence": 0.95
+        }
+      ]
+    },
+    {
+      "from": "P_2015_NDRC_3d821d6e",
+      "to": "P_2017_GZ_f47663f2",
+      "rel": "aligns_with",
+      "stratum": "aligns_with",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "reject",
+        "vote": {
+          "reject": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "reject",
+          "reason": "P_2017_GZ_f47663f2 正文明确声明\"落实《国家发展改革委 国家能源局关于印发电力体制改革配套文件的通知》（发改经体[2015]2752号）要求\"，即以 P_2015_NDRC_3d821d6e 为上位依据，两者为 derives_from 关系（P_2017 → P_2015），而非无因果依据的对称 aligns_with；且两份文件均由同一发文机关（国家发展改革委/国家能源局）发布，不符合 aligns_with 定义中\"跨地区或跨部门方向对齐\"的典型场景。",
+          "confidence": 0.97
+        },
+        {
+          "model": "haiku",
+          "decision": "reject",
+          "reason": "不成立为aligns_with。2017贵州文件明确表述\"为贯彻...落实《国家发展改革委 国家能源局关于印发电力体制改革配套文件的通知》...要求\"，声明了对2015年国家文件的明确依据关系，存在从属/落实关系。此为有向的derives_from关系（from下级→to上级），非aligns_with的对称关系。",
+          "confidence": 0.95
+        }
+      ]
+    },
+    {
+      "from": "P_2015_NEA_73",
+      "to": "P_2016_HI_3bac5b3a",
+      "rel": "aligns_with",
+      "stratum": "aligns_with",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "reject",
+        "vote": {
+          "reject": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "reject",
+          "reason": "两篇政策之间存在明确的上下位依据关系，而非平行对齐关系。海南省政策（P_2016_HI_3bac5b3a）正文明确表述\"贯彻国务院决策部署\"，且国家政策（P_2015_NEA_73）第（二十二）条明确要求各地\"2016年3月底前发布充电基础设施专项规划\"，海南省政策正是落实该要求所发布的省级专项规划通知。实际关系应为 derives_from（P_2016_HI_3bac5b3a → P_2015_NEA_73），而非对称的 aligns_with。",
+          "confidence": 0.93
+        },
+        {
+          "model": "haiku",
+          "decision": "reject",
+          "reason": "海南省文件明确声明\"贯彻国务院决策部署\"，表明这是有向的落实/承接关系（derives_from），而非对称的aligns_with。两篇政策确实同主题方向一致，但关键是存在明确的上下游依据关系，不符合aligns_with的\"对称无依据\"定义。",
+          "confidence": 0.92
+        }
+      ]
+    },
+    {
+      "from": "P_2016_AH_ae5294fd",
+      "to": "P_2017_GZ_f47663f2",
+      "rel": "aligns_with",
+      "stratum": "aligns_with",
+      "agreement": "low",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "manual_review",
+        "vote": {
+          "accept": 1,
+          "reject": 1
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "accept",
+          "reason": "两份文件均以中发〔2015〕9号为共同上位依据，同属\"推进电力市场化直接交易\"主题，方向一致（扩大市场化交易规模、放开发用电计划、规范市场主体行为），且互相之间无直接引用或上下位依据关系（安徽省文件发布于2016年11月，国家文件发布于2017年3月，安徽文件不可能依据尚未发布的国家文件），符合跨层级\"同主题方向对齐但不声明因果依据\"的aligns_with定义。",
+          "confidence": 0.72
+        },
+        {
+          "model": "haiku",
+          "decision": "reject",
+          "reason": "两篇政策虽均涉及电力改革，共同以中发〔2015〕9号为上位依据，但聚焦内容差异大：P_2016_AH为省级直接交易规则细则（规范市场主体准入、交易机制等操作层），P_2017_GZ为国家级计划放开框架（涉及跨省跨区、优先发电制度等宏观层）。两者处于改革体系的不同层次，规范对象和机制完全不同，不符合「同主题方向对齐」的aligns_with定义，更接近各自独立实施改革的不同维度。",
+          "confidence": 0.88
+        }
+      ]
+    },
+    {
+      "from": "P_2016_CQ_58e17873",
+      "to": "P_2016_NDRC_8890ad14",
+      "rel": "aligns_with",
+      "stratum": "aligns_with",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "reject",
+        "vote": {
+          "reject": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "reject",
+          "reason": "P_2016_CQ_58e17873 在正文开篇明确写道\"按照国家发展改革委、国家能源局《关于规范开展增量配电业务改革试点的通知》（发改经体〔2016〕2480号）要求\"，将 P_2016_NDRC_8890ad14 作为上位依据援引，构成 derives_from（地方文件落实/承接国家文件）关系，而非平行对齐的 aligns_with 关系。",
+          "confidence": 0.95
+        },
+        {
+          "model": "haiku",
+          "decision": "reject",
+          "reason": "P_2016_CQ_58e17873 explicitly derives from P_2016_NDRC_8890ad14, not aligns_with. The CQ policy states it follows \"国家发展改革委、国家能源局《关于规范开展增量配电业务改革试点的通知》（发改经体〔2016〕2480号）要求\" (NDRC's notice 2480), establishing a directional causal dependency rather than symmetric alignment. This is derives_from (CQ provincial → NDRC national), not aligns_with.",
+          "confidence": 0.95
+        }
+      ]
+    },
+    {
+      "from": "P_2016_HI_3bac5b3a",
+      "to": "P_2017_GD_70875d73",
+      "rel": "aligns_with",
+      "stratum": "aligns_with",
+      "agreement": "high",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "reject",
+        "vote": {
+          "reject": 2
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "reject",
+          "reason": "两篇政策虽同属电动汽车充电基础设施主题，但分属完全独立的省级/市级管辖链（海南省发改委规划 vs. 广州市工信委运营管理通知），互不引用，上位依据也无交集（广州文件溯源为国办发〔2015〕73号和粤发改能电〔2016〕691号，与海南文件无关）；主题重合属全国普遍性政策背景下的共现，不构成 aligns_with 所要求的\"跨地区/跨部门方向对齐\"的实质证据。",
+          "confidence": 0.8
+        },
+        {
+          "model": "haiku",
+          "decision": "reject",
+          "reason": "两篇政策虽同主题,但无方向对齐:广州2017年政策明确依据国务院、建规部、广东省文件,未引用海南政策,两者属各自省市在国家/省级指导下的独立实施,非平行对齐关系。",
+          "confidence": 0.92
+        }
+      ]
+    },
+    {
+      "from": "P_2016_AH_ae5294fd",
+      "to": "P_2017_LN_54de50fa",
+      "rel": "aligns_with",
+      "stratum": "aligns_with:easy_confuse",
+      "agreement": "low",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "manual_review",
+        "vote": {
+          "reject": 1,
+          "accept": 1
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "reject",
+          "reason": "两篇政策同属电力体制改革背景（均源自中发〔2015〕9号），但主题不同：安徽政策（ae5294fd）是省级电力直接交易规则及市场主体准入退出细则，辽宁政策（54de50fa）是组建省级电力市场管理委员会的通知，属于市场治理组织架构事项，而非交易规则；加之辽宁政策正文依申请公开、内容不可读，无法确认方向对齐；两篇既无互引也无明确主题重叠，不满足 aligns_with\"同主题方向对齐\"的定义。",
+          "confidence": 0.72
+        },
+        {
+          "model": "haiku",
+          "decision": "accept",
+          "reason": "两篇政策均在落实中央电力体制改革精神的框架下，分别建立安徽和辽宁的电力市场管理机制：安徽(2016)规定了市场交易规则并明确需建立\"电力市场管理委员会\"，辽宁(2017)实施\"组建辽宁电力市场管理委员会\"，两者在同一深化改革主题上方向对齐且无因果依据关系，符合aligns_with定义。",
+          "confidence": 0.72
+        }
+      ]
+    },
+    {
+      "from": "P_2017_CQ_c8d99857",
+      "to": "P_2018_HI_bdeeb7db",
+      "rel": "aligns_with",
+      "stratum": "aligns_with:easy_confuse",
+      "agreement": "low",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "manual_review",
+        "vote": {
+          "reject": 1,
+          "accept": 1
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "reject",
+          "reason": "两文均源于同一国家级增量配电改革框架，但主题不同：重庆文件聚焦第二批试点项目申报组织（项目遴选），海南文件聚焦增量配电网配电价格管理机制（定价监管），二者无直接引用关系，属于同一上位政策框架下的不同子议题，不构成\"同一主题方向对齐\"的 aligns_with 关系。",
+          "confidence": 0.8
+        },
+        {
+          "model": "haiku",
+          "decision": "accept",
+          "reason": "两篇政策同属增量配电业务改革主题，分别在试点项目申报（重庆2017）和价格管制框架（海南2018）两个维度对齐推进，都引用国家层面政策支持此改革方向，跨地区且无直接因果关系，符合aligns_with定义。",
+          "confidence": 0.82
+        }
+      ]
+    },
+    {
+      "from": "P_2017_GD_70875d73",
+      "to": "P_2017_HI_dcd17e5c",
+      "rel": "aligns_with",
+      "stratum": "aligns_with:easy_confuse",
+      "agreement": "low",
+      "n_labelers": 2,
+      "consensus": {
+        "decision": "manual_review",
+        "vote": {
+          "accept": 1,
+          "reject": 1
+        }
+      },
+      "raw": [
+        {
+          "model": "sonnet",
+          "decision": "accept",
+          "reason": "两篇均为2017年电动汽车充电基础设施主题政策，分属不同地区（广州市 vs 海南省）和不同发文机构（市工信委 vs 省发改委/财政厅），互无引用或上下位依据关系；均聚焦充电设施建设运营的补贴与管理，政策方向一致，符合跨地区同主题方向对齐的 aligns_with 定义。",
+          "confidence": 0.82
+        },
+        {
+          "model": "haiku",
+          "decision": "reject",
+          "reason": "广州政策（2017年4月1日）主要针对充电设施的产品、规划建设、信息录入、运营安全等**全面监督管理**；海南政策（2017年2月16日）专项为**省级补贴实施办法**。两篇政策虽同属电动汽车充电基础设施建设主题，但重心不同（一个管理框架，一个补贴激励），不构成\"同主题方向对齐\"的严格定义。广州政策中的财政补贴仅为管理框架的一个环节，未与海南补贴政策形成方向一致的关系。",
+          "confidence": 0.73
+        }
+      ]
+    }
+  ]
+}
