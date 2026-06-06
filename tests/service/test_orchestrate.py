@@ -1,0 +1,58 @@
+from pathlib import Path
+from scripts.service.hash_ledger import LedgerEntry, compute_hash
+from scripts.service.l2_queue import QueueItem, enqueue
+from scripts.service.orchestrate import StageResult, process_pid, drain_queue
+
+def test_process_pid_skips_when_unchanged():
+    ledger = {"P_X": LedgerEntry("P_X", compute_hash("same"), 1)}
+    calls = []
+    res = process_pid("P_X", "same", version=1, ledger=ledger,
+                      run_attribution=lambda pid: calls.append(pid))
+    assert res.ok is True
+    assert res.error == "skipped"
+    assert calls == []  # 未变 → 不调归属
+
+def test_process_pid_runs_when_changed():
+    ledger = {}
+    calls = []
+    res = process_pid("P_X", "new", version=1, ledger=ledger,
+                      run_attribution=lambda pid: calls.append(pid))
+    assert res.ok is True
+    assert calls == ["P_X"]
+    assert "P_X" in ledger  # mark_done 已更新账本
+
+def test_process_pid_records_error():
+    def boom(pid):
+        raise RuntimeError("llm failed")
+    res = process_pid("P_X", "txt", version=1, ledger={},
+                      run_attribution=boom)
+    assert res.ok is False
+    assert "llm failed" in res.error
+
+def test_drain_queue_processes_high_first(tmp_path):
+    q = tmp_path / "q.jsonl"
+    enqueue(q, QueueItem("P_A", "cron", "normal", "t1"))
+    enqueue(q, QueueItem("P_B", "manual", "high", "t2"))
+    order = []
+    sync_calls = []
+    drain_queue(
+        queue_path=q,
+        ledger={},
+        ledger_path=tmp_path / "ledger.json",
+        raw_text_for=lambda pid: pid + "_txt",
+        version=1,
+        run_attribution=lambda pid: order.append(pid),
+        run_sync=lambda: sync_calls.append("synced"),
+    )
+    assert order[0] == "P_B"   # high 先
+    assert order == ["P_B", "P_A"]
+    assert sync_calls == ["synced"]   # 队列排空后触发一次 sync
+
+def test_drain_queue_empty_no_sync(tmp_path):
+    q = tmp_path / "q.jsonl"
+    sync_calls = []
+    drain_queue(queue_path=q, ledger={}, ledger_path=tmp_path / "l.json",
+                raw_text_for=lambda pid: "", version=1,
+                run_attribution=lambda pid: None,
+                run_sync=lambda: sync_calls.append("x"))
+    assert sync_calls == []  # 空队列不触发 sync
