@@ -1,0 +1,90 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<title>③-C accepted 二次 triage 收口报告(689→537)</title>
+<style>
+*{box-sizing:border-box}
+body{font:15px/1.7 -apple-system,"PingFang SC",sans-serif;margin:0;background:#f4f6fa;color:#1c2530}
+.wrap{max-width:920px;margin:0 auto;padding:28px 22px 60px}
+h1{font-size:22px;margin:0 0 4px}
+.sub{color:#677;font-size:13px;margin-bottom:22px}
+h2{font-size:17px;margin:28px 0 10px;padding-bottom:6px;border-bottom:2px solid #e1e7f0}
+.flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0}
+.box{background:#fff;border:1px solid #d7deea;border-radius:10px;padding:12px 16px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.box .n{font-size:26px;font-weight:700;color:#16202e}
+.box .l{font-size:12px;color:#677;margin-top:2px}
+.box.good .n{color:#0a8a44}.box.cut .n{color:#b4451f}
+.arrow{font-size:22px;color:#9aa7b8}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14px;background:#fff;border-radius:8px;overflow:hidden}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid #eef1f6}
+th{background:#f3f6fb;font-weight:600;color:#46546a}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+.tag{display:inline-block;background:#e8f0fe;color:#1a56db;border-radius:5px;padding:1px 8px;font-size:12px;font-weight:600}
+.warn{background:#fff8e6;border-left:3px solid #e0a800;padding:10px 14px;border-radius:0 6px 6px 0;margin:10px 0;font-size:13.5px}
+.ok{background:#eafaf0;border-left:3px solid #0a8a44;padding:10px 14px;border-radius:0 6px 6px 0;margin:10px 0;font-size:13.5px}
+ul{margin:8px 0;padding-left:22px}li{margin:4px 0}
+code{background:#eef1f6;border-radius:4px;padding:1px 5px;font-size:12.5px;font-family:ui-monospace,monospace}
+.small{color:#8a98ad;font-size:12px}
+</style></head><body><div class="wrap">
+<h1>③-C accepted 二次 triage 收口</h1>
+<div class="sub">2026-06-06 · preview 内人审 · 不写 vault/raw · judge=deepseek-v4-flash(cycle1锁定)</div>
+
+<div class="ok"><b>结论</b>:judge 初判 689 条 accepted,经"确定性剔非政策端点 + 我逐条核残量 + 你终裁 3 条边界"
+三道收口 → <b>537 条高精度 policy↔policy 关系</b>定稿。人审从最初涂黄的 357 条塌缩到你实际只拍了 <b>3 条</b>。</div>
+
+<h2>漏斗</h2>
+<div class="flow">
+<div class="box"><div class="n">689</div><div class="l">judge accept</div></div>
+<div class="arrow">−145</div>
+<div class="box cut"><div class="n">145</div><div class="l">规则剔·非政策端点</div></div>
+<div class="arrow">−4</div>
+<div class="box cut"><div class="n">4</div><div class="l">我核·非政策残量</div></div>
+<div class="arrow">−3</div>
+<div class="box cut"><div class="n">3</div><div class="l">你终裁·弱aligns</div></div>
+<div class="arrow">=</div>
+<div class="box good"><div class="n">537</div><div class="l">clean_final</div></div>
+</div>
+
+<h2>537 定稿构成</h2>
+<table>
+<tr><th>关系类型</th><th class="num">条数</th><th>说明</th></tr>
+<tr><td><span class="tag">aligns_with</span> 同主题跨域对齐</td><td class="num">424</td><td>对称</td></tr>
+<tr><td><span class="tag">derives_from</span> 下位承接上位</td><td class="num">85</td><td>有向</td></tr>
+<tr><td><span class="tag">extends</span> 扩大范围/试点</td><td class="num">15</td><td>有向</td></tr>
+<tr><td><span class="tag">iterates</span> 版本迭代</td><td class="num">13</td><td>有向</td></tr>
+<tr><td colspan="2" class="num"><b>458 / 537 = 85% 置信≥0.9</b></td><td>仅 13 条低置信,且全部经我逐条核确认 KEEP</td></tr>
+</table>
+
+<h2>为什么 357 黄标里 95% 不该上人眼</h2>
+<p>原浏览页把 357 条涂黄,根因是 flag 设计把<b>两类性质完全不同</b>的东西混涂:</p>
+<table>
+<tr><th>桶</th><th class="num">量</th><th>性质 / 处置</th></tr>
+<tr><td>非政策端点</td><td class="num">149</td><td>端点是 政策解读文/人大建议·政协提案答复/座谈会/部门动态/框架协议签署/答记者问/新闻稿 → <b>规则可判死,机器剔</b>(145 规则 + 4 我核补)</td></tr>
+<tr><td>"缺政策词"误标</td><td class="num">~237</td><td>其实是好政策(标题"关于印发《…》"没命中词表)→ <b>废掉这条假阳性弱flag</b></td></tr>
+<tr><td>真低置信</td><td class="num">13</td><td>两端都政策、judge 拿不准 → <b>这才是真要人核的</b>(我已全核)</td></tr>
+</table>
+
+<h2>剔除的 149 条 = L1 污染信号(回灌 B7)</h2>
+<p>这些非政策文书本不该被采进语料、更不该被 ②-B 当政策挂 theme。语义关系层把它们暴露出来。
+去重后 <b>65 个污染端点 PID</b> → <code>b7_contamination.jsonl</code>,交 L1 采集线清理/标记。</p>
+<div class="small">真实污染率:149/689 ≈ 22% 的 accepted 关系触到一个非政策端点(此前"49%"是旧over-firing flag的虚高读数,已校正)。</div>
+
+<h2>你终裁的 3 条(均剔除)</h2>
+<ul>
+<li><b>成品油·沪↔穗</b>:市场行为监管 vs 税控技术 → 工具不同;B 依据广东省部署、与上海无关。</li>
+<li><b>电力市场化·琼↔豫</b>:代理购电 vs 上网电价 → 环节不同;且 A 正文窗为空壳元数据、判官未见 A。</li>
+<li><b>碳达峰↔新能源消纳·沪↔鲁</b>:综合碳达峰工作安排 vs 专项新能源消纳 → 主题相关非同一;两侧窗皆空。</li>
+</ul>
+
+<h2>诚实披露的代价 / 风险</h2>
+<div class="warn"><b>① 时间戳剔除规则有 ~4 条边界误伤</b>:「柴油价格的通知(2023年5月30日)」「广东成品油价格按机制调整×2」「山东工作信息·公开征求价格政策」——是真文件(例行调价通知/征求意见稿),被日期或门户导航标签带走。但调价通知=cycle1 要砍的 iterates 噪声、征求意见稿=草稿,从关系集剔可辩护。</div>
+<div class="warn"><b>② judge 保守 aligns 的已知漏召</b>(承 CALIBRATION_DECISION):cycle1 锁定时自信否掉过用户亲验的 #5/#7 真 aligns。兜底=整文件重生哲学,将来换强模型整体重跑恢复边界召回。</div>
+<div class="warn"><b>③ L1 抽取薄</b>:多条候选正文窗只有标题+元数据(body 没抓到),判官在信息不足下作判。这是 L1 采集质量问题,并入 B7。</div>
+
+<h2>产物(均在 <code>state/node3c/sem_preview_20260606/</code>)</h2>
+<ul>
+<li><code>accepted_clean_final.jsonl</code> — 537 定稿关系</li>
+<li><code>b7_contamination.jsonl</code> — 65 污染端点 PID(回灌 L1)</li>
+<li><code>hand_dropped.jsonl</code> / <code>weak_rel_dropped.jsonl</code> — 4 + 3 人工剔除留痕</li>
+<li><code>reports/accepted_review_clean.html</code> — 537 干净浏览页(可选抽查)</li>
+</ul>
+<div class="small">仍是 preview:不 apply、不写 vault/raw、不进 ④。规则验证后可固化进 program_gate(非政策端点门)。</div>
+</div></body></html>

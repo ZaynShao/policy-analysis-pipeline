@@ -1,0 +1,48 @@
+{
+  "stage": "③-C preview · 二次triage收口",
+  "date": "2026-06-06",
+  "judge": "deepseek-v4-flash (cycle1锁定)",
+  "preview_only": true,
+  "notes": ["no_vault_write", "no_raw_write", "no_apply", "not_in_node4"],
+
+  "judge_accept": 689,
+  "clean_final": 537,
+  "dropped_total": 152,
+  "dropped_breakdown": {
+    "rule_nonpolicy_endpoint": 145,
+    "hand_nonpolicy_residual": 4,
+    "user_adjudicated_weak_aligns": 3
+  },
+
+  "clean_final_by_relation": {
+    "aligns_with": 424,
+    "derives_from": 85,
+    "extends": 15,
+    "iterates": 13
+  },
+  "conf_ge_0_9": 458,
+  "low_conf_lt_0_8_all_human_kept": 13,
+
+  "l1_contamination": {
+    "distinct_endpoint_pids": 65,
+    "file": "b7_contamination.jsonl",
+    "contamination_rate_of_accepted": "149/689 ≈ 22%",
+    "route": "回灌 L1 采集线 (BACKLOG B7)"
+  },
+
+  "honest_caveats": [
+    "时间戳剔除规则 ~4 条边界误伤(例行调价通知/征求意见稿),可辩护",
+    "judge 保守 aligns 漏召边界真关系(承 cycle1 决策),兜底=整文件重生+强模型重跑",
+    "多条候选正文窗仅元数据(L1抽取薄),判官信息不足→并入 B7"
+  ],
+
+  "artifacts": {
+    "final": "accepted_clean_final.jsonl",
+    "contamination": "b7_contamination.jsonl",
+    "hand_dropped": "hand_dropped.jsonl",
+    "weak_rel_dropped": "weak_rel_dropped.jsonl",
+    "review_page": "reports/accepted_review_clean.html",
+    "report": "reports/triage_final_report.html"
+  },
+  "future": "规则验证通过→可固化'非政策端点门'进 program_gate(零pid通则)"
+}

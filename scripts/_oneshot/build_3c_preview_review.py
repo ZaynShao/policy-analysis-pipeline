@@ -8,12 +8,12 @@
 输出 state/node3c/sem_preview_20260606/reports/accepted_review.html
 """
 from __future__ import annotations
-import json, re, html
+import json, re, html, os
 from pathlib import Path
 
 PREV = Path("state/node3c/sem_preview_20260606")
-ACCEPTED = PREV / "accepted_semantic_relations.jsonl"
-OUT = PREV / "reports" / "accepted_review.html"
+ACCEPTED = PREV / os.environ.get("ACC_FILE", "accepted_semantic_relations.jsonl")
+OUT = PREV / "reports" / os.environ.get("OUT_FILE", "accepted_review.html")
 
 REL_ZH = {
     "derives_from": "derives_from·下位承接上位",
@@ -59,14 +59,12 @@ def clean_window(w: str) -> str:
 
 
 def flags_for(rel, conf, ft, tt):
+    # 注:原"疑似新闻/动态"弱flag(缺政策词)假阳性率极高(267/689 误标好政策),已废;
+    # 非政策端点改由 finalize_3c_clean 的确定性规则前置剔除。此处只留"低置信"软标。
     fl = []
     if conf is not None and conf < 0.8:
-        fl.append("低置信")
-    for t in (ft, tt):
-        if any(n in t for n in NEWS_WORDS) or not any(d in t for d in DOC_WORDS):
-            fl.append("疑似新闻/动态")
-            break
-    return sorted(set(fl))
+        fl.append("低置信·已人核")
+    return fl
 
 
 def main():
