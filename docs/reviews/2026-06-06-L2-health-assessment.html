@@ -1,0 +1,122 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<title>L2 健康评估 · 建 L3 消费门前的体检(2026-06-06)</title>
+<style>
+*{box-sizing:border-box}
+body{font:15px/1.7 -apple-system,"PingFang SC",sans-serif;margin:0;background:#f4f6fa;color:#1c2530}
+.wrap{max-width:960px;margin:0 auto;padding:28px 22px 70px}
+h1{font-size:23px;margin:0 0 4px}
+.sub{color:#677;font-size:13px;margin-bottom:18px}
+.verdict{background:#fff;border:2px solid #e0a800;border-radius:12px;padding:16px 20px;margin:16px 0;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.verdict h2{margin:0 0 8px;font-size:18px;border:0;color:#8a5a00}
+.verdict.ok{border-color:#0a8a44}.verdict.ok h2{color:#0a6b35}
+h2{font-size:17px;margin:30px 0 10px;padding-bottom:6px;border-bottom:2px solid #e1e7f0}
+h3{font-size:15px;margin:18px 0 6px;color:#2b3a4f}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13.5px;background:#fff;border-radius:8px;overflow:hidden}
+th,td{padding:8px 11px;text-align:left;border-bottom:1px solid #eef1f6;vertical-align:top}
+th{background:#f3f6fb;font-weight:600;color:#46546a}
+.pill{display:inline-block;border-radius:5px;padding:1px 9px;font-size:12px;font-weight:600}
+.green{background:#eafaf0;color:#0a6b35}.amber{background:#fff8e6;color:#8a5a00}.red{background:#fdecea;color:#b4451f}.gray{background:#eef1f6;color:#677}
+blockquote{margin:8px 0;padding:8px 14px;background:#f7f9fc;border-left:3px solid #9aa7b8;border-radius:0 6px 6px 0;font-size:13.5px;color:#3a4757}
+code{background:#eef1f6;border-radius:4px;padding:1px 5px;font-size:12.5px;font-family:ui-monospace,monospace}
+ul{margin:6px 0;padding-left:22px}li{margin:4px 0}
+.small{color:#8a98ad;font-size:12px}
+.num{font-variant-numeric:tabular-nums}
+.flag{background:#fdecea;border-left:3px solid #b4451f;padding:10px 14px;border-radius:0 6px 6px 0;margin:10px 0;font-size:13.5px}
+.note{background:#eef5ff;border-left:3px solid #2563eb;padding:10px 14px;border-radius:0 6px 6px 0;margin:10px 0;font-size:13.5px}
+</style></head><body><div class="wrap">
+<h1>L2 健康评估 —— 建 L3 消费门(Lever B)前的体检</h1>
+<div class="sub">2026-06-06 · 3 个只读调研 agent 取证 · 全程实测(测试/git/文件计数/校准盘/污染溯源亲自跑过)· judge=deepseek-v4-flash</div>
+
+<div class="verdict">
+<h2>核心裁决</h2>
+<p><b>① 提法要先校正</b>:按你 charter 的口径,<b>"L2 彻底做完" 不是一个合理的提法</b>。charter 明写 L2 是<b>幂等可重生、随 L1 追加永不一次性完成</b>;"健康"的定义不是完成度,而是<b>幂等重建命令在不在 + 验收门守不守得住 + 输出零补丁可整体重生</b>。</p>
+<p><b>② 按正确标尺裁决</b>:L2 的<b>机制层健康(高信心)</b>——三纪律守住、278 测试绿、git 干净、零 pid 补丁;<b>但买卖层(buildout)不完整,且有一处源头病灶已渗透</b>:</p>
+<ul>
+<li><span class="pill red">三缺一</span> <b>结晶支柱从未构建</b>(零代码/零 state/零任务序列;vault 里只有 5/8 旧化石)。L2=归属+分析+结晶,现在实建 2/3。</li>
+<li><span class="pill amber">未落地</span> <b>分析(③)五子节点全是 preview、零 apply 到 vault</b>;且 vault 里 5/12 的旧关系 stale 没清,真值在 state、化石在 vault。</li>
+<li><span class="pill red">源头病灶</span> <b>22% 的关系触到非政策端点</b>(65 个 PID),根因是 L1 错采、②-B 放大——已渗透进 business_view 与 ③。</li>
+</ul>
+<p><b>结论</b>:<b>不能说"L2 已彻底做完健康"。</b>机制是健康的骨架,但有一个从未建的支柱(结晶,需先决定去留)、一层未落地的产物(③)、和一处必须从源头治的污染(22%)。在动 L3 消费门之前,这三件至少要<b>各有定论</b>。</p>
+</div>
+
+<h2>1 · 三支柱状态一览</h2>
+<table>
+<tr><th>支柱</th><th>状态</th><th>落地</th><th>关键证据</th></tr>
+<tr><td><b>归属 ②</b></td><td><span class="pill green">基本健康·小尾巴</span></td><td>已 apply 到 vault</td><td>②-A 修 148 篇(commit <code>d2a3ddbd</code>/<code>2190d637</code>);②-B business_view <b>836/935=89%</b>(commit <code>1b0cad04</code>+apply);全 836 篇字段零缺失、零不变量违反</td></tr>
+<tr><td><b>分析 ③</b></td><td><span class="pill amber">逻辑健康·未落地</span></td><td><b>全 preview,零 apply</b></td><td>③-A 审计 / ③-B 677候选 / ③-C <b>537定稿</b> / ③-D 信号 / ③-E analysis_context 342——全部 <code>no_vault_write</code>,躺在 <code>state/</code></td></tr>
+<tr><td><b>结晶</b></td><td><span class="pill red">从未构建</span></td><td>不存在</td><td><code>grep -ri crystalliz scripts/</code> = 空;<code>state/</code> 无产物;vault <code>2_crystallized/</code> 仅 5/8 旧化石(SCHEMA §6 有契约、从未实现;最新分析层设计已不再提结晶)</td></tr>
+</table>
+
+<h2>2 · the bar:charter 怎么定义"健康"(引原文)</h2>
+<blockquote>"L2 做成一条<b>幂等命令(temperature 0,输入=当前 L1,输出=整批受影响文件全替换)</b>…「重跑」永远是最省选择,补丁诱惑从根上消失。"</blockquote>
+<blockquote>"<b>承诺的是这套纪律(整体重建·验收门·零补丁),不是「零错误」</b>。纪律到位,残余错误只会在下次重建里被整体修掉,永远不沉淀成废料。"</blockquote>
+<blockquote>纪律 A 采集只追加(L1)· 纪律 B 派生按受影响文件整文件重生(L2/L3,"更新"≡"整文件重生")· 纪律 C 定期全量重建做 GC。</blockquote>
+<p class="small">→ 所以本评估不按"完成百分比"判生死,而按"机制是否健康 + 残余错误能否被下次重生整体扫掉 + 是否在往里打补丁"判。机制这关 L2 是过的。</p>
+
+<h2>3 · 归属 ②(基本健康)</h2>
+<ul>
+<li><b>②-A 身份固化</b>:已 apply,§C provenance 落地(<code>id_recompute_from_metadata</code> 等),resolver 纯函数零 pid。残留 45 条<b>全是"宁可不写"的保守挂起,零 raw 污染</b>。所谓 "nea/ndrc 转发站误标"不是 live bug——被 <b>ledger 交叉校验</b>挡住(resolver 说 NEA、ledger 说真机关 → 判 disagree → 挂起,共 11 条)。<code>needs_manual</code> 域名仅剩 4 个长尾。</li>
+<li><b>②-B theme+打分</b>:836/935。<b>未覆盖的 100 篇 = 100% 可追溯到队列,零静默缺口</b>:其中 ~14 篇技术性失败(非JSON/解析/API/拼写)<b>可直接补跑</b>,~90 篇 judge 真判了质量问题待复核/重生。</li>
+<li><b>数据完整性</b>:全 836 篇字段零缺失、primary∈themes 零违反、深档 587 篇影响分析零缺。仅 1 个良性孤儿 <code>P_2025_GD_0203ce87.yaml</code>(汕尾 relay 副本退役时漏删,<code>rm</code> 即可)。</li>
+</ul>
+<div class="note"><b>⚠ memory 数字纠正</b>:②-B judge 的"地方政策低估"盲区,memory 记的是"必抓 67%"。本次从磁盘 <code>judge_calibration.jsonl</code> <b>重算 = planted-recall 7/9 = 77.8%,FP 8%</b>。盲区<b>真实存在</b>(漏的 2 篇正是 underrate_local + wrong_primary),但召回数应以 <b>77.8%</b> 为准。已知、有界、有兜底。</div>
+
+<h2>4 · 分析 ③(逻辑健康,但全在 preview + vault 有 stale 化石)</h2>
+<table>
+<tr><th>节点</th><th>构建</th><th>落地</th><th>产物</th></tr>
+<tr><td>③-A 旧关系审计</td><td>✅</td><td>audit-only</td><td>判定旧关系 stale(endpoint_missing 524)</td></tr>
+<tr><td>③-B 确定性高精度关系</td><td>✅ 纯程序</td><td><span class="pill amber">preview</span></td><td>677 候选(references424/cites_basis161/supersedes5/clarifies87)</td></tr>
+<tr><td>③-C 语义关系</td><td>✅ +judge</td><td><span class="pill amber">preview</span></td><td><b>537 定稿</b>(aligns424/derives85/extends15/iterates13)</td></tr>
+<tr><td>③-D signal_context</td><td>✅</td><td><span class="pill amber">preview</span></td><td>评论/市场信号两层</td></tr>
+<tr><td>③-E analysis_context</td><td>✅</td><td><span class="pill amber">preview</span></td><td>342 行(合成 ③-B 关系 + ③-D 信号)</td></tr>
+</table>
+<div class="flag"><b>staleness 混淆源</b>:vault <code>1_extracted/relations/</code> 那批旧关系 mtime 全是 <b>2026-05-12</b>——早于 raw 清洗(5/31)、②-A/②-B(5/31–6/5)。它们端点已漂移、是 stale,但<b>至今没清退/覆盖</b>,与新 preview 产物并存。新代码全部显式不消费旧关系(只当 ③-A 审计输入),但 vault 里"真值在 state、化石在 vault"是个需要收口的隐患。</div>
+
+<h2>5 · 结晶 —— 三支柱里唯一从未构建(本次最大发现)</h2>
+<ul>
+<li><b>零代码</b>:<code>grep -rl -i "crystalliz|结晶" scripts/</code> → 空。<b>零 state 产物</b>:<code>find . -iname "*crystalliz*"</code> → 空。<b>零任务序列</b>:进度真值通篇 ①→②(A/B)→③(A–E),结晶从未拿到节点编号或 scope。</li>
+<li>vault <code>2_crystallized/</code> 看似有东西(themes/16 + regions/25 + 旧月报),但 mtime 全 ≤ <b>2026-05-08</b>,是旧 L2 化石,SCHEMA §6 已标<b>停维</b>。</li>
+<li>SCHEMA §6 给了完整契约(每主题产 overview/timeline/regional-coverage/opinions-summary 4 文件,"整体重写"),<b>但从未实现</b>;而<b>最新的 2026-06-04 分析层设计里 grep 结晶 = 空</b>——意味着最新一轮设计可能已把结晶<b>隐性去 scope</b>(被 ③-E analysis_context + ④ 直接查询取代?)。</li>
+</ul>
+<div class="note"><b>这不一定是"缺陷",可能是"已被取代"。</b>需要你拍一个 scope 决定:结晶<b>还在计划里(要建)</b>,还是<b>已被 ③-E + ④ 取代(正式除名)</b>?在此之前,"L2 三支柱齐全"这句话不成立。</div>
+
+<h2>6 · 横切健康</h2>
+<table>
+<tr><th>项</th><th>状态</th><th>证据</th></tr>
+<tr><td>测试套件</td><td><span class="pill green">全绿</span></td><td><code>pytest -q</code> → <b>278 passed</b>(62 文件,1.4s)</td></tr>
+<tr><td>git 工作区</td><td><span class="pill green">干净</span></td><td><code>main</code> == <code>origin/main</code>,HEAD <code>0e313a3</code>,nothing to commit</td></tr>
+<tr><td>L1→L2 污染</td><td><span class="pill red">22% · 须从源头治</span></td><td>③-C accepted 里 149/689≈22% 触非政策端,<b>65 个去重 PID</b>;<b>65/65 全在冻结 raw + 65/65 全有 business_view</b>=L1 错采、②-B 放大</td></tr>
+<tr><td>上游抽取质量</td><td><span class="pill amber">中</span></td><td>935 raw 中 body&lt;500字 104篇(11%)、纯元数据 13篇(1%);judge 部分候选"正文窗仅元数据"信息不足</td></tr>
+</table>
+<div class="flag"><b>污染必须从源头修,不能在 L2 打补丁</b>:65 个非政策文书(人大建议答复14/新闻特稿13/政协提案9/政策解读7/座谈会/框架协议/答记者问…)是被 L1 错当政策采进 raw、②-B 又给挂了 theme。按 charter 纪律 B,处置 = <b>退役这些非政策文书出 raw(+ B3 的 4 篇 commentary 迁出)→ ②-B 整文件重生 → business_view 与下游自动清</b>。<code>b7_contamination.jsonl</code> 名单已就绪,这步成本低、杠杆高。</div>
+
+<h2>7 · BACKLOG B1–B7 对 L2 健康的阻塞性</h2>
+<table>
+<tr><th>编号</th><th>一句话</th><th>阻塞 L2 健康?</th></tr>
+<tr><td><b>B2</b></td><td>② 必须吃归属台账(~115 篇真 issuer/region 在台账未写回)</td><td><span class="pill red">是·根</span> 直接决定 ②/③ 输入正确性</td></tr>
+<tr><td><b>B6</b></td><td>L1 采集覆盖未补齐 + <b>非政策错采(=本次 22% 污染源头)</b></td><td><span class="pill red">是·根本</span> L2 数据上限由 L1 定</td></tr>
+<tr><td><b>B3</b></td><td>4 篇政策解读误入 policies/,应迁 commentaries/</td><td><span class="pill amber">是·轻</span> 同源头污染</td></tr>
+<tr><td><b>B4</b></td><td>P_2027/P_1900 date 损坏</td><td><span class="pill amber">是·轻</span> date 是归属字段,个位数</td></tr>
+<tr><td><b>B5</b></td><td>词表 4 处不自洽(部分已收口)</td><td><span class="pill amber">是·轻</span> theme 分类法喂 ②</td></tr>
+<tr><td><b>B1</b></td><td>市场行情第三源</td><td><span class="pill gray">否</span> 源/消费扩展</td></tr>
+<tr><td><b>B7</b></td><td>覆盖盲区反馈环(65 污染已回灌此条)</td><td><span class="pill gray">半</span> 本体属 ④;其"非政策端点门"是修 L2 污染的机制</td></tr>
+</table>
+
+<h2>8 · 对 Lever B / L3 的结论</h2>
+<ul>
+<li><b>机制上 Lever B 可建</b>:它是消费时 + 可逆门;且 ③-C 的 537 <b>已剔掉非政策端点</b>,由它算出的"关系枢纽"信号(29 篇 derives 枢纽 + ③-B cites_basis)是干净的。</li>
+<li><b>但污染在 ②-B 层尚未清</b>:65 个非政策 PID 仍带着 theme/重要性躺在 business_view 里。任何 L3 消费若读 business_view,会把人大答复/新闻稿当政策展示。<b>所以源头修应在 Lever B 之前</b>,否则 Lever B 兜回来的"被低估地方政策"里可能混着非政策垃圾。</li>
+<li><b>③-C 537 是 preview,不应被当作可直接 apply 的事实</b>(设计如此)。L3 消费应读 <code>analysis_context</code>,并固化"非政策端点门"进 program_gate(零 pid 通则,<code>summary_final</code> 的 future 项已指明)。</li>
+</ul>
+
+<div class="verdict ok">
+<h2>推荐序列(建 Lever B 之前)</h2>
+<ol>
+<li><b>先治 22% 源头污染</b>(最高杠杆、名单已就绪):退役 65 非政策 PID 出 raw + B3 的 4 篇迁出 → ②-B 整文件重生 → 同时清掉 business_view 与下游污染。顺带删 1 个孤儿 yaml、补跑 ②-B 那 ~14 篇技术性失败。</li>
+<li><b>拍结晶去留</b>:还建,还是正式除名(并入 ③-E + ④)?——decide,别让"三缺一"悬着。</li>
+<li><b>定 ③ 落地策略</b>:relations 何时/是否 apply 进 vault + 退役 5/12 stale 化石(让 vault 只剩一份真值)。</li>
+<li><b>然后</b> Lever B(或把它折进届时成形的 ④)。</li>
+</ol>
+<p class="small">机制健康让你有底气迭代;但上面 1（污染）是"喂给 L3 的食材"问题,2/3 是"L2 是否齐全/一致"问题——都该在盖 L3 之前各有定论。</p>
+</div>
+</div></body></html>
