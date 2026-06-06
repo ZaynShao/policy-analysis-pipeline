@@ -207,4 +207,16 @@
 **触发条件**:继续 ②-B 全量重生、启动 ③分析重生、或启动 ④消费层之前。**下一步**:做小范围 `commentary_signals` 闭环,再处理 market_intel representation。
 
 ---
-_登记于 2026-05-30。新增推后项往下追加,不删旧项;做掉的标 ✅ done 并注日期。B2–B5 登记于 2026-05-31。B6–B7 登记于 2026-05-31(采集未补齐 + 2线可操作 + 盲区反馈环)。B8 登记于 2026-05-31(②-A 71 入队残留)。B9 登记于 2026-05-31(月报原型退役 + 乡村去污染)。B10 登记于 2026-06-01(③分析=关系/演进/区域,现存8文件但 stale 待重生,依赖②)。B11 登记于 2026-06-02(②-B 人工确认池 + 全局硬化回流)。B12 登记于 2026-06-03(三源接线 + 旧 business_view 消费隔离)。_
+
+## B13 — CONTRACT-REL-1:③ canonical 关系格式 ↔ 服务化 sync relation_mapper 对账(延后)
+
+**发现**:2026-06-06,pipeline origin/main 阶段性 push 了 ③ 关系层投影器(`scripts/analysis_relation_views/`,commits a5266ec/bd61206/8b6d945/ab2d542)。它产 `relations_canonical.jsonl`,边字段为 **`from` / `to` / `rel`**(见 `api_view.py` 的 `to_row()` 输出 + 排序键)。而服务化线(分支 `feat/service-deploy`)的 `scripts/sync/relation_mapper.py` + `run_sync.collect_relation_rows` 吃的是 **`from_pid` / `to_pid` / `relation_type`**,并以这三键做存在性过滤。
+
+**后果(若不对账)**:③ 关系真 apply 进 vault 后,sync 对每条 canonical 边过滤命中失败 → **静默跳过 → `PolicySemanticRelation` 表 0 行**。另:`pg_writer.build_relation_upsert` 写 `confidence`/`evidence`,需确认 canonical `to_row()` 是否携带,否则落空。
+
+**为何延后(非现在修)**:① 关系 sync 本就按 spec §6 延后(首次 sync 只写 ②-B 政策,relations 表暂空);② ③ canonical 现为 preview(`run.py` 注记 `no_vault_write`/`no_apply`,落点 out_root 非 vault `1_extracted/relations/`),格式/落点仍可能动。现在改 = 追移动靶。
+
+**强制对账点(触发条件)**:③ 关系 apply 进 vault 那一刻。届时二选一:(a) relation_mapper 改吃 `from`/`to`/`rel` 且 collect_relation_rows 读 `relations_canonical.jsonl`;(b) 加一层适配器把 canonical 归一化成 sync 入参。同时对齐:canonical 落点 vs sync glob 路径、confidence/evidence 字段、9 类 rel 取值集(SCHEMA §5.2)。**关联 B10**(③分析重生)。
+
+---
+_登记于 2026-05-30。新增推后项往下追加,不删旧项;做掉的标 ✅ done 并注日期。B2–B5 登记于 2026-05-31。B6–B7 登记于 2026-05-31(采集未补齐 + 2线可操作 + 盲区反馈环)。B8 登记于 2026-05-31(②-A 71 入队残留)。B9 登记于 2026-05-31(月报原型退役 + 乡村去污染)。B10 登记于 2026-06-01(③分析=关系/演进/区域,现存8文件但 stale 待重生,依赖②)。B11 登记于 2026-06-02(②-B 人工确认池 + 全局硬化回流)。B12 登记于 2026-06-03(三源接线 + 旧 business_view 消费隔离)。B13 登记于 2026-06-06(CONTRACT-REL-1:③ canonical 关系格式 vs 服务化 sync relation_mapper 对账,延后到 ③关系 apply 进 vault;服务化部署线 feat/service-deploy)。_

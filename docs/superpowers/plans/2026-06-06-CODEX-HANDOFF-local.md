@@ -99,6 +99,8 @@ pnpm dev:frontend  # :5173
 
 - **Plan C(服务器部署)本轮不做**——等 P1 SSH 通(晚上)。本地验证好后再搬。
 - **③-C 语义关系**当前 preview 未 apply(P3)→ 首次 sync 只写 ②-B 的 business_view,relations 表暂空,apply 后下次 sync 自动追上。
+- **分支衔接(2026-06-06 定)**:`feat/service-deploy` 与 origin/main **零文件重叠**(origin/main 阶段性 push 的 ③ 关系层落在 `scripts/analysis_relation_views/`,不碰 service/sync/pyproject/principle_guard/run_2b/SCHEMA 读路径)。**故不中途 rebase**——避免把 ~38 个 analysis_relation_views 测试灌进本线回归基线、搅乱每-task delta。各 task 在当前 base 跑完(回归基线 242→…→320 递增),**最终集成/PR 前再一次性 rebase onto origin/main**(无冲突)。
+- **CONTRACT-REL-1(关系格式对账·延后)**:③ canonical 关系用 `from`/`to`/`rel`,本线 relation_mapper 吃 `from_pid`/`to_pid`/`relation_type`——③ 关系 apply 进 vault 时**必须对账**,否则 `PolicySemanticRelation` 表 0 行。详见 `docs/BACKLOG.md` B13。不影响当前进程(关系 sync 本就延后)。
 - 分析/结晶增量、themeOverrides UI、L3 月报 = Phase 2。
 - safety-platform 是另一条活跃线的仓,只在 `feature/heng-pipeline-integration` 动,PR 走管理员审,不直接推 master。
 
