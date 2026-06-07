@@ -40,3 +40,14 @@ def test_normal_commentary_is_ingested():
 
 def test_policy_interpretation_is_ingested():
     assert classify(_item("解读丨2025年两新政策如何加力扩围")).disposition == Disposition.INGEST
+
+
+def test_ipo_financing_still_market_intel_after_tightening():
+    # 真资本事件仍判 market_intel
+    assert classify(_item("晶科科技完成近2亿元融资")).disposition == Disposition.MARKET_INTEL
+
+
+def test_policy_commentary_with_financing_word_not_diverted():
+    # 政策解读含"融资"/"上市"字样不应被误转 market_intel(应入 vault)
+    assert classify(_item("绿色融资工具政策解读：央行新规影响几何")).disposition == Disposition.INGEST
+    assert classify(_item("新能源上市公司迎政策利好")).disposition == Disposition.INGEST

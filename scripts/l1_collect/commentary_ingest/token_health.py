@@ -23,12 +23,15 @@ def check_token(db_path: Path) -> TokenStatus:
     db_path = Path(db_path)
     if not db_path.exists():
         return TokenStatus(False, "", f"无法读取 wewe-rss DB: {db_path}")
+    con = None
     try:
         con = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
         rows = con.execute("SELECT name, status FROM accounts").fetchall()
-        con.close()
     except sqlite3.Error as e:
         return TokenStatus(False, "", f"无法读取 accounts: {e}")
+    finally:
+        if con is not None:
+            con.close()
     if not rows:
         return TokenStatus(False, "", "accounts 表为空,未登录")
     invalid = [name for name, status in rows if status != 1]

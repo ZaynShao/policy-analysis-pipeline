@@ -15,7 +15,7 @@ WEIXIN_PERMALINK = "https://mp.weixin.qq.com/s/{}"
 
 
 def _norm_date(raw: str) -> str:
-    """ISO datetime / date → YYYY-MM-DD;无法解析返回 ''。"""
+    """ISO datetime/date 取前 10 位当 YYYY-MM-DD(feed 保证 ISO 格式);空值返回 ''。"""
     if not raw:
         return ""
     return str(raw)[:10] if len(str(raw)) >= 10 else ""

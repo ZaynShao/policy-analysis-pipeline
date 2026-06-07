@@ -29,7 +29,7 @@ def _is_market_intel(title: str) -> str:
         return "采购招标+容量"
     if re.search(r"采购公告|招标公告|中标公示|开标公示", title):
         return "采购招标公示"
-    if re.search(r"IPO|上市|完成.{0,6}融资|融资|过会", title):
+    if re.search(r"IPO|过会|拟上市|挂牌上市|完成.{0,8}(融资|募资)|获.{0,6}轮.{0,4}融资|募资|定增", title):
         return "资本市场动态"
     if re.search(r"出货.{0,8}(GWh|GW|万|亿)|同比增长.*%", title):
         return "出货/增速数据"

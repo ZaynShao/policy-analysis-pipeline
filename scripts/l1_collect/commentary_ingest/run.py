@@ -25,7 +25,7 @@ from .content import to_body
 from .feed_client import fetch_feed
 from .filters import classify
 from .ledger import load_seen_urls, record_dispositions, write_last_run
-from .models import Disposition, FeedItem
+from .models import Disposition
 from .token_health import alert, check_token
 from .writer import stage_market_intel, write_commentary
 
@@ -89,16 +89,18 @@ def main() -> int:
                     help="不做正文兜底抓取(只用 feed 全文)")
     args = ap.parse_args()
 
-    # token 健康检查(--check-token 或每轮入库前都查一次)
-    if args.db_path:
-        st = check_token(Path(args.db_path))
-        if not st.valid:
-            msg = f"[commentary-ingest] wewe-rss token 失效:{st.detail}（账号 {st.account_name}）需重新扫码"
-            if not alert(msg, args.alert_webhook):
-                print(msg)
-        if args.check_token:
-            print(f"token valid={st.valid} detail={st.detail}")
-            return 0 if st.valid else 1
+    # token 健康检查。注意:token 失效时**不中止入库**——wewe-rss 仍能 serve 已存
+    # 文章的 feed(token 只挡"发现新文章"),故照常消费并告警提醒补扫。
+    st = check_token(Path(args.db_path)) if args.db_path else None
+    if st is not None and not st.valid:
+        msg = f"[commentary-ingest] wewe-rss token 失效:{st.detail}（账号 {st.account_name}）需重新扫码"
+        if not alert(msg, args.alert_webhook):
+            print(msg)
+    if args.check_token:
+        if st is None:
+            ap.error("--check-token 需 --db-path")
+        print(f"token valid={st.valid} detail={st.detail}")
+        return 0 if st.valid else 1
 
     if not args.feed_url or not args.vault_dir:
         ap.error("缺 --feed-url / --vault-dir(或对应 env)")
@@ -106,9 +108,7 @@ def main() -> int:
     summary = ingest_items(items, vault_dir=Path(args.vault_dir),
                            state_dir=Path(args.state_dir),
                            fetch_fallback=not args.no_fallback)
-    token_status = "valid"
-    if args.db_path:
-        token_status = "valid" if check_token(Path(args.db_path)).valid else "invalid"
+    token_status = "unknown" if st is None else ("valid" if st.valid else "invalid")
     write_last_run(Path(args.state_dir), {**summary, "token_status": token_status})
     print(json.dumps(summary, ensure_ascii=False))
     return 0
