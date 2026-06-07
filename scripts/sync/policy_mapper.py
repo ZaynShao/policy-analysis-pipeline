@@ -69,5 +69,6 @@ def map_policy_row(bv: dict, core: dict, pipeline_version: int) -> dict:
         "doc_number": core.get("doc_number") or None,
         "source_url": core.get("source_url") or None,
         "region": core.get("region") or None,
+        "level": core.get("level") or None,
     })
     return row

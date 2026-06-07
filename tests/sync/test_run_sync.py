@@ -12,18 +12,22 @@ def _write_bv(vault: Path, pid: str):
         f"value_tags: [机会]\n影响分析: {{加油: a, 充电: b, 电力_储能_V2G_交易: c}}\n"
         f"comprehensive: false\n", encoding="utf-8")
 
-def _write_raw(vault: Path, pid: str, date: str = "2025-05-27"):
+def _write_raw(vault: Path, pid: str, date: str = "2025-05-27", region: str = "全国"):
     d = vault / "0_raw" / "policies"
     d.mkdir(parents=True, exist_ok=True)
+    if region == "dict":
+        region_text = "region:\n  level: 省\n  code: '110000'\n  name: 北京市\n"
+    else:
+        region_text = f"region: {region}\n"
     (d / "anyname.md").write_text(
         f"---\nid: {pid}\ntitle: 核心标题\nissuer:\n  - 发文机关\n"
         f"date: {date}\nofficial_number: 文号\n"
-        f"region: 全国\nprovenance:\n  url: https://example.com\n---\n"
+        f"{region_text}provenance:\n  url: https://example.com\n---\n"
         f"## 政策原文\n正文\n",
         encoding="utf-8")
 
 def test_collect_policy_rows(tmp_path):
-    _write_raw(tmp_path, "P_FAKE_0001")
+    _write_raw(tmp_path, "P_FAKE_0001", region="dict")
     _write_bv(tmp_path, "P_FAKE_0001")
     rows, skipped = collect_policy_rows(tmp_path, pipeline_version=1)
     assert len(rows) == 1
@@ -31,6 +35,8 @@ def test_collect_policy_rows(tmp_path):
     assert rows[0]["title"] == "核心标题"
     assert rows[0]["source"] == "AUTO"
     assert rows[0]["issue_date"] == datetime.date(2025, 5, 27)
+    assert rows[0]["region"] == "北京市"
+    assert rows[0]["level"] == "省"
     assert rows[0]["pipeline_pid"] == "P_FAKE_0001"
     assert rows[0]["importance"] == "MAJOR"
 

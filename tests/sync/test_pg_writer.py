@@ -11,7 +11,7 @@ def _policy_row():
         "pipeline_impact": "x", "comprehensive": True,
         "title": "标题", "issuer": "发文机关", "issue_date": "2025-05-27",
         "content": "正文", "source": "AUTO", "doc_number": "文号",
-        "source_url": "https://example.com", "region": "全国",
+        "source_url": "https://example.com", "region": "全国", "level": "国家",
     }
 
 def test_policy_upsert_targets_pipeline_pid_conflict():
@@ -25,13 +25,16 @@ def test_policy_upsert_writes_core_not_null_fields():
     row = _policy_row()
     sql, params = build_policy_upsert(row)
     for col in ['"title"', '"issuer"', '"issueDate"', '"content"',
-                '"source"', '"docNumber"', '"sourceUrl"', '"region"']:
+                '"source"', '"docNumber"', '"sourceUrl"', '"region"',
+                '"level"', '"updatedAt"']:
         assert col in sql
+    assert '"updatedAt"' in sql
+    assert 'now()' in sql
     assert '%(source)s::"PolicySource"' in sql
     assert "importanceOverride" in sql
     assert "IS NULL" in sql
     for key in ["title", "issuer", "issue_date", "content", "source",
-                "doc_number", "source_url", "region"]:
+                "doc_number", "source_url", "region", "level"]:
         assert key in params
 
 def test_policy_upsert_respects_importance_override():
