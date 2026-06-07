@@ -20,6 +20,7 @@ import yaml
 
 VAULT = Path.home() / "Documents/Zayn Main/政策分析"
 POL = VAULT / "0_raw/policies"
+COM = VAULT / "0_raw/commentaries"
 B7 = Path("state/node3c/sem_preview_20260606/b7_contamination.jsonl")
 OUT = Path("state/l1_gate/golden")
 OUT.mkdir(parents=True, exist_ok=True)
@@ -72,6 +73,31 @@ def policy_fields(p: Path) -> tuple:
     return pid, title, url, body[:700]
 
 
+def commentary_records() -> list:
+    """官方解读 golden：COM/*.md 中 commentary_kind==official 的各出一条。"""
+    recs = []
+    for p in sorted(COM.glob("*.md")):
+        if p.name.startswith("_"):
+            continue
+        txt = p.read_text(encoding="utf-8", errors="ignore")
+        m = re.search(r"^---\n(.*?)\n---", txt, re.S)
+        if not m:
+            continue
+        fm = yaml.safe_load(m.group(1))
+        if not isinstance(fm, dict) or fm.get("commentary_kind") != "official":
+            continue
+        pid = str(fm.get("id") or p.stem).strip()
+        title = str(fm.get("title") or p.stem).strip()
+        url = str(fm.get("source_url") or (fm.get("provenance") or {}).get("url") or "").strip()
+        rest = txt[m.end():]
+        body = rest.split("## 政策原文", 1)[-1] if "## 政策原文" in rest else rest
+        body = re.sub(r"^#+\s*", "", body.strip())
+        recs.append({"pid": pid, "url": url, "title": title, "body_head": body[:800],
+                     "gold_label": "commentary", "is_planted": False,
+                     "notes": "official_commentary"})
+    return recs
+
+
 def main() -> None:
     idx = index_id_to_path()
     b7 = [json.loads(l) for l in B7.read_text().splitlines() if l.strip()]
@@ -107,11 +133,15 @@ def main() -> None:
                      "gold_label": "non_policy", "is_planted": (i in PLANTED_IDX),
                      "notes": f"b7:{r['marker'][:20]}"})
 
+    recs += commentary_records()
+
     out = OUT / "golden_v1.jsonl"
     out.write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in recs), encoding="utf-8")
     n_plant = sum(r["is_planted"] for r in recs)
     n_pol = sum(r["gold_label"] == "policy" for r in recs)
-    print(f"golden {len(recs)} (policy={n_pol} non_policy={len(recs) - n_pol} "
+    n_com = sum(r["gold_label"] == "commentary" for r in recs)
+    n_nonpol = sum(r["gold_label"] == "non_policy" for r in recs)
+    print(f"golden {len(recs)} (policy={n_pol} non_policy={n_nonpol} commentary={n_com} "
           f"planted={n_plant} 非政策含真url+body={real_url_cnt}) → {out}")
 
 

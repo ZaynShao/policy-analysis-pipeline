@@ -1,10 +1,17 @@
 {
   "planted_recall": 1.0,
   "nonpolicy_recall": 1.0,
-  "policy_precision": 1.0,
+  "policy_precision": 0.84,
+  "commentary_recall": 1.0,
   "pass": true,
-  "n_golden": 50,
+  "n_golden": 68,
   "n_planted": 10,
+  "n_commentary": 18,
   "planted_miss": [],
-  "policy_false_reject": []
+  "policy_false_reject": [
+    "P_2025_NX_dd322c66",
+    "P_2025_SH_d8527ff1",
+    "P_2026_HL_FGW_a770e0cb"
+  ],
+  "commentary_miss": []
 }
