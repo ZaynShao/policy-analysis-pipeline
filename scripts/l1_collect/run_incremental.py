@@ -31,6 +31,7 @@ class IncrementalConfig:
     dry_run: bool = False
     state_dir: Path = STATE / "T1_incremental"
     vault_dir: Path = VAULT_POLICIES
+    channel_types: list = field(default_factory=list)
 
 
 @contextmanager
@@ -47,9 +48,12 @@ def _l1_lock():
         yield
 
 
-def _select_channels(channels, levels: list):
+def _select_channels(channels, levels: list, channel_types=None):
     cn = {LEVEL_MAP.get(l, l) for l in levels}
-    return [c for c in channels if c.level in cn and c.status == ChannelStatus.验证]
+    out = [c for c in channels if c.level in cn and c.status == ChannelStatus.验证]
+    if channel_types:
+        out = [c for c in out if any(ct in c.channel_type for ct in channel_types)]
+    return out
 
 
 def _gate_extracted_dir(ext_dir: Path, passed_dir: Path, comm_dir: Path,
@@ -136,7 +140,7 @@ def _run_channel(ch, cfg: IncrementalConfig, dedup, llm_fn) -> dict:
 
 def run_incremental(cfg: IncrementalConfig) -> dict:
     catalog = load_catalog(ROOT / "state/T1_channels/channel_catalog.yaml")
-    channels = _select_channels(catalog, cfg.level)
+    channels = _select_channels(catalog, cfg.level, cfg.channel_types)
     print(f"[run_incremental] level={cfg.level} channels={len(channels)} dry={cfg.dry_run}")
     llm_fn = None if cfg.dry_run else make_judge_client()
     results = []
@@ -163,9 +167,11 @@ def main():
     ap.add_argument("--level", default="national,province,city")
     ap.add_argument("--since", default="2026-01-01")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--channel-type", default="")
     a = ap.parse_args()
     run_incremental(IncrementalConfig(level=a.level.split(","), since=a.since,
-                                      dry_run=a.dry_run))
+                                      dry_run=a.dry_run,
+                                      channel_types=[s for s in a.channel_type.split(",") if s]))
 
 
 if __name__ == "__main__":

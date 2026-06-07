@@ -68,3 +68,17 @@ def test_soft_lock_noop_when_service_absent():
     from scripts.l1_collect.run_incremental import _l1_lock
     with _l1_lock():
         pass  # 不抛异常即通过
+
+
+def test_select_channels_channel_type_filter():
+    from scripts.l1_collect.run_incremental import _select_channels
+    from scripts.l1_collect.channel_catalog import Channel, ChannelStatus
+    def mk(ct, lvl="省"):
+        return Channel(city="x", province="p", level=lvl, city_code="320000",
+                       channel_type=ct, root_domain="d", list_url="u",
+                       source="s", status=ChannelStatus.验证)
+    chans = [mk("发改委"), mk("商务"), mk("市监"), mk("商务部", "国家")]
+    sel = _select_channels(chans, ["province", "national"], channel_types=["商务", "市监"])
+    types = {c.channel_type for c in sel}
+    assert types == {"商务", "市监", "商务部"}   # 子串匹配:商务部 含"商务"
+    assert "发改委" not in types
