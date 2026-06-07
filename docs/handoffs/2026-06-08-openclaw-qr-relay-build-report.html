@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenClaw QR Relay 建设报告</title>
+  <style>
+    :root {
+      --ink: #18202a;
+      --muted: #5c6a78;
+      --line: #d8dee6;
+      --panel: #f7f9fb;
+      --ok: #137a4b;
+      --warn: #9a5a00;
+      --bad: #a93434;
+      --accent: #1d5f8f;
+      --bg: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.55;
+    }
+    header {
+      border-bottom: 1px solid var(--line);
+      background: #f4f7fa;
+      padding: 28px 32px 22px;
+    }
+    main {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 28px 32px 56px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      letter-spacing: 0;
+    }
+    h2 {
+      margin: 34px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--line);
+      font-size: 21px;
+      letter-spacing: 0;
+    }
+    h3 {
+      margin: 22px 0 8px;
+      font-size: 16px;
+      letter-spacing: 0;
+    }
+    p { margin: 8px 0; }
+    ul, ol { margin: 8px 0 14px 24px; padding: 0; }
+    li { margin: 5px 0; }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.92em;
+      background: #eef2f6;
+      border: 1px solid #dce4ec;
+      border-radius: 4px;
+      padding: 1px 5px;
+    }
+    pre {
+      overflow: auto;
+      background: #0f1720;
+      color: #e7edf5;
+      border-radius: 6px;
+      padding: 14px 16px;
+      font-size: 13px;
+    }
+    pre code {
+      background: transparent;
+      border: 0;
+      padding: 0;
+      color: inherit;
+    }
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 10px;
+      margin-top: 18px;
+      color: var(--muted);
+    }
+    .meta div {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 6px;
+      padding: 10px 12px;
+    }
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+    .status {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 12px;
+      background: var(--panel);
+      min-height: 92px;
+    }
+    .status strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--accent);
+    }
+    .tag {
+      display: inline-block;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      padding: 2px 8px;
+      font-size: 12px;
+      margin-right: 6px;
+      background: #fff;
+    }
+    .tag.ok { color: var(--ok); border-color: #9fd0b8; background: #effaf5; }
+    .tag.warn { color: var(--warn); border-color: #e2c37a; background: #fff8e8; }
+    .callout {
+      border-left: 4px solid var(--accent);
+      background: #f2f7fb;
+      padding: 12px 14px;
+      margin: 14px 0;
+    }
+    .callout.warn { border-left-color: var(--warn); background: #fff8e8; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      padding: 8px 10px;
+    }
+    th { background: #eef3f8; }
+    .small { color: var(--muted); font-size: 13px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>OpenClaw QR Relay 建设报告</h1>
+    <p>wewe-rss 微信读书 token 失效后，自动生成登录二维码并通过 OpenClaw 推送到 IM 的建设、测试和交接摘要。</p>
+    <div class="meta">
+      <div><strong>日期</strong><br>2026-06-08 00:56 +0800</div>
+      <div><strong>分支</strong><br><code>codex/openclaw-qr-relay</code></div>
+      <div><strong>仓库</strong><br><code>/Users/shaoziyuan/dev/政策分析-pipeline</code></div>
+      <div><strong>当前 IM</strong><br>OpenClaw Feishu channel，本地运行</div>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <h2>结论</h2>
+      <div class="status-grid">
+        <div class="status"><strong>模块状态</strong><span class="tag ok">已实现</span><p>新增 QR relay 模块和测试，保持 additive，不改既有业务文件。</p></div>
+        <div class="status"><strong>IM 通道</strong><span class="tag ok">Feishu 已闭环</span><p>文字 001/002/006 和图片到 005 均由用户确认收到。</p></div>
+        <div class="status"><strong>wewe-rss</strong><span class="tag ok">真实健康可用</span><p>扫码后 <code>/feeds/all.atom</code>、<code>/feeds/all.rss</code>、<code>/feeds/all.json</code> 均返回 200。</p></div>
+        <div class="status"><strong>测试</strong><span class="tag ok">18 passed</span><p><code>pytest tests/commentary_qr_relay -q</code> 通过。</p></div>
+      </div>
+      <div class="callout warn">
+        这次真实演练为了触发失效分支，临时把 SQLite <code>accounts.status</code> 置为 0。脚本在扫码后曾报告“健康检查仍未恢复”，这是人为置 0 的演练假阴性；随后已恢复 DB 状态并用真实 feeds 接口验证 token 可用。
+      </div>
+    </section>
+
+    <section>
+      <h2>新增文件</h2>
+      <table>
+        <thead><tr><th>类别</th><th>文件</th><th>作用</th></tr></thead>
+        <tbody>
+          <tr><td>检测</td><td><code>detector.py</code></td><td>复用 <code>token_health.check_token</code> seam，缺失时 fallback 读 SQLite。</td></tr>
+          <tr><td>登录</td><td><code>wewe_login.py</code></td><td>封装 <code>createLoginUrl</code> 和 <code>getLoginResult</code> tRPC 调用。</td></tr>
+          <tr><td>每日健康</td><td><code>feed_health.py</code> / <code>daily_check.py</code></td><td>用 <code>/feeds/all.atom</code> 做真实 HTTP 验证；失败才进入 QR relay。</td></tr>
+          <tr><td>二维码</td><td><code>qr_render.py</code></td><td>scanUrl 文本渲染为 QR PNG。</td></tr>
+          <tr><td>IM Adapter</td><td><code>openclaw.py</code></td><td><code>push_qr</code> / <code>push_text</code>，当前通过 <code>openclaw message send</code> 接 Feishu。</td></tr>
+          <tr><td>编排</td><td><code>run.py</code></td><td>检测失效、生成 QR、推 IM、轮询扫码、确认恢复、发送结果通知。</td></tr>
+          <tr><td>测试</td><td><code>tests/commentary_qr_relay/</code></td><td>覆盖 detector、wewe login、QR rendering、OpenClaw adapter、run orchestration。</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>核心流程</h2>
+      <ol>
+        <li>调用 token detector 判断 wewe-rss token 是否有效。</li>
+        <li>无效时调用 <code>POST /trpc/platform.createLoginUrl</code> 获取 <code>uuid</code> 和 <code>scanUrl</code>。</li>
+        <li>将 <code>scanUrl</code> 渲染为 QR PNG。</li>
+        <li>通过 OpenClaw adapter 推送二维码图片和说明文案到 IM。</li>
+        <li>轮询 <code>GET /trpc/platform.getLoginResult?input=...</code>。</li>
+        <li>扫码成功后再次执行 token health 确认。</li>
+        <li>向 IM 发送成功、健康未恢复或超时通知。</li>
+        <li>OpenClaw 不可达或扫码超时，走现有 alert seam / <code>oc-ctl notify</code> fallback。</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>wewe-rss 接口事实</h2>
+      <table>
+        <thead><tr><th>动作</th><th>端点</th><th>鉴权</th><th>载荷/响应</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>创建登录 URL</td>
+            <td><code>POST /trpc/platform.createLoginUrl</code></td>
+            <td>裸 <code>Authorization: &lt;AUTH_CODE&gt;</code></td>
+            <td>body <code>{}</code>，读取 <code>result.data.uuid</code> 和 <code>result.data.scanUrl</code></td>
+          </tr>
+          <tr>
+            <td>轮询登录结果</td>
+            <td><code>GET /trpc/platform.getLoginResult?input=...</code></td>
+            <td>裸 <code>Authorization: &lt;AUTH_CODE&gt;</code></td>
+            <td><code>input</code> 为 URL encoded <code>{"id":"uuid"}</code></td>
+          </tr>
+          <tr>
+            <td>feed 健康验证</td>
+            <td><code>/feeds/all.atom</code> 等</td>
+            <td><code>Authorization: Bearer &lt;AUTH_CODE&gt;</code></td>
+            <td>演练后返回 HTTP 200</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>OpenClaw / Feishu 状态</h2>
+      <ul>
+        <li>OpenClaw core 升级到 <code>2026.6.1 (2e08f0f)</code>。</li>
+        <li>安装 <code>@openclaw/feishu@2026.6.1</code>。</li>
+        <li>Feishu channel: <code>running=true</code>，<code>lastError=null</code>。</li>
+        <li>Feishu WebSocket ready。</li>
+        <li>用户发消息后 OpenClaw 收到 inbound，生成 pairing code，并完成 approve。</li>
+        <li>发送目标可用：paired Feishu sender open id；p2p chat id 也可发文字。</li>
+      </ul>
+      <div class="callout">
+        Feishu 插件日志提示：开发者后台需要将事件订阅方式设为“使用长连接接收事件/回调”。插件源码监听 <code>im.message.receive_v1</code>。
+      </div>
+    </section>
+
+    <section>
+      <h2>验证记录</h2>
+      <h3>测试</h3>
+      <pre><code>python3 -m pytest tests/commentary_qr_relay -q
+18 passed, 1 warning</code></pre>
+      <h3>编译</h3>
+      <pre><code>python3 -m compileall -q scripts/l1_collect/commentary_ingest tests/commentary_qr_relay
+passed</code></pre>
+      <h3>凭据扫描</h3>
+      <pre><code>rg -n '&lt;known-app-ids&gt;|&lt;known-app-secrets&gt;|&lt;server-password&gt;|&lt;jwt-prefix&gt;' scripts/l1_collect/commentary_ingest tests/commentary_qr_relay docs/handoffs
+no matches</code></pre>
+      <h3>扫码后真实健康</h3>
+      <pre><code>/feeds/all.atom  HTTP 200
+/feeds/all.rss   HTTP 200
+/feeds/all.json  HTTP 200
+SQLite accounts.status = 1</code></pre>
+    </section>
+
+    <section>
+      <h2>本地每日验证</h2>
+      <ul>
+        <li>LaunchAgent: <code>~/Library/LaunchAgents/com.zayn.policy.wewe-qr-relay-daily.plist</code></li>
+        <li>本机 env: <code>~/.config/policy-pipeline/wewe-qr-relay.env</code></li>
+        <li>Wrapper: <code>~/.local/bin/policy-wewe-qr-relay-daily</code></li>
+        <li>日志: <code>~/Library/Logs/policy-pipeline/wewe-qr-relay-daily.log</code> / <code>.err</code></li>
+        <li>时间: 每天 09:30 本地时间</li>
+      </ul>
+      <div class="callout">
+        <code>AUTH_CODE</code> 不落磁盘；wrapper 运行时从本机 <code>wewe-rss</code> 容器环境动态读取。Feishu app secret 留在本机 OpenClaw 配置，不进入仓库。
+      </div>
+      <h3>手工验证</h3>
+      <pre><code>~/.local/bin/policy-wewe-qr-relay-daily
+{"checked": true, "relayed": false, "restored": true, "detail": "feed health ok: /feeds/all.atom HTTP 200", "qr_path": ""}</code></pre>
+      <h3>launchd 验证</h3>
+      <pre><code>launchctl kickstart -k gui/$(id -u)/com.zayn.policy.wewe-qr-relay-daily
+launchctl print gui/$(id -u)/com.zayn.policy.wewe-qr-relay-daily
+runs = 1
+last exit code = 0</code></pre>
+    </section>
+
+    <section>
+      <h2>生产接入建议</h2>
+      <ol>
+        <li>在主 session 把 <code>relay_once</code> 接到现有 <code>token_health.check_token</code> / <code>run.py --check-token</code> 触发点。</li>
+        <li>凭据只走环境变量、OpenClaw 本地配置或凭据文件，不进 git。</li>
+        <li>优先使用 Feishu channel；WeChat channel 当前只作为次级路径，因为图片投递曾不稳定。</li>
+        <li>部署保持本地或国内节点，避免微信读书账号触发地理风控。</li>
+        <li>后续真实演练不要靠长期保持 DB <code>status=0</code>，避免最终健康检查假阴性。</li>
+      </ol>
+      <h3>命令形态</h3>
+      <pre><code>OPENCLAW_CHANNEL=feishu \
+OPENCLAW_ACCOUNT=main \
+OPENCLAW_IM_TARGET='&lt;paired-feishu-target&gt;' \
+WEWE_DB_PATH="$HOME/wewe-rss-data/wewe-rss.db" \
+WEWE_BASE_URL='http://localhost:4000' \
+WEWE_AUTH_CODE='&lt;secret&gt;' \
+python3 -m scripts.l1_collect.commentary_ingest.qr_relay.run</code></pre>
+    </section>
+
+    <section>
+      <h2>合并判断</h2>
+      <p><span class="tag ok">建议并入主 session</span> 该分支是 additive feature branch，核心模块、测试、Feishu IM 闭环和真实 feed 健康验证均完成。</p>
+      <p class="small">合并时注意：仓库里存在一个与本任务无关的未跟踪文件 <code>docs/2026-06-07-hitl-inventory.html</code>，不要误纳入本分支提交。</p>
+    </section>
+  </main>
+</body>
+</html>
