@@ -27,6 +27,7 @@ class QRRelayConfig:
     poll_interval_seconds: int = 5
     confirm_checks: int = 1
     confirm_interval_seconds: int = 3
+    note: str = ""
 
 
 @dataclass(frozen=True)
@@ -63,6 +64,7 @@ def relay_once(
         "[policy-pipeline] 微信读书 token 失效,请用微信扫码恢复 wewe-rss 登录。"
         f"账号:{status.account_name or 'unknown'} uuid:{login.uuid}"
     )
+    caption = caption + (f"\n{config.note}" if config.note else "")
     if not _push_qr(adapter, qr_path, caption, config.target):
         _fallback_notice(caption, config, qr_path)
         return RelayResult(True, False, False, "QR push failed; fallback alert sent", qr_path)

@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Callable
 
@@ -12,6 +12,35 @@ from .feed_health import feed_token_status
 from .qr_render import render_qr_png
 from .run import QRRelayConfig, RelayResult, relay_once
 from .wewe_login import WeweLoginClient
+
+CST = timezone(timedelta(hours=8))
+
+
+def _load_outage(qr_dir: Path) -> dict | None:
+    path = Path(qr_dir) / "relay_outage.json"
+    if not path.exists():
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        if "first_down_at" not in data or "count" not in data:
+            return None
+        return data
+    except Exception:
+        return None
+
+
+def _save_outage(qr_dir: Path, first_down_at_iso: str, count: int) -> None:
+    Path(qr_dir).mkdir(parents=True, exist_ok=True)
+    (Path(qr_dir) / "relay_outage.json").write_text(
+        json.dumps({"first_down_at": first_down_at_iso, "count": count}, ensure_ascii=False),
+        encoding="utf-8",
+    )
+
+
+def _clear_outage(qr_dir: Path) -> None:
+    path = Path(qr_dir) / "relay_outage.json"
+    if path.exists():
+        path.unlink()
 
 
 def run_daily_check(
@@ -32,10 +61,20 @@ def run_daily_check(
     adapter: Any | None = None,
     qr_renderer: Any = render_qr_png,
     sleeper: Any | None = None,
+    now: datetime | None = None,
 ) -> RelayResult:
+    now = now or datetime.now(CST)
     status = feed_checker(wewe_base_url, auth_code)
     if status.valid:
+        _clear_outage(qr_dir)
         return RelayResult(True, False, True, status.detail)
+
+    prev = _load_outage(qr_dir)
+    first_down = datetime.fromisoformat(prev["first_down_at"]) if prev else now
+    count = (prev["count"] if prev else 0) + 1
+    _save_outage(qr_dir, first_down.isoformat(), count)
+    hours = int((now - first_down).total_seconds() // 3600)
+    note = f"第 {count} 次提醒 · token 自 {first_down.strftime('%m-%d %H:%M')} 起失效(约 {hours}h)"
 
     config = QRRelayConfig(
         db_path=Path(db_path),
@@ -48,6 +87,7 @@ def run_daily_check(
         poll_interval_seconds=poll_interval_seconds,
         confirm_checks=confirm_checks,
         confirm_interval_seconds=confirm_interval_seconds,
+        note=note,
     )
 
     def detector(_db_path: Path) -> TokenStatus:
@@ -64,7 +104,10 @@ def run_daily_check(
     }
     if sleeper is not None:
         kwargs["sleeper"] = sleeper
-    return relay(config, **kwargs)
+    result = relay(config, **kwargs)
+    if result.restored:
+        _clear_outage(qr_dir)
+    return result
 
 
 def config_from_env(argv: list[str] | None = None) -> argparse.Namespace:
