@@ -90,3 +90,42 @@ def test_discover_filters_cross_domain(monkeypatch):
     })
     assert seen["urls"] == ["https://www.miit.gov.cn/zcwj/"]  # ncsti 已被过滤
     assert "miit.gov.cn" in ch.list_url
+
+
+def test_discover_tries_next_candidate_when_pick_probes_bad(monkeypatch):
+    """LLM 选的 URL probe 不通(JS空壳) → 自动试同域其它候选,用第一个验证的。"""
+    from scripts.l1_collect import channel_discovery as cd
+    from scripts.l1_collect.connectivity_probe import ProbeResult
+    monkeypatch.setattr(cd, "_tavily_search",
+                        lambda q: ["http://x.gov.cn/broken.htm", "http://x.gov.cn/good"])
+    monkeypatch.setattr(cd, "_llm_pick", lambda name, urls: "http://x.gov.cn/broken.htm")
+
+    def fake_probe(u, **k):
+        ok = (u == "http://x.gov.cn/good")
+        return ProbeResult(url=u, http_status=200, page_has_list_pattern=ok,
+                           verdict="ok" if ok else "structure_unknown")
+
+    monkeypatch.setattr(cd, "probe_url", fake_probe)
+    ch = cd.discover_one({"city": "X", "province": "省X", "level": "省",
+                          "city_code": "990000", "channel_type": "发改委",
+                          "root_domain": "x.gov.cn"})
+    assert ch.list_url == "http://x.gov.cn/good"  # 跳过 broken.htm 取能验证的
+    assert ch.status.value == "验证"
+
+
+def test_discover_keeps_pick_as_candidate_when_none_verify(monkeypatch):
+    """所有同域候选都 probe 不通 → 保留 LLM 选的作候选(不空转到首页)。"""
+    from scripts.l1_collect import channel_discovery as cd
+    from scripts.l1_collect.connectivity_probe import ProbeResult
+    monkeypatch.setattr(cd, "_tavily_search",
+                        lambda q: ["http://x.gov.cn/a", "http://x.gov.cn/b"])
+    monkeypatch.setattr(cd, "_llm_pick", lambda name, urls: "http://x.gov.cn/a")
+    monkeypatch.setattr(cd, "probe_url",
+                        lambda u, **k: ProbeResult(url=u, http_status=200,
+                                                   page_has_list_pattern=False,
+                                                   verdict="structure_unknown"))
+    ch = cd.discover_one({"city": "X", "province": "省X", "level": "省",
+                          "city_code": "990000", "channel_type": "发改委",
+                          "root_domain": "x.gov.cn"})
+    assert ch.list_url == "http://x.gov.cn/a"
+    assert ch.status.value == "候选"

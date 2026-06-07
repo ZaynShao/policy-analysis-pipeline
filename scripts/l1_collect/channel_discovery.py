@@ -112,15 +112,32 @@ def pick_list_url(target_name: str, candidate_urls: list,
     return url if url in candidate_urls else None
 
 
+def _first_verified(urls: list):
+    """按序探测候选,返回第一个 verdict=ok 的 (url, ProbeResult);
+    都不 ok 则返回第一个探测结果(作候选兜底);urls 空返回 (None, None)。"""
+    fallback = None
+    for u in urls:
+        pr = probe_url(u)
+        if pr.verdict == "ok":
+            return u, pr
+        if fallback is None:
+            fallback = (u, pr)
+    return fallback if fallback else (None, None)
+
+
 def discover_one(target: dict) -> Optional[Channel]:
-    """单目标:搜→选→验证。verdict=ok→验证;否则候选(留firecrawl兜底)。"""
+    """单目标:搜→同域过滤→LLM选→按序探测(LLM选优先,其余同域候选兜底)。
+    治 LLM 选了 JS 空壳/坏 URL(如 nea zxwj.htm):probe 不通时自动试其它同域候选,
+    用第一个验证的(Tavily 往往也返回了能用的真列表页,只是没被 LLM 选中)。"""
     query = f"{target['city']} 政策文件 通知公告 列表"
     candidates = _tavily_search(query)
     on_domain = [u for u in candidates if _same_domain(u, target["root_domain"])]
-    list_url = _llm_pick(target["city"], on_domain)
-    if not list_url:
-        list_url = f"https://{target['root_domain']}/"  # 兜底首页（无同域候选）
-    pr = probe_url(list_url)
+    picked = _llm_pick(target["city"], on_domain)
+    ordered = ([picked] if picked else []) + [u for u in on_domain if u != picked]
+    list_url, pr = _first_verified(ordered)
+    if list_url is None:  # 无同域候选 → 首页兜底
+        list_url = f"https://{target['root_domain']}/"
+        pr = probe_url(list_url)
     status = ChannelStatus.验证 if pr.verdict == "ok" else ChannelStatus.候选
     return Channel(
         city=target["city"], province=target["province"], level=target["level"],
