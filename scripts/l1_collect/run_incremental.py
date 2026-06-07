@@ -127,12 +127,11 @@ def _run_channel(ch, cfg: IncrementalConfig, dedup, llm_fn) -> dict:
     except Exception as e:
         n_comm_ing = 0
         print(f"  [commentary-ingest 失败] {label[:40]}: {str(e)[:120]}")
-    # 清空工作目录供下个渠道复用(避免跨渠道串)
+    # 清空工作目录供下个渠道复用(避免跨渠道串;含 comm_stage 的 *.jsonl 暂存日志)
     for d in ["fetch", "ext", "passed", "comm_ext", "comm_stage"]:
-        for f in (sd / d).glob("*.json"):
-            f.unlink()
-        for f in (sd / d).glob("*.md"):
-            f.unlink()
+        for pat in ("*.json", "*.md", "*.jsonl"):
+            for f in (sd / d).glob(pat):
+                f.unlink()
     return {"channel": label, "scanned": n_scan, "kept": kept,
             "gate_passed": n_pass, "gate_commentary": n_comm, "gate_rejected": n_rej,
             "ingested": ing_ok, "ingested_commentary": n_comm_ing}
