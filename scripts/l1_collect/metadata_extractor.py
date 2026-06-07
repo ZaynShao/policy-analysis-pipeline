@@ -10,6 +10,9 @@ _OFFNUM_RE = re.compile(r"[一-龥]{2,8}[〔\[(]\s*(?:19|20)\d{2}\s*[〕\])]\s*\
 _OFFNUM_RE_LOOSE = re.compile(r"[一-龥]{0,8}[〔\[(]\s*(?:19|20)\d{2}\s*[〕\])]\s*\d+\s*号")
 
 _DATE_URL_RE = re.compile(r"/((?:19|20)\d{2})[-_/](\d{1,2})[-_/](\d{1,2})/")
+# 政府站极常见紧凑格式 /YYYYMM/tYYYYMMDD_id（年月目录 + 文件名带 8 位无分隔日期），
+# 原 delimited 正则抓不到 → date 空 → pid 落 P_1900 占位。带范围校验防 20251340 这类越界。
+_DATE_URL_COMPACT = re.compile(r"[t/_]((?:19|20)\d{2})(\d{2})(\d{2})(?:\D|$)")
 _DATE_BODY_CN = re.compile(r"((?:19|20)\d{2})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})")
 _DATE_BODY_ISO = re.compile(r"((?:19|20)\d{2})[-/](\d{1,2})[-/](\d{1,2})")
 
@@ -52,6 +55,11 @@ def extract_date(url: str, body: str = "") -> str:
         if m:
             y, mo, d = m.groups()
             return f"{int(y):04d}-{int(mo):02d}-{int(d):02d}"
+        m = _DATE_URL_COMPACT.search(url)
+        if m:
+            y, mo, d = m.groups()
+            if 1 <= int(mo) <= 12 and 1 <= int(d) <= 31:
+                return f"{int(y):04d}-{int(mo):02d}-{int(d):02d}"
     if body:
         m = _DATE_BODY_CN.search(body) or _DATE_BODY_ISO.search(body)
         if m:
