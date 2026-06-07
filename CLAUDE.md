@@ -123,7 +123,7 @@ python3 scripts/l3_render/render_monthly.py --month 2026-05
 
 - 运行:`python3 -m scripts.l1_collect.commentary_ingest.run --feed-url ... --vault-dir ... --db-path ...`(路径/凭据全 env/CLI,零硬编码)
 - 迁移:`docs/runbooks/commentary-rss-ingest-migration.md`(方法更新时同步维护本节与该 runbook)
-- 保守轮询:轮询越勤→token 废越快→扫码越频繁。CRON 维持 6h/次量级。
+- 触发频率(已敲定 2026-06-08):discovery 每天1次@07:00(`CRON_EXPRESSION="0 0 7 * * *"`)/ ingest 每天1次@07:30 / token检测每6h(失效触发 openclaw QR)。三节奏解耦:discovery 耗token最省、检测免费可勤。详见 runbook。轮询越勤→token 废越快→扫码越频繁,勿无故调激进。
 - feed limit 别被限住:wewe-rss 不带 `limit` 默认仅 30 条/次,15 号合并会静默漏。`WEWE_FEED_URL` 必须显式给大 limit(如 400);代码不硬编码 limit,`coverage_warning` 是兜底信号。
 
 ---

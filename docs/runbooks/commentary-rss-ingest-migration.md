@@ -27,5 +27,19 @@ token 是个人微信读书账号;东京机房 IP 触发微信地理风控(最�
 2. 账号管理 → 扫码登录 → 手机微信扫 → token 刷新。
 3. （后续)openclaw + IM 模块:自动把 QR 推到 IM,远程扫——独立 spec,届时接 `--check-token` 告警为触发点。
 
+## 触发频率(已敲定 2026-06-08)
+
+三节奏**解耦**:discovery 耗 token → 最省;token 检测免费 → 可勤;ingest 跟 discovery 走。
+
+| 节奏 | 频率 | 接线 |
+|---|---|---|
+| **① wewe-rss discovery**(用 token 拉新文) | **每天 1 次** @07:00 | wewe-rss `CRON_EXPRESSION="0 0 7 * * *"`(6字段:秒分时日月周) |
+| **② ingest**(feed→vault) | **每天 1 次** @07:30(discovery 后) | host cron `30 7 * * *`:`python3 -m scripts.l1_collect.commentary_ingest.run --feed-url '.../feeds/all.json?limit=400' ...` |
+| **③ token 检测 → openclaw 推 QR**(免费,只读 sqlite) | **每 6h** | host cron:`0 */6 * * * ... run --check-token --db-path ...`(失效即触发 openclaw QR relay) |
+
+> 用户决策:**discovery 每天 1 次即可**(评论是校准材料、不紧急;最省 token、最少扫码)。其余倒推。
+> **⚠️ 防重推**:token 检测 6h/次,若 token 已失效且用户尚未扫码,连续几次检测会重复触发 QR 推送。**生产接线时(主 session)relay 须加"已有恢复会话进行中则不重推"的幂等保护**,否则会刷屏 IM。
+> 改频率只动上表三处;`limit=400` 见下"feed limit 纪律"。
+
 ## 保守轮询纪律
-轮询越勤 → token 废越快 → 扫码越频繁(且抬高封号风险)。`CRON_EXPRESSION` 维持 6h/次量级,勿调激进。
+轮询越勤 → token 废越快 → 扫码越频繁(且抬高封号风险)。discovery 已定**每天 1 次**,勿无故调激进。

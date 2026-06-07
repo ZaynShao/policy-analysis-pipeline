@@ -14,7 +14,8 @@ services:
       SERVER_ORIGIN_URL: http://localhost:4000
       FEED_MODE: fulltext
       ENABLE_CLEAN_HTML: "true"
-      # 保守轮询(spec §6.2):每 6 小时一次,降低 token 失效与封号风险
-      CRON_EXPRESSION: "0 0 */6 * * *"
+      # discovery 每天 1 次(用户敲定 2026-06-08):token 损耗源,最省 token/最少扫码。
+      # 6 字段 cron(秒 分 时 日 月 周);默认 07:00。改频率只动这里。
+      CRON_EXPRESSION: "0 0 7 * * *"
     volumes:
       - ./data:/app/data     # SQLite + token;映射到国内节点持久盘
