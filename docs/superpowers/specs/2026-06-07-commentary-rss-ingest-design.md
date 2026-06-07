@@ -147,10 +147,21 @@ source: wewe-rss
 
 ## 8. 增量与状态
 
-- **去重主键**:`source_url`(= `mp.weixin.qq.com/s/{id}`),对照 vault 已有文件 frontmatter + `processed_ids.jsonl`
-- **processed ledger**:`state/commentary_ingest/processed_ids.jsonl`,每行一个已处理 id + 处置(ingested / skip-junk / market_intel / unprocessable)
-- **last_run.json**:本轮拉取数 / 新增数 / 各处置计数 / token 状态 / 时间戳
-- **首轮 backlog**:DB 2479 篇是历史积压。首轮全量过一遍(受订阅 curation 收缩后会少很多),之后纯增量
+- **去重主键**:`source_url`(= `mp.weixin.qq.com/s/{id}`),对照 vault 已有文件 frontmatter + `processed_ids.jsonl`。**不重复**绝对保证(URL 级)
+- **processed ledger**:`state/commentary_ingest/processed_ids.jsonl`,每行一个已处理 id + 处置(ingest / skip_junk / market_intel / unprocessable)
+- **last_run.json**:本轮拉取数 / 各处置计数 / token 状态 / 时间戳
+- **首轮 backlog**:DB 2479 篇是历史积压。首轮用**大 feed limit** 全量过一遍(受订阅 curation 收缩后会少很多),之后纯增量
+
+### 8.1 不漏的两道保障(机制硬化)
+
+去重是"已见集合"式,不是水位线区间式 → "不漏"取决于 feed 窗口 ≥ 两次跑之间发文量。两道保障:
+
+1. **瞬时失败 vs 真删除分流**:正文不可用分两类——
+   - `deleted`(命中微信删除/违规壳页标记)→ 记台账**永久跳过**(重试无意义)
+   - `empty`(正文过短/抓取瞬时失败,无删除标记)→ **不记台账**,下轮**自动重试**(避免瞬时网络/反爬抖动造成永久漏项)
+2. **零重叠覆盖告警**(启发式):有历史却本轮与已见集合零重叠 → `coverage_warning`(feed 窗口可能已越过上次抓取位置)→ 提示增大 feed limit 或提高频率。正常重叠轮询不触发
+
+> 运营建议:feed 用**大 limit**(如 200)或按单号分别拉。wewe-rss SQLite 留全量历史,大 limit 只是多扫被去重,代价极小,却堵住"忙时滚出窗口"的漏。
 
 ---
 
