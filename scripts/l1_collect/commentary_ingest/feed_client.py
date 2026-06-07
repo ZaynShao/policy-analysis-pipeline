@@ -50,7 +50,8 @@ def parse_feed(json_text: str) -> list:
             url=url,
             title=(item.get("title") or "").strip(),
             content_html=_content(item),
-            date_published=_norm_date(item.get("date_published", "")),
+            # 实测 wewe-rss 用 date_modified(非标准 date_published),两者兼容兜底
+            date_published=_norm_date(item.get("date_published") or item.get("date_modified") or ""),
             source_account=_account_name(item),
         ))
     return out
