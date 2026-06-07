@@ -129,3 +129,37 @@ def test_discover_keeps_pick_as_candidate_when_none_verify(monkeypatch):
                           "root_domain": "x.gov.cn"})
     assert ch.list_url == "http://x.gov.cn/a"
     assert ch.status.value == "候选"
+
+
+def test_commerce_market_targets_shape():
+    from scripts.l1_collect.channel_discovery import commerce_market_targets
+    targets = commerce_market_targets()
+    by_type = {}
+    for t in targets:
+        by_type.setdefault(t["channel_type"], []).append(t)
+    # 商务: 31 省 + 10 重点市 ; 市监: 31 省
+    assert len(by_type["商务"]) == 31 + 10
+    assert len(by_type["市监"]) == 31
+    # 直辖市商务用"商务局"显示名,省用"商务厅"
+    names = {t["city"] for t in by_type["商务"]}
+    assert "江苏省商务厅" in names
+    assert "北京市商务局" in names
+    assert "佛山市商务局" in names          # 重点市(加油线)
+    # 市监显示名
+    assert "江苏省市场监督管理局" in {t["city"] for t in by_type["市监"]}
+    # 省级目标 root_domain 默认 None(待发现);市监全 None
+    assert all(t["root_domain"] is None for t in by_type["市监"])
+    # 重点市 province = 所属省(非市名自身)
+    dg = [t for t in by_type["商务"] if t["city"] == "东莞市商务局"][0]
+    assert dg["province"] == "广东省"
+
+def test_commerce_warmstart_from_registry(tmp_path):
+    """registry 已有的商务域名 → root_domain 预填(暖启动)。"""
+    from scripts.l1_collect.channel_discovery import commerce_market_targets
+    reg = tmp_path / "reg.yaml"
+    reg.write_text(
+        "- domain: swt.fujian.gov.cn\n  issuer_canonical: 福建省商务厅\n",
+        encoding="utf-8")
+    targets = commerce_market_targets(registry_path=reg)
+    fj = [t for t in targets if t["city"] == "福建省商务厅"][0]
+    assert fj["root_domain"] == "swt.fujian.gov.cn"

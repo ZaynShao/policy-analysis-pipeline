@@ -11,6 +11,7 @@ from urllib.parse import urlparse
 import yaml
 
 from .channel_catalog import Channel, ChannelStatus
+from .city_priority import MUNICIPALITIES, BUSINESS_RULES
 from .connectivity_probe import probe_url
 from .tavily_client import TavilyClient
 
@@ -42,6 +43,15 @@ _PROV_CODE = {
     "海南省": "46", "重庆市": "50", "四川省": "51", "贵州省": "52", "云南省": "53",
     "西藏自治区": "54", "陕西省": "61", "甘肃省": "62", "青海省": "63",
     "宁夏回族自治区": "64", "新疆维吾尔自治区": "65",
+}
+
+_CODE_TO_PROV = {v: k for k, v in _PROV_CODE.items()}
+
+# 加油线 10 重点市国标码;须与 city_priority.BUSINESS_RULES["加油"][0] 同步
+_CITY_CODE = {
+    "东莞市": "441900", "佛山市": "440600", "嘉兴市": "330400", "温州市": "330300",
+    "泉州市": "350500", "南通市": "320600", "烟台市": "370600", "潍坊市": "370700",
+    "常州市": "320400", "惠州市": "441300",
 }
 
 _SYSTEM_PICK = (
@@ -123,6 +133,48 @@ def _first_verified(urls: list):
         if fallback is None:
             fallback = (u, pr)
     return fallback if fallback else (None, None)
+
+
+def _commerce_name(prov: str) -> str:
+    return f"{prov}商务局" if prov in MUNICIPALITIES else f"{prov}商务厅"
+
+
+def _warmstart_domains(registry_path) -> dict:
+    """registry 里 issuer 含'商务'或'市场监督' → {显示名: domain},用于暖启动。"""
+    if registry_path is None or not Path(registry_path).exists():
+        return {}
+    raw = yaml.safe_load(Path(registry_path).read_text(encoding="utf-8")) or []
+    out = {}
+    for e in raw:
+        iss = e.get("issuer_canonical") or ""
+        dom = e.get("domain") or ""
+        if ("商务" in iss or "市场监督" in iss) and dom:
+            out[iss] = dom
+    return out
+
+
+def commerce_market_targets(registry_path: Optional[Path] = None) -> list:
+    """商务厅(31省+加油线重点市)+ 市监局(31省)目标。root_domain 多为 None(待发现)。"""
+    warm = _warmstart_domains(registry_path)
+    oil_cities = sorted(BUSINESS_RULES["加油"][0]["cities"])  # 10 重点市
+    out = []
+    for prov, code in _PROV_CODE.items():
+        cname = _commerce_name(prov)
+        out.append({"city": cname, "province": prov, "level": "省",
+                    "city_code": f"{code}0000", "channel_type": "商务",
+                    "root_domain": warm.get(cname)})
+        out.append({"city": f"{prov}市场监督管理局", "province": prov, "level": "省",
+                    "city_code": f"{code}0000", "channel_type": "市监",
+                    "root_domain": warm.get(f"{prov}市场监督管理局")})
+    # 商务重点市(加油线)
+    for city in oil_cities:
+        city_code = _CITY_CODE.get(city, "")
+        out.append({"city": f"{city}商务局",
+                    "province": _CODE_TO_PROV.get(city_code[:2], ""),
+                    "level": "市",
+                    "city_code": city_code, "channel_type": "商务",
+                    "root_domain": warm.get(f"{city}商务局")})
+    return out
 
 
 def discover_one(target: dict) -> Optional[Channel]:
