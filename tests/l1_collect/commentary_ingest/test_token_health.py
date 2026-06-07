@@ -27,6 +27,22 @@ def test_check_token_invalid_when_status_0(tmp_path):
     assert st.account_name == "邵子渊"
 
 
+def test_check_token_valid_when_any_account_status_1(tmp_path):
+    db = tmp_path / "wewe-rss.db"
+    con = sqlite3.connect(db)
+    con.execute("CREATE TABLE accounts (id TEXT, name TEXT, status INTEGER, "
+                "token TEXT, updated_at TEXT)")
+    con.execute("INSERT INTO accounts VALUES ('old','旧账号',0,'oldtok','2026-04-28')")
+    con.execute("INSERT INTO accounts VALUES ('current','当前账号',1,'tok','2026-04-29')")
+    con.commit()
+    con.close()
+
+    st = check_token(db)
+
+    assert st.valid is True
+    assert st.account_name == "当前账号"
+
+
 def test_check_token_invalid_when_db_missing(tmp_path):
     st = check_token(tmp_path / "nope.db")
     assert st.valid is False

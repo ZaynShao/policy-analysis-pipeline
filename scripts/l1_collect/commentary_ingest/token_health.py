@@ -34,11 +34,12 @@ def check_token(db_path: Path) -> TokenStatus:
             con.close()
     if not rows:
         return TokenStatus(False, "", "accounts 表为空,未登录")
-    invalid = [name for name, status in rows if status != 1]
-    if invalid:
-        return TokenStatus(False, invalid[0],
-                           f"{len(invalid)} 个账号 token 失效,需重新扫码")
-    return TokenStatus(True, rows[0][0], "token 有效")
+    valid = [name for name, status in rows if status == 1]
+    if valid:
+        return TokenStatus(True, valid[0],
+                           f"至少 1 个账号 token 有效 ({len(valid)}/{len(rows)})")
+    return TokenStatus(False, rows[0][0],
+                       f"{len(rows)} 个账号 token 均失效,需重新扫码")
 
 
 def alert(message: str, webhook_url: str = "") -> bool:
