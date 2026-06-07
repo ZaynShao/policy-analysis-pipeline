@@ -42,3 +42,29 @@ def test_low_conf_to_review_queue():
                  llm_fn=lambda s, u, **k: json.dumps(
                      {"label": "non_policy_news", "confidence": 0.55, "evidence": "x"}))
     assert r.action == "review_queue"
+
+
+def test_heuristic_commentary_before_gov_fastpass():
+    """《X办法》政策解读:含'办法'政策信号+gov域,但应先判 commentary(堵旧洞)。"""
+    from scripts.l1_collect.policy_gate import _heuristic
+    v = _heuristic("https://fgw.sc.gov.cn/zcjd/x.html",
+                   "《四川省绿电直连实施细则》政策解读", "")
+    assert v == "commentary"
+
+
+def test_gate_one_commentary_action():
+    from scripts.l1_collect.policy_gate import gate_one
+    gr = gate_one("p1", "https://x.gov.cn/zcjd/a.html",
+                  "《某办法》答记者问", "记者问……", llm_fn=None)
+    assert gr.label == "commentary"
+    assert gr.action == "commentary"
+
+
+def test_gate_one_llm_commentary_label_maps_to_action():
+    # 灰区URL(gov域名但标题无政策信号词)+LLM返回commentary → action应为commentary
+    import json
+    from scripts.l1_collect.policy_gate import gate_one
+    def fake(system, user):
+        return json.dumps({"label": "commentary", "confidence": 0.9, "evidence": "解读口径"})
+    gr = gate_one("p2", "https://fgw.gd.gov.cn/zcjd/a.html", "某栏目介绍", "", llm_fn=fake)
+    assert gr.action == "commentary"

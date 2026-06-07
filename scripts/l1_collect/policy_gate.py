@@ -11,6 +11,8 @@ from .news_filter import is_news_or_press, GOV_DOMAIN_SUFFIXES
 REVIEW_THRESHOLD = 0.7
 POLICY_TITLE_SIGNALS = ("通知", "意见", "规定", "办法", "方案", "决定", "公告",
                         "批复", "措施", "规划", "细则", "标准", "条例", "暂行", "导则")
+COMMENTARY_MARKERS = ("政策解读", "解读材料", "文字解读", "答记者问",
+                      "一图读懂", "图解", "图读", "问答")
 BODY_POLICY_SIGNALS = ("根据", "现就", "现将", "特此通知", "有关规定", "现通知如下")
 FAST_REJECT_DOMAINS = {
     "xinhuanet.com", "people.com.cn", "cctv.com", "thepaper.cn", "sohu.com",
@@ -20,7 +22,7 @@ FAST_REJECT_DOMAINS = {
 
 _SYSTEM = (
     "你是政策文档分类器。判断文档是『正式政策公文』还是非政策。只输出JSON。"
-    'Schema:{"label":"policy|non_policy_index|non_policy_news|non_policy_reply",'
+    'Schema:{"label":"policy|commentary|non_policy_index|non_policy_news|non_policy_reply",'
     '"confidence":0.0-1.0,"evidence":"<=30字"}'
 )
 
@@ -32,7 +34,7 @@ class GateResult:
     confidence: float
     evidence: str
     used_llm: bool
-    action: str          # pass | reject | review_queue
+    action: str          # pass | commentary | reject | review_queue
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -69,6 +71,8 @@ def _is_gov(url: str) -> bool:
 def _heuristic(url: str, title: str, body_head: str) -> str:
     if _blacklisted(url):
         return "non_policy"
+    if any(m in title for m in COMMENTARY_MARKERS):
+        return "commentary"
     if _is_gov(url) and (any(s in title for s in POLICY_TITLE_SIGNALS)
                          or any(s in body_head for s in BODY_POLICY_SIGNALS)):
         return "policy"
@@ -80,6 +84,8 @@ def _heuristic(url: str, title: str, body_head: str) -> str:
 def gate_one(ref: str, url: str, title: str, body_head: str,
              llm_fn: Optional[Callable]) -> GateResult:
     v = _heuristic(url, title, body_head)
+    if v == "commentary":
+        return GateResult(ref, "commentary", 0.95, "title_commentary_marker", False, "commentary")
     if v == "policy":
         return GateResult(ref, "policy", 0.95, "heuristic_pass", False, "pass")
     if v == "non_policy":
@@ -94,7 +100,9 @@ def gate_one(ref: str, url: str, title: str, body_head: str,
     label = data.get("label", "policy")
     conf = float(data.get("confidence", 0.5))
     ev = data.get("evidence", "")
-    if label == "policy":
+    if label == "commentary":
+        action = "commentary"
+    elif label == "policy":
         action = "pass"
     elif conf < REVIEW_THRESHOLD:
         action = "review_queue"
