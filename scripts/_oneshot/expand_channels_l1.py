@@ -9,8 +9,10 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+from collections import Counter
+
 from scripts.l1_collect.channel_discovery import (
-    NATIONAL_TARGETS, province_targets_from_registry, discover_one)
+    NATIONAL_TARGETS, province_targets_from_registry, commerce_market_targets, discover_one)
 from scripts.l1_collect.channel_catalog import load_catalog, save_catalog, ChannelStatus
 
 CAT = Path("state/T1_channels/channel_catalog.yaml")
@@ -25,6 +27,8 @@ def main() -> None:
         targets += NATIONAL_TARGETS
     if "province" in levels:
         targets += province_targets_from_registry(REG)
+    if "commerce_market" in levels:
+        targets += commerce_market_targets(registry_path=REG)
 
     existing = load_catalog(CAT) if CAT.exists() else []
     have = {c.root_domain for c in existing}
@@ -42,11 +46,10 @@ def main() -> None:
 
     save_catalog(existing + discovered, CAT)
     print("=" * 56)
-    for lv in levels:
-        cn = LEVEL_CN.get(lv, lv)
-        d = [c for c in discovered if c.level == cn]
-        v = sum(1 for c in d if c.status == ChannelStatus.验证)
-        print(f"[{lv}] 新增 {len(d)} | 验证 {v} 候选 {len(d) - v}")
+    v = sum(1 for c in discovered if c.status == ChannelStatus.验证)
+    print(f"新增 {len(discovered)} | 验证 {v} 候选 {len(discovered) - v}")
+    for (ct, st), n in sorted(Counter((c.channel_type, c.status.value) for c in discovered).items()):
+        print(f"  {ct:8s} {st:3s} {n}")
 
 
 if __name__ == "__main__":
