@@ -40,9 +40,12 @@ ul{margin:6px 0;padding-left:22px}li{margin:5px 0}
 <table>
 <tr><th>分支</th><th>内容</th><th>测试</th><th>位置</th></tr>
 <tr><td><code>claude/zen-saha-c3ac3c</code></td><td><b>评论入库主线</b>:feed 解析 / 过滤 / 全文提取 / 写 vault / 去重台账 / token 检测 / wewe-rss 容器 / 文档</td><td><span class="pill green">40 passed</span></td><td>worktree <code>.claude/worktrees/zen-saha-c3ac3c</code></td></tr>
-<tr><td><code>codex/openclaw-qr-relay</code></td><td><b>token 失效 → QR 推飞书</b>:detector / wewe_login / qr_render / openclaw adapter / daily_check</td><td><span class="pill green">13 passed</span></td><td>主仓当前 checkout</td></tr>
+<tr><td><code>codex/openclaw-qr-relay</code></td><td><b>token 失效 → QR 推飞书</b>:detector / wewe_login / qr_render / openclaw adapter / daily_check(detector 已硬化:优先用真实 token_health seam)</td><td><span class="pill green">18 passed</span></td><td>主仓当前 checkout(<b>未提交</b>,工作树文件)</td></tr>
 </table>
-<div class="flag"><b>合并注意</b>:两分支都新增 <code>scripts/l1_collect/commentary_ingest/__init__.py</code>(同为空文件,无冲突);Codex 的 <code>qr_relay/</code> 纯增在该包下。两者基本可叠加合并。本线只新增文件、未改任何既有文件(唯一例外:向根 <code>CLAUDE.md</code> 追加「评论 RSS 入库」一节)。</div>
+<div class="flag danger"><b>合并注意(重要)</b>:<br>
+① <b>Codex 的 <code>qr_relay/</code> + <code>tests/commentary_qr_relay/</code> + 报告在 <code>codex/openclaw-qr-relay</code> 分支当前是<u>未提交工作树文件(git untracked)</u></b> —— 部署 session <b>合并前须先在该分支 commit,否则丢失</b>。(该分支 HEAD 实为 service-deploy Plan C 提交,Codex 文件未入历史。)<br>
+② 两分支都新增 <code>commentary_ingest/__init__.py</code>(同为空文件,无冲突);<code>qr_relay/</code> 纯增在该包下,基本可叠加。<br>
+③ 本线只新增文件、未改既有文件(唯一例外:向根 <code>CLAUDE.md</code> 追加「评论 RSS 入库」一节)。</div>
 
 <h2>2. 架构</h2>
 <div class="card">
@@ -120,7 +123,7 @@ ul{margin:6px 0;padding-left:22px}li{margin:5px 0}
 <h2>7. 验证证据</h2>
 <table>
 <tr><th>项</th><th>结果</th></tr>
-<tr><td>单元测试</td><td>入库线 <span class="pill green">40 passed</span> · QR relay <span class="pill green">13 passed</span></td></tr>
+<tr><td>单元测试</td><td>入库线 <span class="pill green">40 passed</span> · QR relay <span class="pill green">18 passed</span></td></tr>
 <tr><td>discovery(真 token)</td><td>触发刷新 DB <b>2479 → 2810(+331 新文)</b>,最新到当日</td></tr>
 <tr><td>生产入库(真 vault)</td><td>feed 80 = 入库 <b>79</b> + 瞬时 1;真 vault <b>283 → 362(+79)</b>,<b>79 篇全过 <code>validate_schema</code></b>;正文经 fallback 完整(4898/18086/1403 字)</td></tr>
 <tr><td>审计对账</td><td>记账闭合(各桶和=feed_count)、物理对账(文件数=计数)、幂等(二轮全判重复不重写)均 PASS</td></tr>
