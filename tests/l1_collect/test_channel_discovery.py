@@ -163,3 +163,74 @@ def test_commerce_warmstart_from_registry(tmp_path):
     targets = commerce_market_targets(registry_path=reg)
     fj = [t for t in targets if t["city"] == "福建省商务厅"][0]
     assert fj["root_domain"] == "swt.fujian.gov.cn"
+
+
+def test_institution_match_by_domain():
+    from scripts.l1_collect.channel_discovery import _institution_match
+    assert _institution_match("swt.jiangsu.gov.cn", "商务") is True
+    assert _institution_match("scjgj.beijing.gov.cn", "市监") is True
+    assert _institution_match("amr.gd.gov.cn", "市监") is True
+    assert _institution_match("fgw.sc.gov.cn", "商务") is False   # 发改委域名→不匹配商务
+    assert _institution_match("nea.gov.cn", "市监") is False
+
+
+def test_discover_domain_agnostic_derives_domain(monkeypatch):
+    """域名未知:Tavily 返 gov+非gov → gov 过滤 → LLM 选 → 反推域名 → 机构核验 → 验证。"""
+    from scripts.l1_collect import channel_discovery as cd
+    from scripts.l1_collect.connectivity_probe import ProbeResult
+    monkeypatch.setattr(cd, "_tavily_search",
+                        lambda q: ["https://news.sina.com.cn/x",
+                                   "https://swt.jiangsu.gov.cn/col/tzgg/"])
+    monkeypatch.setattr(cd, "_llm_pick",
+                        lambda name, urls: "https://swt.jiangsu.gov.cn/col/tzgg/")
+    monkeypatch.setattr(cd, "probe_url",
+                        lambda u, **k: ProbeResult(url=u, http_status=200,
+                                                   page_has_list_pattern=True, verdict="ok"))
+    ch = cd.discover_one({"city": "江苏省商务厅", "province": "江苏省", "level": "省",
+                          "city_code": "320000", "channel_type": "商务",
+                          "root_domain": None})
+    assert ch.root_domain == "swt.jiangsu.gov.cn"   # 反推
+    assert ch.status.value == "验证"
+
+
+def test_discover_domain_agnostic_demotes_when_institution_mismatch(monkeypatch):
+    """选中的是 gov 列表页但域名不像商务(发改委)→ 核验门降候选。"""
+    from scripts.l1_collect import channel_discovery as cd
+    from scripts.l1_collect.connectivity_probe import ProbeResult
+    monkeypatch.setattr(cd, "_tavily_search",
+                        lambda q: ["https://fgw.sc.gov.cn/zcfb/"])
+    monkeypatch.setattr(cd, "_llm_pick", lambda name, urls: "https://fgw.sc.gov.cn/zcfb/")
+    monkeypatch.setattr(cd, "probe_url",
+                        lambda u, **k: ProbeResult(url=u, http_status=200,
+                                                   page_has_list_pattern=True, verdict="ok"))
+    ch = cd.discover_one({"city": "四川省商务厅", "province": "四川省", "level": "省",
+                          "city_code": "510000", "channel_type": "商务",
+                          "root_domain": None})
+    assert ch.status.value == "候选"   # 域名核验没过 → 不验证
+
+
+def test_discover_warmstart_known_domain_not_demoted(monkeypatch):
+    """暖启动已知域名的商务渠道:域名不含标记(sww)也不被核验门降级。"""
+    from scripts.l1_collect import channel_discovery as cd
+    from scripts.l1_collect.connectivity_probe import ProbeResult
+    monkeypatch.setattr(cd, "_tavily_search", lambda q: ["https://sww.cq.gov.cn/zwgk/"])
+    monkeypatch.setattr(cd, "_llm_pick", lambda name, urls: "https://sww.cq.gov.cn/zwgk/")
+    monkeypatch.setattr(cd, "probe_url",
+                        lambda u, **k: ProbeResult(url=u, http_status=200,
+                                                   page_has_list_pattern=True, verdict="ok"))
+    ch = cd.discover_one({"city": "重庆市商务委员会", "province": "重庆市", "level": "省",
+                          "city_code": "500000", "channel_type": "商务",
+                          "root_domain": "sww.cq.gov.cn"})   # 已知域名
+    assert ch.status.value == "验证"   # 不被降级
+
+
+def test_discover_domain_agnostic_no_gov_candidates(monkeypatch):
+    """域名未知 + Tavily 无 gov 候选 → 候选,root_domain 空。"""
+    from scripts.l1_collect import channel_discovery as cd
+    monkeypatch.setattr(cd, "_tavily_search", lambda q: ["https://news.sina.com.cn/x"])
+    monkeypatch.setattr(cd, "_llm_pick", lambda name, urls: None)
+    ch = cd.discover_one({"city": "某省商务厅", "province": "某省", "level": "省",
+                          "city_code": "990000", "channel_type": "商务",
+                          "root_domain": None})
+    assert ch.status.value == "候选"
+    assert ch.root_domain == ""

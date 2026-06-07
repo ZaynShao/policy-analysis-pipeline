@@ -13,6 +13,7 @@ import yaml
 from .channel_catalog import Channel, ChannelStatus
 from .city_priority import MUNICIPALITIES, BUSINESS_RULES
 from .connectivity_probe import probe_url
+from .news_filter import GOV_DOMAIN_SUFFIXES
 from .tavily_client import TavilyClient
 
 # 决策A:国家级13核心机构(覆盖加油/充电/电力三业务线)
@@ -97,6 +98,25 @@ def _same_domain(url: str, root_domain: str) -> bool:
     return bool(rd) and (h == rd or h.endswith("." + rd))
 
 
+_INST_DOMAIN_MARKERS = {
+    "商务": ("swt", "sww", "swj", "commerce", "mofcom"),
+    "市监": ("scjg", "scjgj", "amr", "samr", "scjgdj"),
+}
+
+
+def _is_gov_host(url: str) -> bool:
+    return any(_host(url).endswith(s) for s in GOV_DOMAIN_SUFFIXES)
+
+
+def _institution_match(domain: str, channel_type: str) -> bool:
+    """域名标记核验(仅域名无关发现路径调用;已知域名由调用方传 True 跳过)。非商务/市监 channel_type 返回 True。"""
+    markers = _INST_DOMAIN_MARKERS.get(channel_type)
+    if markers is None:
+        return True
+    h = (domain or "").lower()
+    return any(m in h for m in markers)
+
+
 def _tavily_search(query: str) -> list:
     return TavilyClient().search_urls(query, max_results=5)
 
@@ -178,23 +198,33 @@ def commerce_market_targets(registry_path: Optional[Path] = None) -> list:
 
 
 def discover_one(target: dict) -> Optional[Channel]:
-    """单目标:搜→同域过滤→LLM选→按序探测(LLM选优先,其余同域候选兜底)。
-    治 LLM 选了 JS 空壳/坏 URL(如 nea zxwj.htm):probe 不通时自动试其它同域候选,
-    用第一个验证的(Tavily 往往也返回了能用的真列表页,只是没被 LLM 选中)。"""
+    """单目标:搜→域名过滤→LLM选→按序探测→反推域名→机构核验→Channel。
+
+    已知域名(known):同域过滤;未知域名(None):gov.cn 过滤 + 反推域名 + 机构名核验。
+    治 LLM 选了 JS 空壳/坏 URL:probe 不通时自动试其它候选,用第一个验证的。
+    """
     query = f"{target['city']} 政策文件 通知公告 列表"
     candidates = _tavily_search(query)
-    on_domain = [u for u in candidates if _same_domain(u, target["root_domain"])]
+    known = target.get("root_domain")
+    if known:
+        on_domain = [u for u in candidates if _same_domain(u, known)]
+    else:
+        on_domain = [u for u in candidates if _is_gov_host(u)]   # 域名未知→gov 过滤
     picked = _llm_pick(target["city"], on_domain)
     ordered = ([picked] if picked else []) + [u for u in on_domain if u != picked]
     list_url, pr = _first_verified(ordered)
-    if list_url is None:  # 无同域候选 → 首页兜底
-        list_url = f"https://{target['root_domain']}/"
-        pr = probe_url(list_url)
-    status = ChannelStatus.验证 if pr.verdict == "ok" else ChannelStatus.候选
+    if list_url is None:  # 无候选 → 首页兜底(仅 known-domain 路径有意义)
+        list_url = f"https://{known}/" if known else (
+            f"https://{_host(picked)}/" if picked else "")
+        pr = probe_url(list_url) if list_url else None
+    resolved = known or (_host(list_url) if list_url else "")
+    inst_ok = True if known else _institution_match(resolved, target["channel_type"])
+    verdict_ok = bool(pr) and pr.verdict == "ok"
+    status = ChannelStatus.验证 if (verdict_ok and inst_ok) else ChannelStatus.候选
     return Channel(
         city=target["city"], province=target["province"], level=target["level"],
         city_code=target["city_code"], channel_type=target["channel_type"],
-        root_domain=target["root_domain"], list_url=list_url,
-        source="discovery", status=status,
-        last_probed_at=pr.probed_at, probe_result=pr.verdict,
+        root_domain=resolved, list_url=list_url, source="discovery", status=status,
+        last_probed_at=(pr.probed_at if pr else None),
+        probe_result=(pr.verdict if pr else None),
     )
