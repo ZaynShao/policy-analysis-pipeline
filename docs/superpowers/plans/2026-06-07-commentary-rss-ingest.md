@@ -341,6 +341,19 @@ def test_to_body_short_content_triggers_empty_without_fallback():
     body, src = to_body(_item(content_html="<p>短</p>"), fetch_fallback=False,
                         min_len=200)
     assert src == "empty"
+
+
+def test_to_body_rejects_wechat_error_shell():
+    # 反爬壳页:过 200 字但命中失败标记 → 判 empty(确定性,不靠 LLM)
+    shell = "<p>" + "环境异常 当前环境异常，完成验证后即可继续访问。" * 8 + "</p>"
+    body, src = to_body(_item(content_html=shell), fetch_fallback=False)
+    assert src == "empty"
+
+
+def test_is_low_quality_accepts_long_real_article():
+    from scripts.l1_collect.commentary_ingest.content import is_low_quality
+    real = "这是一篇正常的政策评论。" * 100
+    assert is_low_quality(real) is False
 ```
 
 - [ ] **Step 2: 运行确认失败**
@@ -371,6 +384,13 @@ from .models import FeedItem
 UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
       "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36")
 
+# 微信已知失败壳页标记(确定性,非 LLM)。这些页能过字数门但是垃圾。
+GARBAGE_MARKERS = (
+    "环境异常", "请在微信客户端打开", "请在微信打开",
+    "该内容已被发布者删除", "此内容因违规无法查看", "内容已被删除",
+    "参数错误", "该公众号已迁移", "已被发布者删除",
+)
+
 
 def html_to_text(html: str) -> str:
     """HTML → 纯文本。trafilatura 优先,bs4 兜底。"""
@@ -381,6 +401,15 @@ def html_to_text(html: str) -> str:
     if extracted and extracted.strip():
         return extracted.strip()
     return BeautifulSoup(html, "html.parser").get_text("\n").strip()
+
+
+def is_low_quality(text: str, min_len: int = 200) -> bool:
+    """正文不可用?过短,或短文本命中微信失败标记。长正文偶含短语不算。"""
+    if len(text) < min_len:
+        return True
+    if len(text) < 500 and any(m in text for m in GARBAGE_MARKERS):
+        return True
+    return False
 
 
 def _refetch(url: str, timeout: int, delay: float) -> str:
@@ -397,13 +426,16 @@ def _refetch(url: str, timeout: int, delay: float) -> str:
 def to_body(item: FeedItem, *, fetch_fallback: bool = True,
             min_len: int = 200, timeout: int = 30,
             delay: float = 4.0) -> tuple:
-    """返回 (body, source)。source ∈ {'feed','refetch','empty'}。"""
+    """返回 (body, source)。source ∈ {'feed','refetch','empty'}。
+
+    确定性内容质量门:feed 全文过短或命中微信失败壳页 → 兜底抓 URL;仍不合格 → empty。
+    """
     body = html_to_text(item.content_html)
-    if len(body) >= min_len:
+    if not is_low_quality(body, min_len):
         return body, "feed"
     if fetch_fallback:
         refetched = _refetch(item.url, timeout, delay)
-        if len(refetched) >= min_len:
+        if not is_low_quality(refetched, min_len):
             return refetched, "refetch"
     return "", "empty"
 ```
@@ -411,7 +443,7 @@ def to_body(item: FeedItem, *, fetch_fallback: bool = True,
 - [ ] **Step 4: 运行确认通过**
 
 Run: `python3 -m pytest tests/l1_collect/commentary_ingest/test_content.py -v`
-Expected: PASS(4 passed)
+Expected: PASS(6 passed)
 
 - [ ] **Step 5: 提交**
 

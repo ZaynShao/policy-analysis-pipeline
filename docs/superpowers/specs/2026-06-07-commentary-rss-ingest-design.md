@@ -89,6 +89,7 @@ vault 0_raw/commentaries/  +  state/commentary_ingest/
 2. **入库层**(代码,**统一规则,账号无关**):
    - **去重**:`source_url` 已在 vault 或 processed ledger → skip
    - **SKIP(完全丢弃)**:招聘/岗位招募 · 节日快乐/放假通知 · 纯视频(标题 `^视频[：:]` 或正文抓不到文字) · 活动征集/报名通道
+   - **内容质量门(确定性,非 LLM)**:正文过短,或命中微信失败壳页标记("环境异常"/"请在微信客户端打开"/"该内容已被发布者删除"/"参数错误"等)→ 判不可入库(进 unprocessable)。这些壳页能过字数门但是垃圾,需结构性拦截。**注**:内容的"相关性/分类"判断不在 L1(属 L2 commentary_signals),L1 只做这种确定性质量拦截
    - **market_intel 路由**(结构性信号,非判断)→ staging(不入 vault):`\d+(MW|GWh|GW)` + 中标/开标/采购公告/招标公告 · IPO/上市/融资 · 出货.{0,8}\d+GWh
    - 其余 → vault commentaries(**保守多收**)
 3. **相关性判断**:留 L2(commentary_signals)。
