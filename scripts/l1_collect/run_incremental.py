@@ -1,0 +1,143 @@
+"""L1增量采集入口。service线调用,无调度逻辑。append-only。
+流程:取锁→Step2分层扫→Step3规则过滤→Step4抓→Step4.5抽→policy_gate门→Step5入库→释放锁。
+"""
+from __future__ import annotations
+import argparse
+import json
+from contextlib import contextmanager
+from dataclasses import dataclass, field
+from pathlib import Path
+
+from .channel_catalog import load_catalog, ChannelStatus
+from .step2_scan import scan_channel
+from .step3_filter import filter_scan_rows
+from .step4_fetch import fetch_candidates
+from .step4_5_extract import extract_all
+from .step5_ingest import ingest_extracted
+from .dedup import DedupIndex
+from .policy_gate import gate_one
+from .common_llm_client import make_judge_client
+
+ROOT = Path(__file__).resolve().parents[2]
+STATE = ROOT / "state"
+VAULT_POLICIES = Path.home() / "Documents" / "Zayn Main" / "政策分析" / "0_raw" / "policies"
+LEVEL_MAP = {"national": "国家", "province": "省", "city": "市"}
+
+
+@dataclass
+class IncrementalConfig:
+    level: list = field(default_factory=lambda: ["national", "province", "city"])
+    since: str = "2026-01-01"
+    dry_run: bool = False
+    state_dir: Path = STATE / "T1_incremental"
+    vault_dir: Path = VAULT_POLICIES
+
+
+@contextmanager
+def _l1_lock():
+    """复用 service 的 l1_status 锁(若在树上);不在 → no-op(边界:不重复造锁)。"""
+    try:
+        from scripts.service.l1_status import acquire  # type: ignore
+    except Exception:
+        acquire = None
+    if acquire is None:
+        yield
+        return
+    with acquire():
+        yield
+
+
+def _select_channels(channels, levels: list):
+    cn = {LEVEL_MAP.get(l, l) for l in levels}
+    return [c for c in channels if c.level in cn and c.status == ChannelStatus.验证]
+
+
+def _gate_extracted_dir(ext_dir: Path, passed_dir: Path,
+                        quar_jsonl: Path, llm_fn) -> tuple:
+    passed_dir.mkdir(parents=True, exist_ok=True)
+    n_pass = n_rej = 0
+    rejects: list = []
+    for jf in sorted(ext_dir.glob("*.json")):
+        rec = json.loads(jf.read_text(encoding="utf-8"))
+        gr = gate_one(ref=jf.stem, url=rec.get("url", ""), title=rec.get("title", ""),
+                      body_head=(rec.get("body") or "")[:800], llm_fn=llm_fn)
+        if gr.action == "pass":
+            (passed_dir / jf.name).write_text(jf.read_text(encoding="utf-8"),
+                                              encoding="utf-8")
+            n_pass += 1
+        else:
+            rejects.append({"file": jf.name, "url": rec.get("url", ""),
+                            "title": rec.get("title", ""), **gr.to_dict()})
+            n_rej += 1
+    if rejects:
+        quar_jsonl.parent.mkdir(parents=True, exist_ok=True)
+        with open(quar_jsonl, "a", encoding="utf-8") as f:
+            for r in rejects:
+                f.write(json.dumps(r, ensure_ascii=False) + "\n")
+    return n_pass, n_rej
+
+
+def _run_channel(ch, cfg: IncrementalConfig, dedup, llm_fn) -> dict:
+    sd = cfg.state_dir
+    for d in ["scan", "cand", "quar", "fetch", "ext", "passed", "ingest"]:
+        (sd / d).mkdir(parents=True, exist_ok=True)
+    label = f"{ch.city}__{ch.channel_type}__{ch.root_domain}"
+    n_scan = scan_channel(ch, sd / "scan")
+    if n_scan == 0:
+        return {"channel": label, "scanned": 0, "ingested": 0}
+    merged = sd / "scan" / f"_merged_{ch.root_domain}.jsonl"
+    src = sd / "scan" / f"{label}.jsonl"
+    merged.write_text(src.read_text(encoding="utf-8") if src.exists() else "",
+                      encoding="utf-8")
+    cand = sd / "cand" / f"{label}.jsonl"
+    kept, _ = filter_scan_rows(merged, cand, sd / "quar" / f"{label}__s3.jsonl", dedup)
+    if cfg.dry_run:
+        return {"channel": label, "scanned": n_scan, "kept": kept, "ingested": 0}
+    fetch_candidates(cand, sd / "fetch", sd / "quar" / f"{label}__ferr.txt")
+    extract_all(sd / "fetch", sd / "ext", sd / "quar" / f"{label}__s45.jsonl")
+    n_pass, n_rej = _gate_extracted_dir(sd / "ext", sd / "passed",
+                                        sd / "quar" / "gate_rejects.jsonl", llm_fn)
+    ing_ok, _ = ingest_extracted(sd / "passed", sd / "ingest" / f"{label}.jsonl")
+    # 清空 ext/passed 供下个渠道复用(避免跨渠道串)
+    for d in ["fetch", "ext", "passed"]:
+        for f in (sd / d).glob("*.json"):
+            f.unlink()
+    return {"channel": label, "scanned": n_scan, "kept": kept,
+            "gate_passed": n_pass, "gate_rejected": n_rej, "ingested": ing_ok}
+
+
+def run_incremental(cfg: IncrementalConfig) -> dict:
+    catalog = load_catalog(ROOT / "state/T1_channels/channel_catalog.yaml")
+    channels = _select_channels(catalog, cfg.level)
+    print(f"[run_incremental] level={cfg.level} channels={len(channels)} dry={cfg.dry_run}")
+    llm_fn = None if cfg.dry_run else make_judge_client()
+    results = []
+    with _l1_lock():
+        dedup = DedupIndex.from_vault_policies(cfg.vault_dir)
+        for ch in channels:
+            r = _run_channel(ch, cfg, dedup, llm_fn)
+            results.append(r)
+            print(f"  {r['channel'][:48]:48s} scan={r['scanned']} ing={r.get('ingested',0)}")
+    summary = {
+        "channels_run": len(results),
+        "total_scanned": sum(r["scanned"] for r in results),
+        "total_ingested": sum(r.get("ingested", 0) for r in results),
+        "total_gate_rejected": sum(r.get("gate_rejected", 0) for r in results),
+        "dry_run": cfg.dry_run,
+    }
+    print(f"[run_incremental] DONE {summary}")
+    return summary
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--level", default="national,province,city")
+    ap.add_argument("--since", default="2026-01-01")
+    ap.add_argument("--dry-run", action="store_true")
+    a = ap.parse_args()
+    run_incremental(IncrementalConfig(level=a.level.split(","), since=a.since,
+                                      dry_run=a.dry_run))
+
+
+if __name__ == "__main__":
+    main()
