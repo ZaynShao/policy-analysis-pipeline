@@ -102,6 +102,9 @@ def main() -> int:
     ap.add_argument("--check-token", action="store_true")
     ap.add_argument("--no-fallback", action="store_true",
                     help="不做正文兜底抓取(只用 feed 全文)")
+    ap.add_argument("--feed-timeout", type=int,
+                    default=int(os.environ.get("WEWE_FEED_TIMEOUT", "120")),
+                    help="拉 feed 的超时秒数(fulltext 大 feed 需调大,默认 120)")
     args = ap.parse_args()
 
     # token 健康检查。注意:token 失效时**不中止入库**——wewe-rss 仍能 serve 已存
@@ -119,7 +122,7 @@ def main() -> int:
 
     if not args.feed_url or not args.vault_dir:
         ap.error("缺 --feed-url / --vault-dir(或对应 env)")
-    items = fetch_feed(args.feed_url, args.auth_code)
+    items = fetch_feed(args.feed_url, args.auth_code, timeout=args.feed_timeout)
     summary = ingest_items(items, vault_dir=Path(args.vault_dir),
                            state_dir=Path(args.state_dir),
                            fetch_fallback=not args.no_fallback)
