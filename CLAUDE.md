@@ -115,6 +115,18 @@ python3 scripts/l3_render/render_monthly.py --month 2026-05
 
 ---
 
+## 评论 RSS 入库(L1 commentary)
+
+评论采集 = wewe-rss(微信公众号→JSON feed)→ `scripts/l1_collect/commentary_ingest/`。
+
+**部署纪律(重要)**:token 是个人微信读书账号,**必须从国内 IP 发起**——东京服务器机房 IP 会触发微信地理风控(最坏冻结账号)。故此线跑**国内节点**(阶段一 Mac,阶段二国内容器),写 Mac vault 经现有 rsync 上服务器只读消费,**不在东京服务器跑 discovery、不写 /root/policy-vault**。
+
+- 运行:`python3 -m scripts.l1_collect.commentary_ingest.run --feed-url ... --vault-dir ... --db-path ...`(路径/凭据全 env/CLI,零硬编码)
+- 迁移:`docs/runbooks/commentary-rss-ingest-migration.md`(方法更新时同步维护本节与该 runbook)
+- 保守轮询:轮询越勤→token 废越快→扫码越频繁。CRON 维持 6h/次量级。
+
+---
+
 ## 与 vault CLAUDE.md 的分工
 
 - **vault CLAUDE.md** — 给在 vault 里写作/浏览的 AI 看,说"这是只读数据仓,工程见 pipeline"
