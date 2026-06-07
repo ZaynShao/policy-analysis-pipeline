@@ -1,0 +1,105 @@
+{
+  "version": "https://jsonfeed.org/version/1.1",
+  "title": "wewe-rss · all feeds",
+  "feed_url": "http://localhost:4000/feeds/all.json",
+  "home_page_url": "http://localhost:4000",
+  "description": "wewe-rss aggregated JSON Feed (SYNTHETIC fixture — built from real DB ids/titles, Docker unavailable at fixture-capture time)",
+  "items": [
+    {
+      "id": "IeeVM8LiITAMfGWZ592Tfw",
+      "url": "https://mp.weixin.qq.com/s/IeeVM8LiITAMfGWZ592Tfw",
+      "title": "IIGF观点 | 李周佳睿、马思雯：可持续信息披露规则趋同下的制度比较与中国路径",
+      "content_html": "<p>随着全球可持续发展信息披露规则的持续演进，国际可持续准则理事会（ISSB）、欧盟企业可持续报告指令（CSRD）与中国相关准则之间的协调趋同进程日益加速。本文从制度比较视角出发，系统梳理三套规则体系在气候相关信息、供应链披露、重要性判断等核心议题上的差异与共性，探讨中国在全球规则制定中的参与路径与战略选择。</p><p>一、全球信息披露规则趋同背景</p><p>近年来，ESG信息披露标准化已成为全球资本市场监管的核心议题之一。</p>",
+      "date_published": "2026-04-28T08:30:00+08:00",
+      "authors": [
+        {
+          "name": "中央财经大学绿色金融国际研究院"
+        }
+      ]
+    },
+    {
+      "id": "tQnDiszHVcjKkO8nv2JulA",
+      "url": "https://mp.weixin.qq.com/s/tQnDiszHVcjKkO8nv2JulA",
+      "title": "绿色金融日报4.28",
+      "content_html": "<p>【绿色金融日报 2026-04-28】</p><p>政策动态：财政部发布《关于支持绿色低碳发展的若干财税政策》，明确对新能源、节能环保等领域给予税收优惠，预计2026年减税规模超600亿元。</p><p>市场动态：今日沪深两市绿色相关ETF整体涨幅0.8%，碳排放权交易市场全国碳价报85元/吨，较上周上涨2.3%。</p><p>研究速递：IIGF发布《2026年一季度绿色债券市场报告》，一季度绿色债券发行规模达8900亿元，同比增长34%。</p>",
+      "date_published": "2026-04-28T07:00:00+08:00",
+      "authors": [
+        {
+          "name": "中央财经大学绿色金融国际研究院"
+        }
+      ]
+    },
+    {
+      "id": "dnaTnk-2_vKc1S-xOTxCgA",
+      "url": "https://mp.weixin.qq.com/s/dnaTnk-2_vKc1S-xOTxCgA",
+      "title": "亿纬锂能Q1：储能出货20.38GWh，同比增长60.82%，正在研发702Ah电芯",
+      "content_html": "<p>亿纬锂能（300014.SZ）发布2026年一季度业绩公告：储能业务出货量达20.38GWh，同比增长60.82%，环比增长12.3%。动力电池出货10.2GWh，同比增长28%。</p><p>公司同时披露，正在研发702Ah大容量储能电芯，预计2026年三季度完成产品认证，年内进入批量生产阶段。该电芯能量密度较现有产品提升约15%，单GWh用芯数量减少约20%，有助于降低系统集成成本。</p><p>中标情况：一季度新签储能订单金额约180亿元，包括华能集团800MWh共享储能项目、国家电网300MWh电网侧储能项目。</p>",
+      "date_published": "2026-04-27T20:15:00+08:00",
+      "authors": [
+        {
+          "name": "储能与电力市场"
+        }
+      ]
+    },
+    {
+      "id": "hVXCtZ7h9cuCzBrptrSpdg",
+      "url": "https://mp.weixin.qq.com/s/hVXCtZ7h9cuCzBrptrSpdg",
+      "title": "主动防御新范式：西清能源AI+储能重构电站安全体系",
+      "content_html": "<p>在储能电站安全事故频发的背景下，西清能源提出AI+储能主动防御体系，通过在电池管理系统（BMS）中嵌入边缘AI推理芯片，实现对电芯热失控前兆信号的毫秒级识别。</p><p>该系统核心算法基于超过3000个真实热失控事件训练，对电压异常、温度梯度、内阻突变等12类前兆特征进行联合判断，误报率控制在0.1%以下，提前预警时间较传统BMS提升至少8分钟。</p><p>目前该系统已在华北、华东地区5个100MWh以上电站完成部署，年内计划推广至20个项目。</p>",
+      "date_published": "2026-04-27T19:00:00+08:00",
+      "authors": [
+        {
+          "name": "储能与电力市场"
+        }
+      ]
+    },
+    {
+      "id": "Jl7ZTJJP0EILxyOX-jBuVA",
+      "url": "https://mp.weixin.qq.com/s/Jl7ZTJJP0EILxyOX-jBuVA",
+      "title": "税收新政赋能，油气增储上产遇新机",
+      "content_html": "<p>国家税务总局近日联合财政部发布《关于支持油气勘探开发税收政策的通知》，对深水、深层、非常规油气勘探开采给予差异化税收优惠：深层（埋深>4500m）气田增值税即征即退比例由30%提高至50%；致密气、页岩气开采所得税减半征收期由5年延长至10年。</p><p>分析人士认为，此次政策调整重点针对四川盆地深层气与新疆非常规气藏，有望撬动未来三年超800亿元的增量勘探投入，推动国内天然气年产量在2028年前突破2800亿立方米。</p>",
+      "date_published": "2026-04-27T16:30:00+08:00",
+      "authors": [
+        {
+          "name": "能源评论•首席能源观"
+        }
+      ]
+    },
+    {
+      "id": "NfAMj7W2jy0hW-gAaaqdNA",
+      "url": "https://mp.weixin.qq.com/s/NfAMj7W2jy0hW-gAaaqdNA",
+      "title": "视频：花香柳马焕新城市生态（上）",
+      "content_html": "",
+      "date_published": "2026-04-27T12:00:00+08:00",
+      "authors": [
+        {
+          "name": "人民网研究院"
+        }
+      ]
+    },
+    {
+      "id": "BbOAQRyNiJcKIFwwJwdUSA",
+      "url": "https://mp.weixin.qq.com/s/BbOAQRyNiJcKIFwwJwdUSA",
+      "title": "【邀请函】北京线下活动丨投资印尼：跨境项目融资及投资架构安排的法律与监管实务",
+      "content_html": "<p>活动报名 | 金杜律师事务所诚邀您参加2026年5月15日北京线下沙龙活动。本次活动聚焦印尼跨境投资实务，议题包括：印尼外资准入最新政策解读、PPP项目融资结构设计、矿产资源投资法律风险及应对策略。名额有限，扫描下方二维码报名。</p>",
+      "date_published": "2026-04-27T10:00:00+08:00",
+      "authors": [
+        {
+          "name": "金杜研究"
+        }
+      ]
+    },
+    {
+      "id": "r8keVO0B9PqCQDetEiuECA",
+      "url": "https://mp.weixin.qq.com/s/r8keVO0B9PqCQDetEiuECA",
+      "title": "中能财经 | 淡季不淡，煤价还能涨多少？",
+      "content_html": "<p>进入2026年5月传统煤炭消费淡季，但秦皇岛港5500大卡动力煤现货价格仍维持在840元/吨附近，较年初上涨约12%。</p><p>支撑煤价的核心逻辑有三：其一，今年南方来水偏枯，水电出力持续低于预期，火电顶峰压力凸显；其二，进口煤量价双降——澳大利亚煤炭对华出口受地缘政策扰动，印尼煤受汛期影响减量；其三，安全生产督查常态化使国内主产区产能弹性收窄。</p><p>机构预测：若6月气温偏高，迎峰度夏电力需求提前释放，煤价存在再涨50-80元/吨的空间。</p>",
+      "date_published": "2026-04-27T09:30:00+08:00",
+      "authors": [
+        {
+          "name": "中能传媒研究院"
+        }
+      ]
+    }
+  ]
+}
