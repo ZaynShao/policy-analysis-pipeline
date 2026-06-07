@@ -1,5 +1,3 @@
 *
 !.gitignore
 !.gitkeep
-!processed_ids.jsonl
-!last_run.json

@@ -24,8 +24,6 @@
 !T1_quarantine/**
 !T1_ingest_log/
 !T1_ingest_log/**
-# commentary_ingest:放行台账与状态,不放行正文 staging(原文不进 git)
+# commentary_ingest:仅放行目录占位;台账/last_run/正文均为运行态,不进 git
 !commentary_ingest/
-!commentary_ingest/processed_ids.jsonl
-!commentary_ingest/last_run.json
 !commentary_ingest/.gitkeep

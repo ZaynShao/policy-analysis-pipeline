@@ -15,8 +15,10 @@ token 是个人微信读书账号;东京机房 IP 触发微信地理风控(最�
    - 若 token 已失效:开 4000 管理页,手机微信扫码重登(见"扫码")。
 3. 配 `.env`:`WEWE_AUTH_CODE` / `ALERT_WEBHOOK_URL`(不入 git)。
 4. ingest 接入(二选一):
-   - a) 节点 cron:`cd <repo> && VAULT_DIR=<vault> WEWE_FEED_URL=http://wewe-rss:4000/feeds/all.json WEWE_AUTH_CODE=... python3 -m scripts.l1_collect.commentary_ingest.run --db-path <db>`
-   - b) ingest 也容器化,与 wewe-rss 同 compose 网络,feed-url 用服务名 `http://wewe-rss:4000/...`
+   - a) 节点 cron:`cd <repo> && VAULT_DIR=<vault> WEWE_FEED_URL='http://wewe-rss:4000/feeds/all.json?limit=400' WEWE_AUTH_CODE=... python3 -m scripts.l1_collect.commentary_ingest.run --db-path <db>`
+   - b) ingest 也容器化,与 wewe-rss 同 compose 网络,feed-url 用服务名 `http://wewe-rss:4000/feeds/all.json?limit=400`
+
+   > **feed limit 纪律(重要,别被限住)**:wewe-rss **不带 `limit` 默认只回 30 条/次**(实测)。15 个号合并、忙时 6h 内发文常 >30 → 会**静默漏**。务必显式给**大 limit**(如 400;wewe-rss 留全量历史,大 limit 只是多扫被去重,代价极小)。代码侧**不硬编码 limit**,完全由 `WEWE_FEED_URL` 控制;`coverage_warning`(本轮与已见零重叠)是兜底信号,出现就调大 limit / 提频。
 5. vault 落地与回流:节点写本地 vault 副本 → 约定回流路径(rsync 回 Mac 或直接作为新的 vault 著作点,二选一,迁移时定并更新 spec §9 + 本 runbook)。
 6. 验证:`--check-token` 通;小批量 `--no-fallback` 干跑;过 `validate_schema`。
 
