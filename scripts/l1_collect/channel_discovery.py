@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 from typing import Callable, Optional
+from urllib.parse import urlparse
 import yaml
 
 from .channel_catalog import Channel, ChannelStatus
@@ -73,6 +74,19 @@ def province_targets_from_registry(registry_path: Path) -> list:
     return out
 
 
+def _host(url: str) -> str:
+    try:
+        return (urlparse(url).hostname or "").lower()
+    except Exception:
+        return ""
+
+
+def _same_domain(url: str, root_domain: str) -> bool:
+    """候选 URL 是否属于目标机构域名（含子域）。治 Tavily 跨机构串味（miit→ncsti）。"""
+    h, rd = _host(url), (root_domain or "").lower()
+    return bool(rd) and (h == rd or h.endswith("." + rd))
+
+
 def _tavily_search(query: str) -> list:
     return TavilyClient().search_urls(query, max_results=5)
 
@@ -102,9 +116,10 @@ def discover_one(target: dict) -> Optional[Channel]:
     """单目标:搜→选→验证。verdict=ok→验证;否则候选(留firecrawl兜底)。"""
     query = f"{target['city']} 政策文件 通知公告 列表"
     candidates = _tavily_search(query)
-    list_url = _llm_pick(target["city"], candidates)
+    on_domain = [u for u in candidates if _same_domain(u, target["root_domain"])]
+    list_url = _llm_pick(target["city"], on_domain)
     if not list_url:
-        list_url = f"https://{target['root_domain']}/"  # 兜底首页
+        list_url = f"https://{target['root_domain']}/"  # 兜底首页（无同域候选）
     pr = probe_url(list_url)
     status = ChannelStatus.验证 if pr.verdict == "ok" else ChannelStatus.候选
     return Channel(

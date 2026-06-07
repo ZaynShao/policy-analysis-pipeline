@@ -45,8 +45,8 @@ def test_discover_builds_verified_channel(monkeypatch):
     monkeypatch.setattr(cd, "_llm_pick",
                         lambda name, urls: "https://ndrc.gov.cn/zcfb/")
     monkeypatch.setattr(cd, "probe_url",
-                        lambda u: ProbeResult(url=u, http_status=200,
-                                              page_has_list_pattern=True, verdict="ok"))
+                        lambda u, **k: ProbeResult(url=u, http_status=200,
+                                                   page_has_list_pattern=True, verdict="ok"))
     ch = cd.discover_one({
         "city": "国家发展和改革委员会", "province": "国家", "level": "国家",
         "city_code": "000000", "channel_type": "发改委",
@@ -55,3 +55,38 @@ def test_discover_builds_verified_channel(monkeypatch):
     assert ch is not None
     assert ch.list_url == "https://ndrc.gov.cn/zcfb/"
     assert ch.status.value == "验证"
+
+
+def test_same_domain_constraint():
+    """域名约束：跨机构候选被判 False、同域(含子域)True。"""
+    from scripts.l1_collect.channel_discovery import _same_domain
+    assert _same_domain("https://www.ncsti.gov.cn/zcfg", "miit.gov.cn") is False
+    assert _same_domain("https://www.miit.gov.cn/zcwj/", "miit.gov.cn") is True
+    assert _same_domain("https://xxgk.mot.gov.cn/list.html", "mot.gov.cn") is True
+    assert _same_domain("https://www.gov.cn/zhengce", "www.gov.cn") is True
+    assert _same_domain("https://nhc.gov.cn/x", "www.gov.cn") is False
+
+
+def test_discover_filters_cross_domain(monkeypatch):
+    """Tavily 返回错机构 URL(ncsti) → 域名约束在 LLM 选之前过滤掉。"""
+    from scripts.l1_collect import channel_discovery as cd
+    from scripts.l1_collect.connectivity_probe import ProbeResult
+    seen = {}
+    monkeypatch.setattr(cd, "_tavily_search",
+                        lambda q: ["https://www.ncsti.gov.cn/zcfg",
+                                   "https://www.miit.gov.cn/zcwj/"])
+
+    def fake_pick(name, urls):
+        seen["urls"] = list(urls)
+        return urls[0] if urls else None
+
+    monkeypatch.setattr(cd, "_llm_pick", fake_pick)
+    monkeypatch.setattr(cd, "probe_url",
+                        lambda u, **k: ProbeResult(url=u, http_status=200,
+                                                   page_has_list_pattern=True, verdict="ok"))
+    ch = cd.discover_one({
+        "city": "工业和信息化部", "province": "国家", "level": "国家",
+        "city_code": "000000", "channel_type": "工信部", "root_domain": "miit.gov.cn",
+    })
+    assert seen["urls"] == ["https://www.miit.gov.cn/zcwj/"]  # ncsti 已被过滤
+    assert "miit.gov.cn" in ch.list_url
