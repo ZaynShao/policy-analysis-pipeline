@@ -62,6 +62,18 @@ def test_paginate_urls_uses_index_n_pattern():
     assert any("index_1" in u or "index_2" in u for u in urls)
 
 
+def test_keywords_cover_oil_retail_and_market_reg():
+    from scripts.l1_collect.step2_scan import KEYWORDS
+    for kw in ("加油站", "成品油零售", "平台经济", "反垄断", "市场监管", "网络交易"):
+        assert kw in KEYWORDS, f"缺关键词 {kw}"
+
+def test_title_with_new_keyword_passes_filter():
+    from scripts.l1_collect.step2_scan import KEYWORDS
+    titles = ["浙江省成品油零售经营管理实施细则", "关于平台经济反垄断的指导意见"]
+    for t in titles:
+        assert any(kw in t for kw in KEYWORDS)
+
+
 def test_bs4_get_fixes_mojibake_encoding(monkeypatch):
     """政府站谎报 charset(ISO-8859-1) → _bs4_get 用 apparent_encoding 纠正中文乱码。"""
     from scripts.l1_collect import step2_scan as s
