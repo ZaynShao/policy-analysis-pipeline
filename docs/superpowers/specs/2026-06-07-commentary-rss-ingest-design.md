@@ -71,7 +71,8 @@ vault 0_raw/commentaries/  +  state/commentary_ingest/
 | 入库脚本 | `scripts/l1_collect/commentary_rss_ingest.py` | 主逻辑:拉 feed→过滤→兜底抓正文→写 vault→记 ledger |
 | feed adapter | 同上(内部模块或同文件函数) | 把 wewe-rss feed 解析成统一文章记录;隔离 wewe-rss 特定格式 |
 | token 健康检查 | `scripts/l1_collect/commentary_rss_ingest.py --check-token` | 检测 token 失效(feed 全空/报错 或 DB accounts.status=0)→ 告警 |
-| Docker 配置 | `docker/wewe-rss/compose.yml` | wewe-rss 服务定义(数据卷 + 保守轮询间隔) |
+| Docker 配置(阶段二) | `docker/wewe-rss/compose.yml` | wewe-rss + ingest 容器定义(数据卷 + 保守轮询间隔 + 共享网络);**国内容器迁移用**,Mac 阶段一可用现有原生安装 |
+| 迁移文档(阶段二) | `docs/runbooks/commentary-rss-ingest-migration.md` | Mac→国内容器迁移步骤;摘要进 `CLAUDE.md` |
 | 状态目录 | `state/commentary_ingest/` | `last_run.json` + `processed_ids.jsonl` + `market_intel_staging/` |
 
 凭据(token / DB 路径 / vault 路径 / feed URL)全部通过 **env var / CLI arg** 传入,**绝不进 git**。
@@ -96,16 +97,26 @@ vault 0_raw/commentaries/  +  state/commentary_ingest/
 
 ---
 
-## 6. 风险缓解(封号 / 反爬 / 节奏)
+## 6. 风险缓解(地理风控 / 封号 / 反爬 / 节奏)
 
-token 属用户个人微信读书账号,服务器常驻轮询有两层风险面:
+token 属用户**个人微信读书账号**。风险分三层:
+
+### 6.1 地理风控(最大风险,决定部署位置)
+
+服务部署的目标服务器是**阿里云东京**(`8.216.59.173`,日本)。若 wewe-rss 在东京机房 IP 用 token 拉取:微信风控看到"账号日常在国内、token 从东京发起"的地理异常 → ① token 失效更快(扫码更频繁)→ ② 触发 headless 过不了的安全验证 → ③ 最坏**个人微信账号冻结**(需本人实名复验,非重新扫码可解)。
+
+**决策(用户拍板)**:wewe-rss discovery + 评论入库**跑在国内节点**(先用 Mac,后续迁国内容器),token 走国内住宅 IP 与微信地理一致,风控风险最低。东京服务器**不跑 discovery**,仅消费 rsync 上来的结果。详见 §9 部署与可移植性。
+
+> 同时解决 vault 写入归属:入库写 Mac vault,顺现有 Mac→服务器 rsync 流,**不与 service-deploy 的"服务器只读镜像"模型冲突**。
+
+### 6.2 轮询与反爬(两层风险面)
 
 | 风险面 | 风险 | 缓解 |
 |---|---|---|
 | discovery 轮询(wewe-rss→微信 API,带 token) | 轮询太勤 → 微信更快废 token(加重扫码痛)甚至限号 | wewe-rss 轮询间隔设**保守**(数小时/次,如 2–4 次/天),走 wewe-rss `CRON_EXPRESSION` 配置 |
-| 正文兜底抓取(→ mp.weixin.qq.com) | 服务器机房 IP 抓微信,反爬风险高 | **优先用 wewe-rss 全文模式,不自己抓**;必须兜底时:限速 + 随机延迟(3–8s)+ 退避重试 + 失败标记不硬刚 |
+| 正文兜底抓取(→ mp.weixin.qq.com) | 抓取被反爬限速 | **优先用 wewe-rss 全文模式,不自己抓**;必须兜底时:限速 + 随机延迟(3–8s)+ 退避重试 + 失败标记不硬刚 |
 
-**核心洞察(写进运营纪律)**:轮询节奏越激进 → 扫码次数越多。保守轮询既防封又减痛。
+**核心洞察(写进运营纪律)**:轮询节奏越激进 → token 废越快 → 扫码次数越多。保守轮询既防封又减痛。
 
 ---
 
@@ -142,21 +153,38 @@ source: wewe-rss
 
 ---
 
-## 9. 服务器目录规范(建议)
+## 9. 部署与可移植性(国内节点,Mac 先行 → 国内容器)
 
-代码与数据分离,路径不硬编码:
+按 §6.1,本线跑在**国内节点**,不上东京服务器。分两态,设计要求"Mac 现跑"与"国内容器迁移"零改代码。
 
-```
-/opt/policy-pipeline/        # 代码
-  pipeline/                  # 本 git 仓
-  docker/                    # compose 文件
-/data/policy-pipeline/       # 持久数据
-  wewe-rss/                  # wewe-rss 数据卷(SQLite 在此)
-  vault/                     # vault 镜像
-  state/                     # pipeline 运行时状态
-```
+### 9.1 阶段一:Mac 现跑(now)
 
-wewe-rss compose 数据卷 → `/data/policy-pipeline/wewe-rss:/app/data`。Mac 本地与服务器路径分离,脚本经 env 传入。
+| 项 | 位置 |
+|---|---|
+| wewe-rss | 本机现有 `~/wewe-rss-data/`(可保持,或下文容器化) |
+| feed 接口 | wewe-rss HTTP 端点(本机) |
+| 入库脚本 | `scripts/l1_collect/commentary_rss_ingest.py`,经 cron 定时(Mac 开机时) |
+| 写入目标 | **Mac vault** `~/Documents/Zayn Main/政策分析/0_raw/commentaries/` |
+| 状态 | `state/commentary_ingest/` |
+| 结果上服务器 | 走 **现有 Mac→东京 rsync** 流,无需本线额外动作 |
+
+**路径全经 env / CLI arg 传入,零硬编码**(`WEWE_FEED_URL` / `VAULT_DIR` / `STATE_DIR` / token 不进 git)。这是可移植性的根基。
+
+### 9.2 阶段二:迁国内容器(later,设计上预留)
+
+国内容器节点定下后,凭可移植设计快速迁移:wewe-rss 与 ingest 容器化、共享 docker 网络、ingest 经服务名读 feed(`http://wewe-rss:<port>/...`,与 §3 的 β 架构天然契合)、env_file 注入凭据。**届时 token 仍走国内 IP,§6.1 风控前提不变。**
+
+→ 产出独立**迁移文档** `docs/runbooks/commentary-rss-ingest-migration.md`(见 §12 done-gate),并把迁移方法摘要维护进项目 `CLAUDE.md`(用户要求:方法定稿/更新时同步维护)。
+
+### 9.3 东京服务器约定(对齐,不冲突——仅供参照)
+
+本线**不在东京服务器写任何东西**。服务器既有约定(来自 service-deploy Plan C,本线遵守不触碰):
+
+- pipeline 仓 → `/root/policy-pipeline`;heng-guan 仓 → `/root/safety-platform`(**不碰**)
+- vault 镜像 → `/root/policy-vault`(容器内 `:ro` 挂载,**本线不向其写入**)
+- state → `/root/policy-pipeline-state`;凭据 → `/etc/policy-pipeline/pipeline.env`(600,不入仓)
+- docker 网络 → external `safety-platform_platform-net`
+- 评论由 Mac vault 经 rsync 流上 `/root/policy-vault`,服务器侧只读消费 → **与 rsync 单向镜像模型一致,零冲突**
 
 ---
 
@@ -173,9 +201,9 @@ wewe-rss compose 数据卷 → `/data/policy-pipeline/wewe-rss:/app/data`。Mac 
 ## 11. 与主 session(service-deploy)的交叉
 
 须知文件:`docs/handoffs/2026-06-07-commentary-ingest-handoff.md`。要点:
-- 本线**只新增文件,不改任何已有文件**;不碰 `feat/service-deploy` 分支、不碰 `state/node3c/`
-- merge 后由 L1 orchestrator 把 `commentary_ingest` 纳入可调度任务
-- docker/wewe-rss/ 可纳入主 compose 或独立
+- 本线**只新增文件,不改任何已有文件**;不碰 `feat/service-deploy` 分支、不碰 `state/node3c/`、不碰 `/root/safety-platform`
+- 本线**跑国内节点**(Mac→国内容器),**不在东京服务器写 vault**;评论经现有 Mac→东京 rsync 上 `/root/policy-vault` 只读消费 → 与服务器单向镜像模型零冲突
+- 唯一例外:用户要求把"迁移方法摘要"维护进项目根 `CLAUDE.md`(见 §12),这是对已有文件的**追加**,需在须知里向主 session 交代,避免 merge 撞车
 
 ---
 
@@ -189,3 +217,5 @@ wewe-rss compose 数据卷 → `/data/policy-pipeline/wewe-rss:/app/data`。Mac 
 6. `state/commentary_ingest/` 产物正确,凭据零泄漏(git 无 token/路径)
    - 写入的评论过 `scripts/audit/validate_schema.py`:已核实 commentary 仅 `title` 必填,本线 6 字段(title/source_account/source_url/date_published/fetched_at/source)全在白名单,留空 LLM 判定字段合规
 7. 本机端到端干跑一遍(可用现有失效 token 验证"失效检测"路径;有效路径待用户扫码后验证)
+8. **可移植性**:全路径/凭据经 env/CLI 注入,Mac 与国内容器零改代码;产出迁移文档 `docs/runbooks/commentary-rss-ingest-migration.md`(Mac→国内容器步骤)
+9. **CLAUDE.md 维护**:迁移方法摘要追加进项目根 `CLAUDE.md`,后续方法更新时同步维护(用户要求)
