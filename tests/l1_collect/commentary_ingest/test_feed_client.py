@@ -1,0 +1,37 @@
+import json
+from pathlib import Path
+
+from scripts.l1_collect.commentary_ingest.feed_client import parse_feed
+
+FIXTURE = Path(__file__).parent / "fixtures" / "feed_sample.json"
+
+
+def test_parse_feed_returns_feeditems_from_real_fixture():
+    items = parse_feed(FIXTURE.read_text(encoding="utf-8"))
+    assert len(items) >= 1
+    first = items[0]
+    assert len(first.id) == 22
+    assert first.url == f"https://mp.weixin.qq.com/s/{first.id}"
+    assert first.title
+    assert first.source_account
+
+
+def test_parse_feed_normalizes_date_to_yyyy_mm_dd():
+    raw = json.dumps({
+        "version": "https://jsonfeed.org/version/1.1",
+        "items": [{
+            "id": "tQnDiszHVcjKkO8nv2JulA",
+            "url": "https://mp.weixin.qq.com/s/tQnDiszHVcjKkO8nv2JulA",
+            "title": "绿色金融日报4.28",
+            "content_html": "<p>正文</p>",
+            "date_published": "2026-04-28T13:13:41+08:00",
+            "authors": [{"name": "中央财经大学绿色金融国际研究院"}],
+        }],
+    })
+    items = parse_feed(raw)
+    assert items[0].date_published == "2026-04-28"
+    assert items[0].source_account == "中央财经大学绿色金融国际研究院"
+
+
+def test_parse_feed_empty_items_returns_empty_list():
+    assert parse_feed('{"version":"x","items":[]}') == []
