@@ -1,4 +1,5 @@
 from pathlib import Path
+import datetime
 import json
 from scripts.sync.run_sync import collect_policy_rows, collect_relation_rows, build_summary
 
@@ -11,15 +12,38 @@ def _write_bv(vault: Path, pid: str):
         f"value_tags: [机会]\n影响分析: {{加油: a, 充电: b, 电力_储能_V2G_交易: c}}\n"
         f"comprehensive: false\n", encoding="utf-8")
 
+def _write_raw(vault: Path, pid: str, date: str = "2025-05-27"):
+    d = vault / "0_raw" / "policies"
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "anyname.md").write_text(
+        f"---\nid: {pid}\ntitle: 核心标题\nissuer:\n  - 发文机关\n"
+        f"date: {date}\nofficial_number: 文号\n"
+        f"region: 全国\nprovenance:\n  url: https://example.com\n---\n"
+        f"## 政策原文\n正文\n",
+        encoding="utf-8")
+
 def test_collect_policy_rows(tmp_path):
-    _write_bv(tmp_path, "P_2024_NDRC_718")
-    rows = collect_policy_rows(tmp_path, pipeline_version=1)
+    _write_raw(tmp_path, "P_FAKE_0001")
+    _write_bv(tmp_path, "P_FAKE_0001")
+    rows, skipped = collect_policy_rows(tmp_path, pipeline_version=1)
     assert len(rows) == 1
-    assert rows[0]["pipeline_pid"] == "P_2024_NDRC_718"
+    assert len(skipped) == 0
+    assert rows[0]["title"] == "核心标题"
+    assert rows[0]["source"] == "AUTO"
+    assert rows[0]["issue_date"] == datetime.date(2025, 5, 27)
+    assert rows[0]["pipeline_pid"] == "P_FAKE_0001"
     assert rows[0]["importance"] == "MAJOR"
 
+def test_collect_policy_rows_skips_bad_date(tmp_path):
+    _write_raw(tmp_path, "P_FAKE_0002", date="")
+    _write_bv(tmp_path, "P_FAKE_0002")
+    rows, skipped = collect_policy_rows(tmp_path, pipeline_version=1)
+    assert rows == []
+    assert skipped[0]["pid"] == "P_FAKE_0002"
+    assert "reason" in skipped[0]
+
 def test_collect_policy_rows_empty(tmp_path):
-    assert collect_policy_rows(tmp_path, pipeline_version=1) == []
+    assert collect_policy_rows(tmp_path, pipeline_version=1) == ([], [])
 
 def test_collect_relation_rows(tmp_path):
     d = tmp_path / "1_extracted" / "relations"
@@ -60,3 +84,7 @@ def test_build_summary():
     assert s["skipped_override_count"] == 2
     assert s["relation_count"] == 5
     assert s["errors"] == ["e1"]
+    assert s["skipped_invalid_count"] == 0
+    s = build_summary(synced=10, skipped_override=2, relations=5,
+                      errors=["e1"], skipped_invalid=3)
+    assert s["skipped_invalid_count"] == 3

@@ -1,4 +1,13 @@
-from scripts.sync.policy_mapper import map_business_view, importance_to_enum
+import datetime
+
+import pytest
+
+from scripts.sync.policy_mapper import (
+    map_business_view,
+    importance_to_enum,
+    parse_issue_date,
+    map_policy_row,
+)
 
 def _bv():
     return {
@@ -44,3 +53,43 @@ def test_map_comprehensive_flag_in_themes_meta():
     row = map_business_view(_bv(), pipeline_version=1)
     themes = json.loads(row["pipeline_themes"])
     assert any(t.get("isComprehensive") for t in themes) or row.get("comprehensive") is True
+
+def test_parse_issue_date():
+    assert parse_issue_date("2025-05-27") == datetime.date(2025, 5, 27)
+    for bad in ["", "abc", None]:
+        with pytest.raises(ValueError):
+            parse_issue_date(bad)
+
+def test_map_policy_row_includes_core_and_pipeline_fields():
+    core = {
+        "title": "核心标题",
+        "issuer": "发文机关",
+        "date": "2025-05-27",
+        "content": "正文",
+        "doc_number": "文号",
+        "source_url": "https://example.com",
+        "region": "全国",
+    }
+    row = map_policy_row(_bv(), core, pipeline_version=1)
+    assert row["title"] == "核心标题"
+    assert row["issuer"] == "发文机关"
+    assert row["content"] == "正文"
+    assert row["source"] == "AUTO"
+    assert row["issue_date"] == datetime.date(2025, 5, 27)
+    assert row["pipeline_pid"] == "P_2024_NDRC_718"
+    assert row["importance"] == "MAJOR"
+
+def test_map_policy_row_rejects_bad_date():
+    core = {"title": "t", "issuer": "i", "date": "", "content": "c"}
+    with pytest.raises(ValueError):
+        map_policy_row(_bv(), core, pipeline_version=1)
+
+def test_map_policy_row_rejects_empty_title():
+    core = {"title": "", "issuer": "i", "date": "2025-05-27", "content": "c"}
+    with pytest.raises(ValueError):
+        map_policy_row(_bv(), core, pipeline_version=1)
+
+def test_map_policy_row_rejects_empty_content():
+    core = {"title": "t", "issuer": "i", "date": "2025-05-27", "content": ""}
+    with pytest.raises(ValueError):
+        map_policy_row(_bv(), core, pipeline_version=1)

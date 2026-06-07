@@ -12,18 +12,30 @@ def build_policy_upsert(row: dict) -> tuple[str, dict]:
     sql = '''
     INSERT INTO "Policy"
       ("id", "pipelinePid", "pipelineVersion", "importance",
-       "pipelineScores", "pipelineThemes", "pipelineImpact", "syncedAt")
+       "pipelineScores", "pipelineThemes", "pipelineImpact", "syncedAt",
+       "title", "issuer", "issueDate", "content", "source",
+       "docNumber", "sourceUrl", "region")
     VALUES
       (gen_random_uuid()::text, %(pipeline_pid)s, %(pipeline_version)s,
        %(importance)s::"PolicyImportance",
        %(pipeline_scores)s::jsonb, %(pipeline_themes)s::jsonb,
-       %(pipeline_impact)s, now())
+       %(pipeline_impact)s, now(),
+       %(title)s, %(issuer)s, %(issue_date)s, %(content)s, %(source)s::"PolicySource",
+       %(doc_number)s, %(source_url)s, %(region)s)
     ON CONFLICT ("pipelinePid") DO UPDATE SET
       "pipelineVersion" = EXCLUDED."pipelineVersion",
       "pipelineScores"  = EXCLUDED."pipelineScores",
       "pipelineThemes"  = EXCLUDED."pipelineThemes",
       "pipelineImpact"  = EXCLUDED."pipelineImpact",
       "syncedAt"        = now(),
+      "title"           = EXCLUDED."title",
+      "issuer"          = EXCLUDED."issuer",
+      "issueDate"       = EXCLUDED."issueDate",
+      "content"         = EXCLUDED."content",
+      "source"          = EXCLUDED."source",
+      "docNumber"       = EXCLUDED."docNumber",
+      "sourceUrl"       = EXCLUDED."sourceUrl",
+      "region"          = EXCLUDED."region",
       "importance"      = CASE
         WHEN "Policy"."importanceOverride" IS NULL THEN EXCLUDED."importance"
         ELSE "Policy"."importance"
@@ -36,6 +48,14 @@ def build_policy_upsert(row: dict) -> tuple[str, dict]:
         "pipeline_scores": row["pipeline_scores"],
         "pipeline_themes": row["pipeline_themes"],
         "pipeline_impact": row["pipeline_impact"],
+        "title": row["title"],
+        "issuer": row["issuer"],
+        "issue_date": row["issue_date"],
+        "content": row["content"],
+        "source": row["source"],
+        "doc_number": row["doc_number"],
+        "source_url": row["source_url"],
+        "region": row["region"],
     }
     return sql, params
 

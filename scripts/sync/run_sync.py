@@ -8,22 +8,60 @@ import argparse
 import glob
 import json
 import os
+import re
 from pathlib import Path
 
 import yaml
 
-from scripts.sync.policy_mapper import map_business_view
+from scripts.l1_audit.corpus import load_policies
+from scripts.sync.policy_mapper import map_business_view, map_policy_row
 from scripts.sync.relation_mapper import map_relation
 from scripts.sync import pg_writer
 
+_FM = re.compile(r"^---\n.*?\n---\n?(.*)$", re.S)
 
-def collect_policy_rows(vault: Path, pipeline_version: int) -> list[dict]:
-    rows = []
+
+def _read_full_body(path):
+    t = Path(path).read_text(encoding="utf-8")
+    m = _FM.match(t)
+    return (m.group(1).lstrip("\n") if m else t)
+
+
+def _norm_region(v):
+    if not v:
+        return None
+    if isinstance(v, list):
+        return "、".join(str(x) for x in v) or None
+    return str(v)
+
+
+def collect_policy_rows(vault: Path, pipeline_version: int) -> tuple[list[dict], list[dict]]:
+    rows, skipped = [], []
+    recs = {r.pid: r for r in load_policies(f"{vault}/0_raw/policies")}
     for fp in sorted(glob.glob(str(Path(vault) / "_meta" / "business_view" / "*.yaml"))):
         bv = yaml.safe_load(Path(fp).read_text(encoding="utf-8"))
-        if bv and bv.get("pid"):
-            rows.append(map_business_view(bv, pipeline_version))
-    return rows
+        if not (bv and bv.get("pid")):
+            continue
+        pid = bv["pid"]
+        rec = recs.get(pid)
+        if rec is None:
+            skipped.append({"pid": pid, "reason": "raw not found"})
+            continue
+        issuer_list = rec.issuer_canonical or rec.issuer or []
+        core = {
+            "title": rec.title,
+            "issuer": "、".join(issuer_list),
+            "date": str(rec.date or "").strip(),
+            "content": _read_full_body(rec.path),
+            "doc_number": rec.official_number or None,
+            "source_url": rec.url or None,
+            "region": _norm_region(rec.raw_fm.get("region")),
+        }
+        try:
+            rows.append(map_policy_row(bv, core, pipeline_version))
+        except ValueError as e:
+            skipped.append({"pid": pid, "reason": str(e)})
+    return rows, skipped
 
 
 def collect_relation_rows(vault: Path, pipeline_version: int) -> list[dict]:
@@ -50,18 +88,20 @@ def collect_relation_rows(vault: Path, pipeline_version: int) -> list[dict]:
     return rows
 
 
-def build_summary(synced: int, skipped_override: int, relations: int, errors: list[str]) -> dict:
+def build_summary(synced: int, skipped_override: int, relations: int, errors: list[str],
+                  skipped_invalid: int = 0) -> dict:
     return {
         "synced_count": synced,
         "skipped_override_count": skipped_override,
         "relation_count": relations,
         "errors": errors,
+        "skipped_invalid_count": skipped_invalid,
     }
 
 
 def run(vault: Path, state_dir: Path, pipeline_version: int, database_url: str) -> dict:
     import psycopg2
-    policy_rows = collect_policy_rows(vault, pipeline_version)
+    policy_rows, skipped_rows = collect_policy_rows(vault, pipeline_version)
     relation_rows = collect_relation_rows(vault, pipeline_version)
     errors: list[str] = []
     synced = 0
@@ -89,9 +129,13 @@ def run(vault: Path, state_dir: Path, pipeline_version: int, database_url: str) 
         conn.commit()
     finally:
         conn.close()
-    summary = build_summary(synced, 0, rel_synced, errors)
+    summary = build_summary(synced, 0, rel_synced, errors,
+                            skipped_invalid=len(skipped_rows))
     state_dir = Path(state_dir)
     state_dir.mkdir(parents=True, exist_ok=True)
+    (state_dir / "sync_skipped.jsonl").write_text(
+        "".join(json.dumps(r, ensure_ascii=False) + "\n" for r in skipped_rows),
+        encoding="utf-8")
     (state_dir / "last_sync_run.json").write_text(
         json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
     return summary
