@@ -1,0 +1,168 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>评论 RSS 自动入库 · 完成报告(交部署 session)</title>
+<style>
+*{box-sizing:border-box}
+body{font:15px/1.7 -apple-system,"PingFang SC",sans-serif;margin:0;background:#eef1f6;color:#1c2530}
+.wrap{max-width:1000px;margin:0 auto;padding:28px 22px 80px}
+h1{font-size:23px;margin:0 0 4px}.sub{color:#5a6b80;font-size:13px;margin-bottom:20px}
+h2{font-size:17px;margin:30px 0 10px;padding-bottom:6px;border-bottom:2px solid #d3dceb;color:#16324f}
+h3{font-size:14.5px;margin:18px 0 6px;color:#33455c}
+.card{background:#fff;border-radius:12px;padding:16px 20px;margin:14px 0;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.verdict{background:#fff;border:2px solid #0a6b35;border-radius:12px;padding:16px 20px;margin:16px 0}
+.verdict h2{margin:0 0 8px;border:0;color:#0a6b35}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13.5px;background:#fff;border-radius:8px;overflow:hidden}
+th,td{padding:8px 11px;text-align:left;border-bottom:1px solid #eef1f6;vertical-align:top}
+th{background:#f3f6fb;color:#46546a;font-weight:600}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+code{background:#eef1f6;border-radius:4px;padding:1px 5px;font-size:12.5px;font-family:ui-monospace,SFMono-Regular,monospace}
+pre{background:#1c2530;color:#e6edf3;border-radius:8px;padding:12px 14px;overflow:auto;font-size:12.5px;line-height:1.55}
+.pill{display:inline-block;border-radius:5px;padding:1px 9px;font-size:12px;font-weight:600}
+.green{background:#eafaf0;color:#0a6b35}.amber{background:#fff8e6;color:#8a5a00}.red{background:#fdecea;color:#b4451f}.blue{background:#e8f0fe;color:#1452c4}
+ul{margin:6px 0;padding-left:22px}li{margin:5px 0}
+.flag{background:#fff8e6;border-left:3px solid #c79100;padding:10px 14px;border-radius:0 6px 6px 0;margin:10px 0;font-size:13.5px}
+.danger{background:#fdecea;border-left:3px solid #b4451f}
+.ok{background:#eafaf0;border-left:3px solid #0a6b35}
+.small{color:#8a98ad;font-size:12px}
+.kv{display:grid;grid-template-columns:160px 1fr;gap:4px 14px;font-size:13.5px}
+.kv div:nth-child(odd){color:#5a6b80}
+</style></head><body><div class="wrap">
+
+<h1>评论 RSS 自动入库 · 完成报告</h1>
+<div class="sub">2026-06-08 · 交「服务化部署」session 集中处理 · L1 commentary 采集线 · 关联 backlog B3 / B6</div>
+
+<div class="verdict">
+<h2>一句话状态:链路打通、真实验证通过,待部署 session 合并两分支 + 接生产 cron</h2>
+<p>「手工扫微信读书二维码 + 手工批量入库」已替换为<b>自动闭环</b>:wewe-rss(国内 IP)发现新文 → 入库脚本过滤/抓全文/写 vault → token 失效自动推 QR 到飞书远程扫。已用真 token 端到端验证:刷新发现 <b>331 篇新文</b>,生产入库 <b>79 篇全过 schema</b>。代码<b>零 Claude</b>、模型层国产化(deepseek-v4-flash)。</p>
+</div>
+
+<h2>1. 两条待合并分支</h2>
+<table>
+<tr><th>分支</th><th>内容</th><th>测试</th><th>位置</th></tr>
+<tr><td><code>claude/zen-saha-c3ac3c</code></td><td><b>评论入库主线</b>:feed 解析 / 过滤 / 全文提取 / 写 vault / 去重台账 / token 检测 / wewe-rss 容器 / 文档</td><td><span class="pill green">40 passed</span></td><td>worktree <code>.claude/worktrees/zen-saha-c3ac3c</code></td></tr>
+<tr><td><code>codex/openclaw-qr-relay</code></td><td><b>token 失效 → QR 推飞书</b>:detector / wewe_login / qr_render / openclaw adapter / daily_check</td><td><span class="pill green">13 passed</span></td><td>主仓当前 checkout</td></tr>
+</table>
+<div class="flag"><b>合并注意</b>:两分支都新增 <code>scripts/l1_collect/commentary_ingest/__init__.py</code>(同为空文件,无冲突);Codex 的 <code>qr_relay/</code> 纯增在该包下。两者基本可叠加合并。本线只新增文件、未改任何既有文件(唯一例外:向根 <code>CLAUDE.md</code> 追加「评论 RSS 入库」一节)。</div>
+
+<h2>2. 架构</h2>
+<div class="card">
+<p><b>β 接口</b>:消费 wewe-rss 的 HTTP JSON feed(非直读其 SQLite),wewe-rss 用 <code>FEED_MODE=fulltext</code> 自带全文并扛微信反爬;feed 全文不足时入库脚本 trafilatura 兜底抓 mp.weixin 原页(限速)。</p>
+<p><b>分层纪律</b>:L1 只做<b>确定性结构性处理</b>(去重 / 招聘·节日·视频丢弃 / market_intel 结构路由 / 失败壳页质量门),<b>不含任何 LLM、不写 LLM 判定字段</b>;相关性/主题判断留 L2(commentary_signals)。</p>
+<pre>微信公众号(国内 IP, 用 token)
+  └─ wewe-rss discovery ─HTTP JSON feed(fulltext)─┐
+                                                   ▼
+  入库脚本: 拉feed→去重(vault+台账)→结构性过滤→全文/兜底→写vault(仅追加)→记台账
+                                                   ▼
+  vault 0_raw/commentaries/*.md  +  state/commentary_ingest/(台账/last_run/market_intel暂存)
+  (token失效时: detector→createLoginUrl→QR→openclaw推飞书→轮询getLoginResult→恢复)</pre>
+</div>
+
+<h2>3. 关键决策记录(部署须遵守)</h2>
+<table>
+<tr><th>决策</th><th>内容 / 理由</th></tr>
+<tr><td><span class="pill red">国内节点</span> 部署位置</td><td>token 是<b>个人微信读书账号</b>,东京机房 IP 触发微信<b>地理风控</b>(最坏冻结账号)。<b>discovery + 入库必须跑国内 IP</b>(现 Mac,后续国内容器);<b>不在东京服务器跑 discovery</b>。"国内节点"可为任意国内机器/容器,非仅本机。</td></tr>
+<tr><td>vault 写入归属</td><td>入库写 <b>国内 vault</b>,经<b>现有 Mac→东京 rsync</b> 上 <code>/root/policy-vault</code>(东京侧<b>只读消费</b>)→ 与 service-deploy 单向镜像模型零冲突。<b>本线不向东京 vault 写</b>。</td></tr>
+<tr><td>触发频率(已敲定)</td><td>discovery 每天 1 次 / ingest 每天 1 次 / token 检测每 6h(见 §6)。评论非紧急,最省 token、最少扫码。</td></tr>
+<tr><td>模型国产化</td><td>本线<b>零模型</b>;OpenClaw 全局默认已切 <b>deepseek-v4-flash</b>(见 §8)。生产不用 Claude。</td></tr>
+<tr><td>market_intel 归类</td><td>4 个行情号(储能与电力市场 / 高工储能 / 电动汽车观察家 / 中能传媒)文章经 title 结构规则判 market_intel → 暂存 <code>state/commentary_ingest/market_intel_staging/</code>,<b>不入 vault</b>,等 backlog B1 设计 raw 表示。</td></tr>
+<tr><td>订阅 curate(建议)</td><td>4 个纯噪音号建议在 wewe-rss 退订:金杜研究 / 人民网研究院 / 中石油经研院 / 综合开发研究院(与能源政策零相关)。属配置层,非代码。</td></tr>
+<tr><td>台账不入 git</td><td><code>processed_ids.jsonl</code> / <code>last_run.json</code> 为 per-node 运行态,只留磁盘;去重另有 vault frontmatter 兜底。</td></tr>
+</table>
+
+<h2>4. wewe-rss 运行事实(实测)</h2>
+<div class="card kv">
+<div>镜像</div><div><code>cooderl/wewe-rss-sqlite:latest</code> — <b>Docker Hub 直连被墙</b>,用国内镜像源 <code>docker.1ms.run</code> 拉(daocloud 已 403)</div>
+<div>启动参数</div><div><code>-p 4000:4000 -e DATABASE_TYPE=sqlite -e AUTH_CODE=&lt;secret&gt; -e FEED_MODE=fulltext -e ENABLE_CLEAN_HTML=true -v &lt;data&gt;:/app/data</code></div>
+<div>数据卷</div><div>SQLite + token 在 <code>/app/data</code>(本机 <code>~/wewe-rss-data</code>)。表 <code>accounts(status: 0=失效/1=有效/2=禁用)</code></div>
+<div>feed 端点</div><div><code>GET /feeds/all.json?limit=N</code>,鉴权 <code>Authorization: Bearer &lt;AUTH_CODE&gt;</code></div>
+<div>tRPC 端点</div><div><code>/trpc/*</code>,鉴权 <code>Authorization: &lt;AUTH_CODE&gt;</code>(<b>裸 code,无 Bearer</b> — 两种头别混)</div>
+<div>feed 结构</div><div>JSON Feed v1;item 字段 <code>id / content_html / url / title / image / date_modified / author</code>。<b>日期是 <code>date_modified</code></b>(非标准 date_published);<code>author</code> 单数对象;<code>id</code> 即微信短链 hash(22 位)</div>
+</div>
+<div class="flag danger"><b>limit 陷阱(已硬化)</b>:<code>/feeds/all.json</code> <b>不带 limit 默认只回 30 条/次</b>(实测)。15 号合并、忙时 6h 内常 &gt;30 → 静默漏。<b>生产 feed-url 必须显式给大 limit(如 400)</b>;代码不硬编码 limit;<code>coverage_warning</code>(本轮与已见零重叠)是兜底信号。</div>
+
+<h3>token 失效 → 扫码恢复流程(tRPC,无 superjson,响应 <code>{"result":{"data":...}}</code>)</h3>
+<pre>① POST /trpc/platform.createLoginUrl   body {}   → {uuid, scanUrl:"https://open.weixin.qq.com/connect/confirm?uuid=..."}
+② scanUrl 渲染成二维码 → openclaw 推飞书
+③ GET  /trpc/platform.getLoginResult?input={"id":"&lt;uuid&gt;"}   轮询直到登录成功
+④ 确认: token_health.check_token(db).valid 持续为 True</pre>
+<div class="flag"><b>实测坑</b>:UI 里把账号 toggle 成"启用" <b>≠ token 真活</b>。旧 token 一旦被真用即被微信打回 <code>status=0</code>;只有真扫码拿新 token、且 check_token 持续 valid 才算恢复。</div>
+
+<h2>5. 部署清单 · 环境变量(全 env/CLI 注入,零硬编码,凭据不入 git)</h2>
+<table>
+<tr><th>变量</th><th>用途</th></tr>
+<tr><td><code>WEWE_FEED_URL</code></td><td>如 <code>http://wewe-rss:4000/feeds/all.json?limit=400</code>(<b>务必带大 limit</b>)</td></tr>
+<tr><td><code>WEWE_AUTH_CODE</code></td><td>wewe-rss feed/tRPC 访问码</td></tr>
+<tr><td><code>WEWE_DB_PATH</code></td><td>wewe-rss.db 路径(token 检测用)</td></tr>
+<tr><td><code>VAULT_DIR</code></td><td>vault 根(写 <code>0_raw/commentaries/</code>)</td></tr>
+<tr><td><code>STATE_DIR</code></td><td>state 根(台账/暂存)</td></tr>
+<tr><td><code>WEWE_FEED_TIMEOUT</code></td><td>拉 feed 超时秒,默认 120(fulltext 大 feed 需)</td></tr>
+<tr><td><code>ALERT_WEBHOOK_URL</code></td><td>token 失效告警通道(可选)</td></tr>
+<tr><td colspan="2" class="small">QR relay 额外:<code>OPENCLAW_CHANNEL=feishu</code> / <code>OPENCLAW_ACCOUNT=main</code> / <code>OPENCLAW_IM_TARGET=&lt;paired&gt;</code> / <code>WEWE_BASE_URL</code></td></tr>
+</table>
+<h3>东京服务器既有约定(对齐,勿冲突 — 本线不在东京写)</h3>
+<div class="card kv">
+<div>pipeline 仓</div><div><code>/root/policy-pipeline</code></div>
+<div>heng-guan 仓</div><div><code>/root/safety-platform</code>(<b>不碰</b>)</div>
+<div>vault 镜像</div><div><code>/root/policy-vault</code>(容器 <code>:ro</code>;本线只经 rsync 间接流入)</div>
+<div>凭据</div><div><code>/etc/policy-pipeline/pipeline.env</code>(600,不入仓)</div>
+<div>docker 网络</div><div>external <code>safety-platform_platform-net</code></div>
+</div>
+
+<h2>6. 触发频率(已敲定 2026-06-08)</h2>
+<table>
+<tr><th>节奏</th><th>频率</th><th>接线</th></tr>
+<tr><td>① wewe-rss discovery(耗 token)</td><td><b>每天 1 次</b> @07:00</td><td>wewe-rss <code>CRON_EXPRESSION="0 0 7 * * *"</code>(6 字段:秒分时日月周)</td></tr>
+<tr><td>② ingest(feed→vault)</td><td><b>每天 1 次</b> @07:30</td><td>host cron <code>30 7 * * *</code> → <code>run --feed-url '...?limit=400' ...</code></td></tr>
+<tr><td>③ token 检测 → 推 QR(免费,只读 sqlite)</td><td><b>每 6h</b></td><td>host cron <code>0 */6 * * *</code> → <code>run --check-token --db-path ...</code></td></tr>
+</table>
+<div class="flag"><b>⚠️ 防重推(部署须接)</b>:token 检测 6h/次,若失效且用户尚未扫码,会重复触发 QR 推送刷屏。<b>relay 须加"恢复会话进行中则不重推"幂等保护</b>(Codex relay 接生产触发时一并做)。</div>
+
+<h2>7. 验证证据</h2>
+<table>
+<tr><th>项</th><th>结果</th></tr>
+<tr><td>单元测试</td><td>入库线 <span class="pill green">40 passed</span> · QR relay <span class="pill green">13 passed</span></td></tr>
+<tr><td>discovery(真 token)</td><td>触发刷新 DB <b>2479 → 2810(+331 新文)</b>,最新到当日</td></tr>
+<tr><td>生产入库(真 vault)</td><td>feed 80 = 入库 <b>79</b> + 瞬时 1;真 vault <b>283 → 362(+79)</b>,<b>79 篇全过 <code>validate_schema</code></b>;正文经 fallback 完整(4898/18086/1403 字)</td></tr>
+<tr><td>审计对账</td><td>记账闭合(各桶和=feed_count)、物理对账(文件数=计数)、幂等(二轮全判重复不重写)均 PASS</td></tr>
+<tr><td>token 失效检测</td><td>正确识别失效账号并触发告警;deepseek-v4-flash 真实 infer 通过</td></tr>
+<tr><td>凭据扫描</td><td>pipeline 仓 / vault 仓 / openclaw.json 均<b>无裸 key</b></td></tr>
+</table>
+
+<h2>8. OpenClaw / 模型现状</h2>
+<div class="card">
+<ul>
+<li>OpenClaw 核心 <code>2026.6.1</code> + <code>@openclaw/feishu</code>;飞书频道已配对,文本+图片投递端到端验证(QR 实际推达)。</li>
+<li><b>全局默认模型已切 <code>deepseek/deepseek-v4-flash</code></b>(原 qwen3.5-plus),provider <code>https://api.deepseek.com/v1</code>,实测调用通过。key 存 <code>~/.openclaw/agents/main/agent/auth-profiles.json</code>(非 git)。改前备份 <code>openclaw.json.bak-before-deepseek-claude</code>。</li>
+<li>微信 OpenClaw 频道图片投递不稳 → <b>飞书为本线已验证通道</b>。</li>
+</ul>
+<div class="flag danger"><b>安全</b>:deepseek API key 曾在对话明文出现,建议在 DeepSeek 控制台<b>轮换一次</b>(轮换后 <code>openclaw models auth paste-api-key --provider deepseek</code> 重粘即可)。</div>
+</div>
+
+<h2>9. 部署 session 待办清单</h2>
+<table>
+<tr><th>#</th><th>事项</th><th>类</th></tr>
+<tr><td>1</td><td>合并两分支 <code>claude/zen-saha-c3ac3c</code> + <code>codex/openclaw-qr-relay</code>(基本可叠加,见 §1 注意)</td><td>合并</td></tr>
+<tr><td>2</td><td>接生产 cron 三节奏(§6),feed-url 带 <code>limit=400</code></td><td>接线</td></tr>
+<tr><td>3</td><td>QR relay 接生产触发点(<code>run --check-token</code>)+ 加<b>防重推幂等</b></td><td>接线</td></tr>
+<tr><td>4</td><td>定国内容器节点后按 <code>commentary-rss-ingest-migration.md</code> 迁移;定 vault 回流路径</td><td>迁移</td></tr>
+<tr><td>5</td><td>(可选)用大 limit 跑一次<b>全量回填</b>补 4月→最近中段缺口</td><td>数据</td></tr>
+<tr><td>6</td><td>改 <code>scripts/common/llm.py</code> 的 <code>DEFAULT_MODEL="claude-opus-4-7"</code> 为国产/强制 env(已 spawn 任务)</td><td>清理</td></tr>
+<tr><td>7</td><td>轮换 deepseek API key(§8 安全)</td><td>安全</td></tr>
+</table>
+
+<h2>10. 文档索引</h2>
+<div class="card">
+<ul>
+<li>设计 spec:<code>docs/superpowers/specs/2026-06-07-commentary-rss-ingest-design.md</code></li>
+<li>实施计划:<code>docs/superpowers/plans/2026-06-07-commentary-rss-ingest.md</code></li>
+<li>迁移 runbook(含三节奏 cron + limit 纪律):<code>docs/runbooks/commentary-rss-ingest-migration.md</code></li>
+<li>主 session 须知:<code>docs/handoffs/2026-06-07-commentary-ingest-handoff.md</code></li>
+<li>Codex 交接 spec(QR relay 事实):<code>docs/handoffs/2026-06-07-codex-openclaw-qr-push.md</code></li>
+<li>Codex 构建报告:<code>docs/handoffs/2026-06-08-openclaw-qr-relay-build-report.{md,html}</code></li>
+<li>容器定义:<code>docker/wewe-rss/compose.yml</code> · 部署纪律摘要:根 <code>CLAUDE.md</code> 「评论 RSS 入库」节</li>
+</ul>
+</div>
+
+<p class="small">报告生成于 2026-06-08 · 评论入库线 = claude/zen-saha-c3ac3c · 现状:wewe-rss 在跑、token 有效、模型国产化、频率敲定、待部署 session 合并接线。</p>
+
+</div></body></html>
