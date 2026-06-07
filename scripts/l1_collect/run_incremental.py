@@ -52,10 +52,11 @@ def _select_channels(channels, levels: list):
     return [c for c in channels if c.level in cn and c.status == ChannelStatus.验证]
 
 
-def _gate_extracted_dir(ext_dir: Path, passed_dir: Path,
+def _gate_extracted_dir(ext_dir: Path, passed_dir: Path, comm_dir: Path,
                         quar_jsonl: Path, llm_fn) -> tuple:
     passed_dir.mkdir(parents=True, exist_ok=True)
-    n_pass = n_rej = 0
+    comm_dir.mkdir(parents=True, exist_ok=True)
+    n_pass = n_comm = n_rej = 0
     rejects: list = []
     for jf in sorted(ext_dir.glob("*.json")):
         rec = json.loads(jf.read_text(encoding="utf-8"))
@@ -65,6 +66,10 @@ def _gate_extracted_dir(ext_dir: Path, passed_dir: Path,
             (passed_dir / jf.name).write_text(jf.read_text(encoding="utf-8"),
                                               encoding="utf-8")
             n_pass += 1
+        elif gr.action == "commentary":
+            (comm_dir / jf.name).write_text(jf.read_text(encoding="utf-8"),
+                                            encoding="utf-8")
+            n_comm += 1
         else:
             rejects.append({"file": jf.name, "url": rec.get("url", ""),
                             "title": rec.get("title", ""), **gr.to_dict()})
@@ -74,12 +79,26 @@ def _gate_extracted_dir(ext_dir: Path, passed_dir: Path,
         with open(quar_jsonl, "a", encoding="utf-8") as f:
             for r in rejects:
                 f.write(json.dumps(r, ensure_ascii=False) + "\n")
-    return n_pass, n_rej
+    return n_pass, n_comm, n_rej
+
+
+def _ingest_commentary(comm_ext_dir: Path, staging_dir: Path) -> int:
+    """commentary extracted → ingest 成 staging raw(out_dir=staging)→ route_files 转 commentaries/。"""
+    from scripts._oneshot.route_interpretations import route_files, build_title_index
+    staging_dir.mkdir(parents=True, exist_ok=True)
+    ingest_extracted(comm_ext_dir, staging_dir / "_ingest_log.jsonl", out_dir=staging_dir)
+    paths = [p for p in staging_dir.glob("*.md")]
+    if not paths:
+        return 0
+    idx = build_title_index(skip_paths=set())
+    n = route_files(paths, index=idx, dry=False)
+    (staging_dir / "_ingest_log.jsonl").unlink(missing_ok=True)
+    return n
 
 
 def _run_channel(ch, cfg: IncrementalConfig, dedup, llm_fn) -> dict:
     sd = cfg.state_dir
-    for d in ["scan", "cand", "quar", "fetch", "ext", "passed", "ingest"]:
+    for d in ["scan", "cand", "quar", "fetch", "ext", "passed", "comm_ext", "comm_stage", "ingest"]:
         (sd / d).mkdir(parents=True, exist_ok=True)
     label = f"{ch.city}__{ch.channel_type}__{ch.root_domain}"
     n_scan = scan_channel(ch, sd / "scan")
@@ -95,15 +114,24 @@ def _run_channel(ch, cfg: IncrementalConfig, dedup, llm_fn) -> dict:
         return {"channel": label, "scanned": n_scan, "kept": kept, "ingested": 0}
     fetch_candidates(cand, sd / "fetch", sd / "quar" / f"{label}__ferr.txt")
     extract_all(sd / "fetch", sd / "ext", sd / "quar" / f"{label}__s45.jsonl")
-    n_pass, n_rej = _gate_extracted_dir(sd / "ext", sd / "passed",
-                                        sd / "quar" / "gate_rejects.jsonl", llm_fn)
+    n_pass, n_comm, n_rej = _gate_extracted_dir(
+        sd / "ext", sd / "passed", sd / "comm_ext",
+        sd / "quar" / "gate_rejects.jsonl", llm_fn)
     ing_ok, _ = ingest_extracted(sd / "passed", sd / "ingest" / f"{label}.jsonl")
-    # 清空 ext/passed 供下个渠道复用(避免跨渠道串)
-    for d in ["fetch", "ext", "passed"]:
+    try:
+        n_comm_ing = _ingest_commentary(sd / "comm_ext", sd / "comm_stage")
+    except Exception as e:
+        n_comm_ing = 0
+        print(f"  [commentary-ingest 失败] {label[:40]}: {str(e)[:120]}")
+    # 清空工作目录供下个渠道复用(避免跨渠道串)
+    for d in ["fetch", "ext", "passed", "comm_ext", "comm_stage"]:
         for f in (sd / d).glob("*.json"):
             f.unlink()
+        for f in (sd / d).glob("*.md"):
+            f.unlink()
     return {"channel": label, "scanned": n_scan, "kept": kept,
-            "gate_passed": n_pass, "gate_rejected": n_rej, "ingested": ing_ok}
+            "gate_passed": n_pass, "gate_commentary": n_comm, "gate_rejected": n_rej,
+            "ingested": ing_ok, "ingested_commentary": n_comm_ing}
 
 
 def run_incremental(cfg: IncrementalConfig) -> dict:
@@ -122,6 +150,7 @@ def run_incremental(cfg: IncrementalConfig) -> dict:
         "channels_run": len(results),
         "total_scanned": sum(r["scanned"] for r in results),
         "total_ingested": sum(r.get("ingested", 0) for r in results),
+        "total_commentary": sum(r.get("ingested_commentary", 0) for r in results),
         "total_gate_rejected": sum(r.get("gate_rejected", 0) for r in results),
         "dry_run": cfg.dry_run,
     }

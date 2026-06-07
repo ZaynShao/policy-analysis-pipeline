@@ -29,6 +29,7 @@ def test_gate_extracted_routes_pass_and_reject(tmp_path):
     from scripts.l1_collect.run_incremental import _gate_extracted_dir
     ext = tmp_path / "ext"; ext.mkdir()
     passed = tmp_path / "passed"; passed.mkdir()
+    comm = tmp_path / "comm"
     quar = tmp_path / "q.jsonl"
     (ext / "a.json").write_text(json.dumps({
         "url": "https://ndrc.gov.cn/zcfb/d.html",
@@ -37,11 +38,29 @@ def test_gate_extracted_routes_pass_and_reject(tmp_path):
     (ext / "b.json").write_text(json.dumps({
         "url": "https://in-en.com/x.html", "title": "市场快讯", "body": "据记者"}),
         encoding="utf-8")
-    n_pass, n_rej = _gate_extracted_dir(ext, passed, quar, llm_fn=None)
+    n_pass, n_comm, n_rej = _gate_extracted_dir(ext, passed, comm, quar, llm_fn=None)
     assert n_pass == 1 and n_rej == 1
     assert (passed / "a.json").exists()
     assert not (passed / "b.json").exists()
     assert quar.exists() and "in-en" in quar.read_text()
+
+
+def test_gate_dir_three_way_split(tmp_path):
+    import json
+    from scripts.l1_collect.run_incremental import _gate_extracted_dir
+    ext = tmp_path / "ext"; ext.mkdir()
+    (ext / "a.json").write_text(json.dumps(
+        {"url": "https://x.gov.cn/a.html", "title": "某办法的通知", "body": "现就……"}),
+        encoding="utf-8")
+    (ext / "b.json").write_text(json.dumps(
+        {"url": "https://x.gov.cn/zcjd/b.html", "title": "《某办法》政策解读", "body": "解读"}),
+        encoding="utf-8")
+    passed = tmp_path / "passed"; comm = tmp_path / "comm"
+    quar = tmp_path / "q.jsonl"
+    n_pass, n_comm, n_rej = _gate_extracted_dir(ext, passed, comm, quar, llm_fn=None)
+    assert n_pass == 1 and n_comm == 1
+    assert (passed / "a.json").exists()
+    assert (comm / "b.json").exists()
 
 
 def test_soft_lock_noop_when_service_absent():
