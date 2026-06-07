@@ -399,9 +399,11 @@ L2 已扫过该来源但没抓到该篇 → 记 L1 漏采反馈：
 
 | # | 事项 | 卡点 | 负责方 |
 |---|---|---|---|
-| P1 | SSH 登录服务器打通（密钥或确认密码） | 当前 SSH 密码认证被拒 | 用户提供登录方式 |
-| P2 | vault 推上 GitHub remote（服务器要 clone） | 确认 vault 是否已有 remote | 用户确认 |
-| P3 | ③-C preview → apply（语义关系进 vault） | Task10 preview 跑完后 apply | pipeline 工作流 |
+| P1 | SSH 登录服务器打通 | ✅ **已解（2026-06-07）** key 装好，root 免密 | — |
+| P2 | vault 上服务器 | ✅ **Phase 1 用 rsync 绕开**（不需 GitHub remote）；L1 服务化（append 回推）时才需 remote | — |
+| P3 | ③-C preview → apply（语义关系进 vault） | Task10 preview 跑完后 apply；**apply 后须先做 CONTRACT-REL-1 对账（BACKLOG B13）** | pipeline 工作流 |
+
+> **⚡ 服务器实测 + 决策（2026-06-07，重写 Plan C v2 容器版）**：实测发现 **heng-guan 全栈已 Docker Compose 部署在服务器并在跑**（heng-pg=容器 `platform-heng-pg`/pgvector pg15，网络 `safety-platform_platform-net`，DB `hengguan`/user `heng`，5432 不暴露 host；真 schema 在 `/root/safety-platform/.../prisma/schema.prisma`）。host Python 3.14（psycopg2 wheel 风险）。**决策**：① pipeline 做成 **Docker 容器挂 platform-net**（镜像钉 py3.12，服务名 `heng-pg:5432` 连库）；② Prisma 迁移打**线上生产库**（迁移前 `pg_dump` 备份）；③ 生产现有 **50 条演示 Policy → 清空替换**（TRUNCATE CASCADE，pipeline 成唯一权威=Route C；用户已拍，PR 时前端团队会看到）；④ 新 Policy id 用 **UUID**（`gen_random_uuid()`，内部代理键、前端展示走 pipelinePid，可逆）。详见 Plan C v2 + memory `service-deploy-2026-06-06`。契约对账（对真生产 schema）已过：enum PolicyImportance + importance 列已存在且与 `importance_to_enum` 一致、零 @map。
 
 ### 8.2 TODO（必须主动闭环，不随服务化静默掉）
 

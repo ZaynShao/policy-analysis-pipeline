@@ -46,6 +46,9 @@ services/heng-guan/frontend/
 
 ## Task 1: Prisma schema 扩展 + 迁移
 
+> **⚡ 服务器实测对账（2026-06-07）**：真 schema 在 `/root/safety-platform/services/heng-guan/backend/prisma/schema.prisma`（535 行）。已核：enum `PolicyImportance`（STRATEGIC/MAJOR/GENERAL/INFO）+ `Policy.importance` 列**已存在**且与 `importance_to_enum` 一致；**零 @map**（字段名=列名，pg_writer 带引号列名对得上）；3 新表 + 8 pipeline 字段（pipelinePid/pipelineVersion/pipelineScores/pipelineThemes/pipelineImpact/importanceOverride/themeOverrides/syncedAt）**均待新增**，全 nullable/独立。
+> **迁移应用 = 打线上生产库 `hengguan`**（不是本地空库）。本地 `heng_dev` 仅作迁移彩排 + sync 冒烟。**生产应用 + 备份 + 清空替换 cutover 在 Plan C v2 Task 3**（顺序：pg_dump 备份 → `prisma migrate deploy` → `TRUNCATE "Policy" ... CASCADE` 清空 50 条演示数据 → 首次 sync）。本任务只负责**在 safety-platform 仓改 schema + 生成 migration + PR 给管理员**。
+
 **Files:**
 - Modify: `services/heng-guan/backend/prisma/schema.prisma`
 - Create: 迁移目录（prisma migrate 自动生成）
