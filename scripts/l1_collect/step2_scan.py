@@ -57,6 +57,11 @@ def _bs4_get(url: str) -> str:
         r = requests.get(url, headers={"User-Agent": UA}, timeout=TIMEOUT)
         if r.status_code >= 400:
             return ""
+        # 政府站常发 GBK/GB2312 或谎报 charset,HTTP 头无/错 charset → requests 默认
+        # ISO-8859-1 解码成乱码 → 标题全乱 → KEYWORD 匹配失败 → scan=0。头未明确指定
+        # 时用 chardet 探测(apparent_encoding)纠正中文编码。
+        if not r.encoding or r.encoding.lower() == "iso-8859-1":
+            r.encoding = r.apparent_encoding or r.encoding
         return r.text or ""
     except Exception:
         return ""

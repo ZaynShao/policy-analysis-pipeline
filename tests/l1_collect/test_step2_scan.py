@@ -60,3 +60,22 @@ def test_paginate_urls_uses_index_n_pattern():
     urls = _page_urls("https://x.gov.cn/zcwj/index.html", max_pages=3)
     assert "https://x.gov.cn/zcwj/index.html" in urls
     assert any("index_1" in u or "index_2" in u for u in urls)
+
+
+def test_bs4_get_fixes_mojibake_encoding(monkeypatch):
+    """政府站谎报 charset(ISO-8859-1) → _bs4_get 用 apparent_encoding 纠正中文乱码。"""
+    from scripts.l1_collect import step2_scan as s
+
+    class _FakeResp:
+        def __init__(self):
+            self.status_code = 200
+            self.encoding = "ISO-8859-1"      # 头里的(错的)
+            self.apparent_encoding = "utf-8"  # chardet 探测(对的)
+
+        @property
+        def text(self):
+            return "关于印发新能源通知" if self.encoding == "utf-8" else "å³äºæ°"
+
+    monkeypatch.setattr(s.requests, "get", lambda *a, **k: _FakeResp())
+    out = s._bs4_get("https://www.ndrc.gov.cn/xwdt/tzgg")
+    assert "新能源" in out  # 已按 apparent_encoding 解码,非乱码
