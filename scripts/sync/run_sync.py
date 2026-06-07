@@ -35,9 +35,16 @@ def collect_relation_rows(vault: Path, pipeline_version: int) -> list[dict]:
             if not line:
                 continue
             rec = json.loads(line)
-            if rec.get("from_pid") and rec.get("to_pid") and rec.get("relation_type"):
+            norm = {
+                "from_pid": rec.get("from"),
+                "to_pid": rec.get("to"),
+                "relation_type": rec.get("rel"),
+                "confidence": rec.get("confidence"),
+                "evidence": rec.get("evidence"),
+            }
+            if norm["from_pid"] and norm["to_pid"] and norm["relation_type"]:
                 try:
-                    rows.append(map_relation(rec, pipeline_version))
+                    rows.append(map_relation(norm, pipeline_version))
                 except ValueError:
                     continue  # 未知关系类型跳过（不污染 DB）
     return rows

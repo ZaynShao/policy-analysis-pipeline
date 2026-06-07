@@ -24,13 +24,35 @@ def test_collect_policy_rows_empty(tmp_path):
 def test_collect_relation_rows(tmp_path):
     d = tmp_path / "1_extracted" / "relations"
     d.mkdir(parents=True, exist_ok=True)
-    (d / "derives_from.jsonl").write_text(
-        json.dumps({"from_pid": "P_A", "to_pid": "P_B",
-                    "relation_type": "derives_from", "confidence": 0.9}) + "\n",
+    (d / "relations_canonical.jsonl").write_text(
+        json.dumps({"from": "P_A", "to": "P_B", "rel": "derives_from",
+                    "confidence": 0.9, "evidence": "ev1", "source": "s"}) + "\n",
         encoding="utf-8")
     rows = collect_relation_rows(tmp_path, pipeline_version=1)
     assert len(rows) == 1
     assert rows[0]["relation_type"] == "derives_from"
+    assert rows[0]["from_pid"] == "P_A"
+    assert rows[0]["to_pid"] == "P_B"
+    assert rows[0]["evidence"] == "ev1"
+
+def test_collect_relation_rows_skips_unknown_rel(tmp_path):
+    d = tmp_path / "1_extracted" / "relations"
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "relations_canonical.jsonl").write_text(
+        json.dumps({"from": "P_A", "to": "P_B", "rel": "bogus",
+                    "confidence": 0.9, "evidence": "ev1", "source": "s"}) + "\n",
+        encoding="utf-8")
+    rows = collect_relation_rows(tmp_path, pipeline_version=1)
+    assert rows == []
+
+def test_collect_relation_rows_skips_missing_required_fields(tmp_path):
+    d = tmp_path / "1_extracted" / "relations"
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "relations_canonical.jsonl").write_text(
+        json.dumps({"to": "P_B", "rel": "references"}) + "\n",
+        encoding="utf-8")
+    rows = collect_relation_rows(tmp_path, pipeline_version=1)
+    assert rows == []
 
 def test_build_summary():
     s = build_summary(synced=10, skipped_override=2, relations=5, errors=["e1"])
