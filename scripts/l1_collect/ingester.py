@@ -81,6 +81,21 @@ def _sanitize_filename(title: str) -> str:
     return t.strip() or "untitled"
 
 
+def _infer_region(issuer: Optional[str], city: Optional[str],
+                  city_code: Optional[str]) -> dict:
+    """按 city_code 区分级别(省级渠道 city=省名/code 末尾 0000,不能一律判市)。
+    000000=国家;末尾 0000(非000000)=省;其余=市。治省级渠道被误标 level=市。"""
+    if city:
+        if city_code == "000000":
+            return {"level": "国家", "code": "000000", "name": "全国"}
+        if city_code and city_code.endswith("0000"):
+            return {"level": "省", "code": city_code, "name": city}
+        return {"level": "市", "code": city_code or "", "name": city}
+    if issuer in ISSUER_SHORT_TABLE:
+        return {"level": "国家", "code": "000000", "name": "全国"}
+    return {"level": "", "code": "", "name": ""}
+
+
 def ingest_one(*, url: str, title: str, official_number: str, date: str,
                issuer: Optional[str], body: str,
                city: Optional[str] = None, city_code: Optional[str] = None,
@@ -88,13 +103,7 @@ def ingest_one(*, url: str, title: str, official_number: str, date: str,
                via: str = "trafilatura", confidence: float = 0.85) -> Path:
     """生成 vault md 文件,返回路径。"""
     pid = compute_pid(date, issuer, official_number, title, city_code, channel_type)
-    # region 推断
-    if city:
-        region = {"level": "市", "code": city_code or "", "name": city}
-    elif issuer in ISSUER_SHORT_TABLE:
-        region = {"level": "国家", "code": "000000", "name": "全国"}
-    else:
-        region = {"level": "", "code": "", "name": ""}
+    region = _infer_region(issuer, city, city_code)
     fm = {
         "id": pid,
         "aliases": [pid],
