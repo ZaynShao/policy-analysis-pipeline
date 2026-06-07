@@ -34,11 +34,17 @@ CST = timezone(timedelta(hours=8))
 
 def ingest_items(items: list, *, vault_dir: Path, state_dir: Path,
                  fetch_fallback: bool = True) -> dict:
-    """对一批 FeedItem 执行 去重→过滤→正文→写入→记账,返回 summary。"""
+    """对一批 FeedItem 执行 去重→过滤→正文→写入→记账,返回 summary。
+
+    真删除壳页(src=='deleted')记台账永久跳过;瞬时失败(src=='empty')不记台账,
+    下轮可重试。有历史却与本轮 feed 零重叠 → coverage_warning(窗口可能越过上次位置)。
+    """
     seen = load_seen_urls(vault_dir, state_dir)
+    prior_seen = len(seen)
     run_date = datetime.now(CST).strftime("%Y-%m-%d")
     summary = {"feed_count": len(items), "ingested": 0, "market_intel": 0,
-               "skipped_junk": 0, "duplicates": 0, "unprocessable": 0}
+               "skipped_junk": 0, "duplicates": 0, "unprocessable": 0,
+               "transient_fail": 0}
     entries = []
     for item in items:
         if not item.id or len(item.id) != 22:
@@ -57,10 +63,14 @@ def ingest_items(items: list, *, vault_dir: Path, state_dir: Path,
                             "disposition": "skip_junk", "reasons": cls.reasons})
             continue
         body, src = to_body(item, fetch_fallback=fetch_fallback)
-        if src == "empty":
+        if src == "deleted":
             summary["unprocessable"] += 1
             entries.append({"id": item.id, "url": item.url,
-                            "disposition": "unprocessable", "reasons": ["no_body"]})
+                            "disposition": "unprocessable", "reasons": ["deleted"]})
+            continue
+        if src == "empty":
+            # 瞬时抓取失败:不记台账(下轮可重试),仅计数
+            summary["transient_fail"] += 1
             continue
         if cls.disposition == Disposition.MARKET_INTEL:
             stage_market_intel(item, body, state_dir, run_date, cls.reasons)
@@ -72,6 +82,11 @@ def ingest_items(items: list, *, vault_dir: Path, state_dir: Path,
         summary["ingested"] += 1
         entries.append({"id": item.id, "url": item.url, "disposition": "ingest",
                         "reasons": [], "file": path.name, "body_src": src})
+    # 不漏 safeguard:有历史却与本轮零重叠 → 窗口可能已越过上次抓取位置(启发式)
+    if prior_seen > 0 and summary["duplicates"] == 0 and summary["feed_count"] > 0:
+        summary["coverage_warning"] = (
+            "本轮与已见集合零重叠,feed 窗口可能已越过上次抓取位置;"
+            "建议增大 feed limit 或提高跑批频率")
     record_dispositions(state_dir, entries)
     return summary
 
@@ -108,6 +123,10 @@ def main() -> int:
     summary = ingest_items(items, vault_dir=Path(args.vault_dir),
                            state_dir=Path(args.state_dir),
                            fetch_fallback=not args.no_fallback)
+    if summary.get("coverage_warning"):
+        cov = f"[commentary-ingest] 覆盖告警:{summary['coverage_warning']}"
+        if not alert(cov, args.alert_webhook):
+            print(cov)
     token_status = "unknown" if st is None else ("valid" if st.valid else "invalid")
     write_last_run(Path(args.state_dir), {**summary, "token_status": token_status})
     print(json.dumps(summary, ensure_ascii=False))

@@ -34,9 +34,21 @@ def test_to_body_short_content_triggers_empty_without_fallback():
 
 
 def test_to_body_rejects_wechat_error_shell():
-    # 反爬壳页:过 200 字但命中失败标记 → 判 empty(确定性,不靠 LLM)
+    # 反爬/删除壳页:命中标记 → 'deleted'(永久,不重试)
     shell = "<p>" + "环境异常 当前环境异常，完成验证后即可继续访问。" * 8 + "</p>"
     body, src = to_body(_item(content_html=shell), fetch_fallback=False)
+    assert src == "deleted"
+
+
+def test_to_body_publisher_deleted_returns_deleted():
+    body, src = to_body(_item(content_html="<p>该内容已被发布者删除</p>"),
+                        fetch_fallback=False)
+    assert src == "deleted"
+
+
+def test_to_body_short_no_marker_is_transient_empty():
+    # 过短但无删除标记 → 'empty'(瞬时,可重试)
+    body, src = to_body(_item(content_html="<p>短内容</p>"), fetch_fallback=False)
     assert src == "empty"
 
 

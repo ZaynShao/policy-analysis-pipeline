@@ -44,6 +44,11 @@ def is_low_quality(text: str, min_len: int = 200) -> bool:
     return False
 
 
+def is_deleted_shell(text: str) -> bool:
+    """正文是否为微信删除/违规壳页(命中标记的短文本)。区别于一般过短/抓取失败。"""
+    return len(text) < 500 and any(m in text for m in GARBAGE_MARKERS)
+
+
 def _refetch(url: str, timeout: int, delay: float) -> str:
     """限速兜底抓正文;任何失败返回 ''。"""
     time.sleep(delay)
@@ -58,15 +63,21 @@ def _refetch(url: str, timeout: int, delay: float) -> str:
 def to_body(item: FeedItem, *, fetch_fallback: bool = True,
             min_len: int = 200, timeout: int = 30,
             delay: float = 4.0) -> tuple:
-    """返回 (body, source)。source ∈ {'feed','refetch','empty'}。
+    """返回 (body, source)。source ∈ {'feed','refetch','deleted','empty'}。
 
-    确定性内容质量门:feed 全文过短或命中微信失败壳页 → 兜底抓 URL;仍不合格 → empty。
+    'deleted' = 命中微信删除/违规壳页(永久,调用方不应重试);
+    'empty'   = 正文过短/抓取失败(瞬时,调用方应下轮重试);
+    确定性内容质量门:feed 全文过短或命中壳页 → 兜底抓 URL;仍不合格按上述区分。
     """
     body = html_to_text(item.content_html)
     if not is_low_quality(body, min_len):
         return body, "feed"
+    if is_deleted_shell(body):
+        return "", "deleted"
     if fetch_fallback:
         refetched = _refetch(item.url, timeout, delay)
         if not is_low_quality(refetched, min_len):
             return refetched, "refetch"
+        if is_deleted_shell(refetched):
+            return "", "deleted"
     return "", "empty"
