@@ -128,55 +128,78 @@ def match_related(ref_name: str, index: list):
     return None, None
 
 
-def main() -> None:
-    files = untracked_policies()
-    targets = []
-    for fn in files:
-        p = VAULT / fn
+def _rel(p: Path) -> str:
+    return str(p.relative_to(VAULT))
+
+
+def _is_tracked(p: Path) -> bool:
+    try:
+        rel = _rel(p)
+    except ValueError:
+        return False   # 不在 VAULT 下 → 不可能被 vault git 跟踪
+    r = subprocess.run(["git", "-C", str(VAULT), "ls-files", "--error-unmatch", rel],
+                       capture_output=True)
+    return r.returncode == 0
+
+
+def route_files(paths: list, index: list, dry: bool, now: str = "") -> int:
+    """转换给定文件 → commentaries/。tracked 走 git rm,untracked unlink。返回处理数(dry=True 时为满足条件数,非实际写入数)。"""
+    now = now or datetime.now(timezone(timedelta(hours=8))).isoformat(timespec="seconds")
+    n = 0
+    for p in paths:
         if not p.exists():
             continue
         fm, body = _front_body(p.read_text(encoding="utf-8", errors="ignore"))
         if not fm:
             continue
-        if is_interp(str(fm.get("title") or "")):
-            targets.append((p, fm, body))
-    skip = {p.name for p, _, _ in targets}
-    index = build_title_index(skip)
-    print(f"untracked={len(files)}  解读={len(targets)}  index={len(index)}  DRY={DRY}\n")
-
-    now = datetime.now(CST).isoformat(timespec="seconds")
-    moved = 0
-    for p, fm, body in targets:
         title = str(fm.get("title") or "")
         tag = derive_tag(title, body)
-        ref = ref_policy_name(title)
-        pid, matched_title = match_related(ref, index)
+        pid, _ = match_related(ref_policy_name(title), index)
         prov = fm.get("provenance") or {}
-        # 加工 frontmatter(保留原序 + 追加 commentary 字段)
         fm["type"] = "政策评论"
         fm["source"] = "l1_official"
         fm["commentary_kind"] = "official"
         fm["business_tag"] = tag
-        if prov.get("url"):
-            fm["source_url"] = prov["url"]
-        if fm.get("date"):
-            fm["date_published"] = fm["date"]
+        if prov.get("url"): fm["source_url"] = prov["url"]
+        if fm.get("date"): fm["date_published"] = fm["date"]
         if pid:
             fm["related_policy"] = [pid]
             fm["related_policy_source"] = "l1_title_match"
             fm["related_policy_confidence"] = 0.7
             fm["related_policy_matched_at"] = now
-        link = f"→ {pid} 〔{matched_title[:24]}〕" if pid else "→ (无匹配)"
-        print(f"[{tag:8}] {p.name[:42]}")
-        print(f"           ref《{ref[:30]}》 {link}")
-        if DRY:
+        n += 1
+        if dry:
             continue
         new_fm = yaml.dump(fm, allow_unicode=True, sort_keys=False)
-        dst = COMMENTARIES / p.name
-        dst.write_text(f"---\n{new_fm}---\n{body}", encoding="utf-8")
-        p.unlink()
-        moved += 1
-    print(f"\n{'(dry)将移' if DRY else '已移'} {moved if not DRY else len(targets)} 篇 → commentaries/")
+        (COMMENTARIES / p.name).write_text(f"---\n{new_fm}---\n{body}", encoding="utf-8")
+        if _is_tracked(p):
+            r = subprocess.run(["git", "-C", str(VAULT), "rm", "-q", "--", _rel(p)],
+                                capture_output=True)
+            if r.returncode != 0:
+                raise RuntimeError(f"git rm failed for {p.name}: {r.stderr.decode(errors='ignore')[:200]}")
+        else:
+            p.unlink()
+    return n
+
+
+def main() -> None:
+    files = untracked_policies()
+    target_paths = []
+    for fn in files:
+        p = VAULT / fn
+        if not p.exists():
+            continue
+        fm, _ = _front_body(p.read_text(encoding="utf-8", errors="ignore"))
+        if not fm:
+            continue
+        if is_interp(str(fm.get("title") or "")):
+            target_paths.append(p)
+    skip = {p.name for p in target_paths}
+    index = build_title_index(skip)
+    print(f"untracked={len(files)}  解读={len(target_paths)}  index={len(index)}  DRY={DRY}\n")
+
+    moved = route_files(target_paths, index, DRY)
+    print(f"\n{'(dry)将移' if DRY else '已移'} {moved} 篇 → commentaries/")
 
 
 if __name__ == "__main__":
