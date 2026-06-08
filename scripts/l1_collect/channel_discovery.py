@@ -103,18 +103,52 @@ _INST_DOMAIN_MARKERS = {
     "市监": ("scjg", "scjgj", "amr", "samr", "scjgdj"),
 }
 
+# 省 → gov 域拼音段(缩写+全拼);host 按 "." 分段做相等匹配,避免子串误命中
+_PROV_TOKENS = {
+    "北京市": ("bj", "beijing"), "天津市": ("tj", "tianjin"), "河北省": ("he", "hebei"),
+    "山西省": ("sx", "shanxi"), "内蒙古自治区": ("nm", "nmg", "neimenggu"),
+    "辽宁省": ("ln", "liaoning"), "吉林省": ("jl", "jilin"), "黑龙江省": ("hlj", "heilongjiang"),
+    "上海市": ("sh", "shanghai"), "江苏省": ("js", "jiangsu"), "浙江省": ("zj", "zhejiang"),
+    "安徽省": ("ah", "anhui"), "福建省": ("fj", "fujian"), "江西省": ("jx", "jiangxi"),
+    "山东省": ("sd", "shandong"), "河南省": ("ha", "henan"), "湖北省": ("hb", "hubei"),
+    "湖南省": ("hn", "hunan"), "广东省": ("gd", "guangdong"), "广西壮族自治区": ("gx", "guangxi"),
+    "海南省": ("hi", "hainan"), "重庆市": ("cq", "chongqing"), "四川省": ("sc", "sichuan"),
+    "贵州省": ("gz", "guizhou"), "云南省": ("yn", "yunnan"), "西藏自治区": ("xz", "xizang", "tibet"),
+    "陕西省": ("shaanxi", "sn"), "甘肃省": ("gs", "gansu"), "青海省": ("qh", "qinghai"),
+    "宁夏回族自治区": ("nx", "ningxia"), "新疆维吾尔自治区": ("xj", "xinjiang"),
+}
+# 加油线 10 重点市国标码 → gov 域拼音段(缩写+全拼)
+_CITY_TOKENS = {
+    "441900": ("dg", "dongguan"), "440600": ("fs", "foshan"), "330400": ("jx", "jiaxing"),
+    "330300": ("wz", "wenzhou"), "350500": ("qz", "quanzhou"), "320600": ("nt", "nantong"),
+    "370600": ("yt", "yantai"), "370700": ("wf", "weifang"), "320400": ("cz", "changzhou"),
+    "441300": ("hz", "huizhou"),
+}
+
+
+def _area_match(domain: str, target: dict) -> bool:
+    """host 按 '.' 分段,任一段 == 期望省/市拼音 token 即命中。"""
+    segs = (domain or "").lower().split(".")
+    tokens = set(_PROV_TOKENS.get(target.get("province", ""), ()))
+    if target.get("level") == "市":
+        tokens |= set(_CITY_TOKENS.get(target.get("city_code", ""), ()))
+    return any(t in segs for t in tokens)
+
 
 def _is_gov_host(url: str) -> bool:
     return any(_host(url).endswith(s) for s in GOV_DOMAIN_SUFFIXES)
 
 
-def _institution_match(domain: str, channel_type: str) -> bool:
-    """域名标记核验(仅域名无关发现路径调用;已知域名由调用方传 True 跳过)。非商务/市监 channel_type 返回 True。"""
-    markers = _INST_DOMAIN_MARKERS.get(channel_type)
+def _institution_match(domain: str, target: dict) -> bool:
+    """域名无关发现路径核验:host 行政区段 或 机构 marker 命中即过。
+    非商务/市监 channel_type 返回 True(发改委/能源等不受影响)。"""
+    ctype = target.get("channel_type", "")
+    markers = _INST_DOMAIN_MARKERS.get(ctype)
     if markers is None:
         return True
     h = (domain or "").lower()
-    return any(m in h for m in markers)
+    marker_ok = any(m in h for m in markers)
+    return _area_match(domain, target) or marker_ok
 
 
 def _tavily_search(query: str) -> list:
@@ -218,7 +252,7 @@ def discover_one(target: dict) -> Optional[Channel]:
             f"https://{_host(picked)}/" if picked else "")
         pr = probe_url(list_url) if list_url else None
     resolved = known or (_host(list_url) if list_url else "")
-    inst_ok = True if known else _institution_match(resolved, target["channel_type"])
+    inst_ok = True if known else _institution_match(resolved, target)
     verdict_ok = bool(pr) and pr.verdict == "ok"
     status = ChannelStatus.验证 if (verdict_ok and inst_ok) else ChannelStatus.候选
     return Channel(

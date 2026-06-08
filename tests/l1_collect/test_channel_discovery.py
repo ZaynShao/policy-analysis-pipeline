@@ -167,11 +167,18 @@ def test_commerce_warmstart_from_registry(tmp_path):
 
 def test_institution_match_by_domain():
     from scripts.l1_collect.channel_discovery import _institution_match
-    assert _institution_match("swt.jiangsu.gov.cn", "商务") is True
-    assert _institution_match("scjgj.beijing.gov.cn", "市监") is True
-    assert _institution_match("amr.gd.gov.cn", "市监") is True
-    assert _institution_match("fgw.sc.gov.cn", "商务") is False   # 发改委域名→不匹配商务
-    assert _institution_match("nea.gov.cn", "市监") is False
+    # marker 命中
+    assert _institution_match("swt.jiangsu.gov.cn",
+                              {"province": "江苏省", "channel_type": "商务", "level": "省", "city_code": ""}) is True
+    assert _institution_match("scjgj.beijing.gov.cn",
+                              {"province": "北京市", "channel_type": "市监", "level": "省", "city_code": ""}) is True
+    assert _institution_match("amr.gd.gov.cn",
+                              {"province": "广东省", "channel_type": "市监", "level": "省", "city_code": ""}) is True
+    # 非本省段且无 marker → 拒绝
+    assert _institution_match("hq.mof.gov.cn",
+                              {"province": "四川省", "channel_type": "商务", "level": "省", "city_code": ""}) is False
+    assert _institution_match("nea.gov.cn",
+                              {"province": "海南省", "channel_type": "市监", "level": "省", "city_code": ""}) is False
 
 
 def test_discover_domain_agnostic_derives_domain(monkeypatch):
@@ -194,19 +201,19 @@ def test_discover_domain_agnostic_derives_domain(monkeypatch):
 
 
 def test_discover_domain_agnostic_demotes_when_institution_mismatch(monkeypatch):
-    """选中的是 gov 列表页但域名不像商务(发改委)→ 核验门降候选。"""
+    """选中的是 gov 列表页但域名不含四川省段也无商务 marker → 核验门降候选。"""
     from scripts.l1_collect import channel_discovery as cd
     from scripts.l1_collect.connectivity_probe import ProbeResult
     monkeypatch.setattr(cd, "_tavily_search",
-                        lambda q: ["https://fgw.sc.gov.cn/zcfb/"])
-    monkeypatch.setattr(cd, "_llm_pick", lambda name, urls: "https://fgw.sc.gov.cn/zcfb/")
+                        lambda q: ["https://hq.mof.gov.cn/zcfb/"])
+    monkeypatch.setattr(cd, "_llm_pick", lambda name, urls: "https://hq.mof.gov.cn/zcfb/")
     monkeypatch.setattr(cd, "probe_url",
                         lambda u, **k: ProbeResult(url=u, http_status=200,
                                                    page_has_list_pattern=True, verdict="ok"))
     ch = cd.discover_one({"city": "四川省商务厅", "province": "四川省", "level": "省",
                           "city_code": "510000", "channel_type": "商务",
                           "root_domain": None})
-    assert ch.status.value == "候选"   # 域名核验没过 → 不验证
+    assert ch.status.value == "候选"   # 财政部域名:无四川省段·无商务 marker → 不验证
 
 
 def test_discover_warmstart_known_domain_not_demoted(monkeypatch):
