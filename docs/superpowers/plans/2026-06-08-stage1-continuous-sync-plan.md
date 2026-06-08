@@ -106,8 +106,8 @@ def main(argv=None) -> int:
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("--vault-dir", required=True)        # host 上 vault git 目录,如 /root/policy-vault
-    ap.add_argument("--pipeline-dir", required=True)     # host 上 pipeline 仓目录,如 /root/policy-pipeline(docker compose run 的 cwd)
-    ap.add_argument("--compose-file", required=True)     # 如 /root/policy-pipeline/docker-compose.server.yml
+    ap.add_argument("--pipeline-dir", required=True)     # host 上 pipeline 源码目录,实测 /root/policy-pipeline-src(docker compose run 的 cwd)
+    ap.add_argument("--compose-file", required=True)     # 实测 /root/policy-pipeline-src/docker-compose.server.yml
     ap.add_argument("--container-vault", default="/vault")
     ap.add_argument("--container-state", default="/state")
     ap.add_argument("--pipeline-version", type=int, default=1)
@@ -200,10 +200,10 @@ ssh -i <pem> root@<srv> 'git clone --depth=1 git@github-vault:ZaynShao/energy-po
 
 ## Task 4: host cron + logrotate(Claude ops)
 
-- [ ] **Step 1**:确保服务器有 pipeline 仓(跑 sync_tick.py 需要)+ 镜像(Task 1 提交后拉/重建)。`cd /root/policy-pipeline && git pull`(或首次 clone)。
+- [ ] **Step 1**:确保服务器有 pipeline 源码 `/root/policy-pipeline-src`(实测=tarball·**非 git 仓**)+ 镜像 `policy-pipeline:latest`。**sync_tick.py 经 scp 落地** 到 `scripts/service/`(非 `git pull`;代码 git 化=后续路 B)。as-built 详见 `OPERATIONS.md §8`。
 - [ ] **Step 2**:cron entry(每天 21:00,producer 当天产完后)
 ```bash
-ssh -i <pem> root@<srv> '(crontab -l 2>/dev/null; echo "0 21 * * * cd /root/policy-pipeline && /usr/bin/python3 -m scripts.service.sync_tick --vault-dir /root/policy-vault --pipeline-dir /root/policy-pipeline --compose-file /root/policy-pipeline/docker-compose.server.yml >> /var/log/policy-pipeline/sync_tick.log 2>&1") | crontab -'
+ssh -i <pem> root@<srv> '(crontab -l 2>/dev/null | grep -v scripts.service.sync_tick; echo "0 21 * * * cd /root/policy-pipeline-src && /usr/bin/python3 -m scripts.service.sync_tick --vault-dir /root/policy-vault --pipeline-dir /root/policy-pipeline-src --compose-file /root/policy-pipeline-src/docker-compose.server.yml >> /var/log/policy-pipeline/sync_tick.log 2>&1") | crontab -'
 ssh -i <pem> root@<srv> 'mkdir -p /var/log/policy-pipeline'
 ```
 - [ ] **Step 3**:logrotate
@@ -220,7 +220,7 @@ EOF'
 
 前提:`pipeline.env` 的 `DATABASE_URL` 指 **staging**(`hengguan_staging`)。
 
-- [ ] **Step 1 无变更跳过**:`ssh ... 'cd /root/policy-pipeline && python3 -m scripts.service.sync_tick --vault-dir /root/policy-vault --pipeline-dir /root/policy-pipeline --compose-file /root/policy-pipeline/docker-compose.server.yml'` → 日志 "no change, skip"(因刚 clone,HEAD=远端)。
+- [ ] **Step 1 无变更跳过**:`ssh ... 'cd /root/policy-pipeline-src && python3 -m scripts.service.sync_tick --vault-dir /root/policy-vault --pipeline-dir /root/policy-pipeline-src --compose-file /root/policy-pipeline-src/docker-compose.server.yml'` → 日志 "no change, skip"(因刚 clone,HEAD=远端)。
 - [ ] **Step 2 有变更同步**:producer 端 push 一个小 vault 变更(改一篇 bv 或加一关系)→ 服务器再跑 sync_tick → 日志 "vault X->Y, running run_sync" + exit=0 → 查 staging DB 反映该变更 + `last_sync_run.json` errors 空。
 - [ ] **Step 3 失败信号**:临时把 `pipeline.env` 的 `DATABASE_URL` 改坏 → 跑 sync_tick → run_sync exit≠0 + last_sync_run errors 非空 + 日志可见(过渡期);恢复 env。
 - [ ] **Step 4**:等一个真实 cron 周期(或确认 cron 行无误),确认自动跑通。

@@ -1,7 +1,7 @@
 ---
 title: 政策分析 · 运营手册(OPERATIONS)
-status: v0.2 骨架(待从 vault 实际数据蒸馏后填实)
-last_updated: 2026-05-08
+status: v0.3(+ §8 Stage 1 持续上云)
+last_updated: 2026-06-08
 ---
 
 # 运营手册
@@ -208,7 +208,78 @@ Step 6 抓取(评论正文): 同上链路
 
 ---
 
+## 8. Stage 1 持续上云(云端投影 · 2026-06-08 上线)
+
+> producer 产 vault → push GitHub → 东京服务器每天定时 `git pull`(变了才拉)→ 容器 `run_sync` 投影到 heng-pg。告别手动 rsync + 手动 sync。设计见 `docs/superpowers/specs/2026-06-08-stage1-continuous-sync-design.md`,计划见对应 plan。
+
+### 8.1 数据流
+
+```
+Producer(Mac/国内常开机)产 vault → git commit + push
+        │
+        ▼  GitHub: ZaynShao/energy-policy-analysis(vault 仓·main)
+        │
+东京服务器 ── host cron 每天 21:00 ──▶ scripts/service/sync_tick.py
+        │   git fetch --depth=1;HEAD 变了才 git reset --hard
+        │   → docker compose run --rm policy-pipeline  python -m scripts.sync.run_sync
+        │   → 投影 heng-pg(staging:hengguan_staging / 生产:hengguan)
+        └── Mac 只读阅览 ── git pull ──▶ Obsidian 看最新
+```
+
+### 8.2 服务器实测布局(≠ 早期设计假设,以此为准)
+
+| 项 | 路径 |
+|---|---|
+| pipeline 代码 | `/root/policy-pipeline-src` ⚠️ **非 git 仓**(tarball 部署;sync_tick.py 经 scp 落地) |
+| vault | `/root/policy-vault`(git 仓·deploy key `github-vault`) |
+| state | `/root/policy-pipeline-state`(含 `last_sync_run.json`) |
+| 环境变量 | `/etc/policy-pipeline/pipeline.env`(含 DATABASE_URL,**out-of-git**) |
+| compose | `/root/policy-pipeline-src/docker-compose.server.yml`(挂 vault:ro + state;net `safety-platform_platform-net`) |
+| 日志 | `/var/log/policy-pipeline/sync_tick.log`(logrotate weekly×4) |
+
+### 8.3 日常运维
+
+- **自动**:cron `0 21 * * *`(producer 当天产完后)。查 `crontab -l`。
+- **手动跑一次**:
+  ```bash
+  cd /root/policy-pipeline-src && /usr/bin/python3 -m scripts.service.sync_tick \
+    --vault-dir /root/policy-vault --pipeline-dir /root/policy-pipeline-src \
+    --compose-file /root/policy-pipeline-src/docker-compose.server.yml
+  ```
+  无变更 → `no change, skip`(不空跑);有变更 → reset + run_sync。
+- **看结果**:`cat /root/policy-pipeline-state/last_sync_run.json`(synced/relation/errors/skipped_invalid)+ `tail /var/log/policy-pipeline/sync_tick.log`。
+- **失败可见(过渡期)**:run_sync 退出码 + `last_sync_run.json` 的 `errors` 非空 + 日志。**正式告警 = hengguan 内建"消息"/Notification(配套 PR,待建)**。
+
+### 8.4 vault rsync→git 一次性切换(已于 2026-06-08 完成 · 回滚锚)
+
+切换步骤(`mv` 备份 → 浅克隆):
+```bash
+mv /root/policy-vault /root/policy-vault.rsync-bak-$(date +%s)
+git clone --depth=1 git@github-vault:ZaynShao/energy-policy-analysis.git /root/policy-vault
+```
+**回滚**:`rm -rf /root/policy-vault && mv /root/policy-vault.rsync-bak-* /root/policy-vault`
+deploy key:服务器 `~/.ssh/vault_deploy`(只读)+ `~/.ssh/config` 的 `Host github-vault`;公钥加在 vault 仓 Deploy keys(read-only)。
+
+### 8.5 staging → 生产 cutover(gated · 不在 Stage 1)
+
+`pipeline.env` 当前 `DATABASE_URL` 指 `hengguan_staging`。切生产 = **PR #14 合并 + pg_dump 备份 + migrate deploy + TRUNCATE + 改 DATABASE_URL→hengguan + 首 sync**,单独 gated,双确认。cron 不变,自动续上生产。
+
+### 8.6 已知 caveat
+
+- **代码漂移**:`/root/policy-pipeline-src` 是非 git tarball,且其中 L2 常驻服务代码(`run_l2`/`orchestrate`/…)**未在 pipeline git 仓**。服务器一挂即丢。修复 = 后续"代码 git 化部署"(路 B / Stage 1.5)。
+- **upsert 不 prune**:run_sync 只 upsert,不删 vault 已移除的政策。生产 cutover 先 TRUNCATE 拿干净基线;staging 长期累积无害。
+- **producer 不常开(现 Mac)**:Mac 不开不 push,服务器当天拉不到新 → 迁国内常开机后消失。
+
+### 8.7 上线验证记录(2026-06-08)
+
+E2E 实测:模拟 vault 落后一提交 → sync_tick 检测 `cf2f824f→c7389b10` → reset → run_sync → **synced 761 / relation 998 / errors=[] / exit 0**;无变更再跑 → `no change skip`。HEAD 比对幂等、cron/日志/logrotate、deploy key 只读拉取全部验过。
+
+---
+
 ## Changelog
+
+### v0.3 — 2026-06-08
+- 添 §8 Stage 1 持续上云(vault rsync→git、sync_tick cron、实测布局、cutover 指针、caveat、验证记录)
 
 ### v0.2 — 2026-05-08
 - 删 L3 月报章节(本阶段不做)
