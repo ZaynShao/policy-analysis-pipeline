@@ -1,0 +1,21 @@
+services:
+  policy-pipeline:
+    build: .
+    image: policy-pipeline:latest
+    container_name: policy-pipeline
+    env_file: /etc/policy-pipeline/pipeline.env
+    volumes:
+      - /root/policy-vault:/vault:ro
+      - /root/policy-pipeline-state:/state
+    networks: [platform-net]
+    # 默认不常驻;用 `docker compose run` 跑 L2/sync。L2 常驻化留 Task 5。
+    command: ["python", "-m", "scripts.service.run_l2",
+              "--vault", "/vault", "--state-dir", "/state",
+              "--gen-model", "MiniMax-M2.7-highspeed", "--gen-provider", "anthropic",
+              "--judge-model", "deepseek-v4-flash", "--judge-provider", "openai"]
+    restart: "no"
+
+networks:
+  platform-net:
+    external: true
+    name: safety-platform_platform-net

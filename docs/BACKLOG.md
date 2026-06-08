@@ -207,4 +207,30 @@
 **触发条件**:继续 ②-B 全量重生、启动 ③分析重生、或启动 ④消费层之前。**下一步**:做小范围 `commentary_signals` 闭环,再处理 market_intel representation。
 
 ---
-_登记于 2026-05-30。新增推后项往下追加,不删旧项;做掉的标 ✅ done 并注日期。B2–B5 登记于 2026-05-31。B6–B7 登记于 2026-05-31(采集未补齐 + 2线可操作 + 盲区反馈环)。B8 登记于 2026-05-31(②-A 71 入队残留)。B9 登记于 2026-05-31(月报原型退役 + 乡村去污染)。B10 登记于 2026-06-01(③分析=关系/演进/区域,现存8文件但 stale 待重生,依赖②)。B11 登记于 2026-06-02(②-B 人工确认池 + 全局硬化回流)。B12 登记于 2026-06-03(三源接线 + 旧 business_view 消费隔离)。_
+
+## B13 — CONTRACT-REL-1:③ canonical 关系格式 ↔ 服务化 sync relation_mapper 对账 ✅ done 2026-06-07
+
+**✅ 已解(2026-06-07,commit `a6aba37`)**:③ 关系层已 apply 进 vault(HEAD `a6fb3c09`),关系=单文件 `1_extracted/relations/relations_canonical.jsonl`(字段 `from`/`to`/`rel`/`confidence`/`evidence`,1138 条,rel 词表 8 类全 ∈ VALID_RELATION_TYPES,仅缺 conflicts_with;`from`/`to` 全 P_ pid;evidence str)。修法=`collect_relation_rows` 读取边界把 `from`/`to`/`rel` 归一为 `from_pid`/`to_pid`/`relation_type`,`map_relation` 一字未动(3 测试覆盖 canonical/未知 rel/残缺行)。本地彩排实证:relation **998 行**落库(canonical 1138 中两端都在已同步 767 政策内的;140 条某端不在被丢=正确)。↓ 原始延后记录:
+
+**发现**:2026-06-06,pipeline origin/main 阶段性 push 了 ③ 关系层投影器(`scripts/analysis_relation_views/`,commits a5266ec/bd61206/8b6d945/ab2d542)。它产 `relations_canonical.jsonl`,边字段为 **`from` / `to` / `rel`**(见 `api_view.py` 的 `to_row()` 输出 + 排序键)。而服务化线(分支 `feat/service-deploy`)的 `scripts/sync/relation_mapper.py` + `run_sync.collect_relation_rows` 吃的是 **`from_pid` / `to_pid` / `relation_type`**,并以这三键做存在性过滤。
+
+**后果(若不对账)**:③ 关系真 apply 进 vault 后,sync 对每条 canonical 边过滤命中失败 → **静默跳过 → `PolicySemanticRelation` 表 0 行**。另:`pg_writer.build_relation_upsert` 写 `confidence`/`evidence`,需确认 canonical `to_row()` 是否携带,否则落空。
+
+**为何延后(非现在修)**:① 关系 sync 本就按 spec §6 延后(首次 sync 只写 ②-B 政策,relations 表暂空);② ③ canonical 现为 preview(`run.py` 注记 `no_vault_write`/`no_apply`,落点 out_root 非 vault `1_extracted/relations/`),格式/落点仍可能动。现在改 = 追移动靶。
+
+**强制对账点(触发条件)**:③ 关系 apply 进 vault 那一刻。届时二选一:(a) relation_mapper 改吃 `from`/`to`/`rel` 且 collect_relation_rows 读 `relations_canonical.jsonl`;(b) 加一层适配器把 canonical 归一化成 sync 入参。同时对齐:canonical 落点 vs sync glob 路径、confidence/evidence 字段、9 类 rel 取值集(SCHEMA §5.2)。**关联 B10**(③分析重生)。
+
+## B14 — 人工处理/反馈机制交互设计(盘点先行·等 L1 机制落盘再启动) — 新增
+
+**问题**:系统累积了 ~9 个"人在环里"触点、分 3-4 类不同性质,无统一交互设计。缺陷被机制检测后"丢进"池(IN 大体有),但"人处理完结论怎么出来"(OUT = 人交互面 + 回灌 pipeline 管道)没设计,有变僵尸池风险。
+
+**盘点(起点·待扩充)**:缺陷/质量池(拒→人修)= ②-B review_queue / ②-A needs_manual / `sync_skipped.jsonl`(服务同步层·新) / B4 日期缺陷;覆盖/漏采反馈 = L1FeedbackQueue / B7;用户发起流 = ManualEntryRequest;校准/审计 = ②-B golden 抽查 / low-conf 队列。
+
+**设计轴线**:① 每池处理人是谁 → 交互形态(平台运营 OPERATOR/HQ_GA/FIELD_GA → 前端 UI;builder/技术如 golden/low-conf → CLI/session/文件,别硬上前端);② 每池设计两半 = 人交互面 + 结论回灌管道(光界面无回灌=没闭环);③ Plan B 已规划前端审核页(L1FeedbackPool / ManualEntryModal 轮询 / PolicyDrawer override)= 已在途、别重做。
+
+**硬约束(防膨胀)**:目标【不是】"统一审核中台"(各池生命周期不同·强行统一是错);要的是交互图 + 每池消费/回灌协议;先盘点出 HTML 文档再谈建。
+
+**分阶段**:阶段0(现在)= 理解 + 进一步盘点(全仓 pipeline/vault/safety-platform/BACKLOG 找全)出 HTML;阶段1(等 L1 采集修复机制 Task11/12 落盘后)= 基于真实残留评估 + 设计交互面+回灌管道 + 建。**非阻塞·上生产前定下来**(否则池带上线无人消费)。可独立 session 做。
+
+---
+_登记于 2026-05-30。新增推后项往下追加,不删旧项;做掉的标 ✅ done 并注日期。B2–B5 登记于 2026-05-31。B6–B7 登记于 2026-05-31(采集未补齐 + 2线可操作 + 盲区反馈环)。B8 登记于 2026-05-31(②-A 71 入队残留)。B9 登记于 2026-05-31(月报原型退役 + 乡村去污染)。B10 登记于 2026-06-01(③分析=关系/演进/区域,现存8文件但 stale 待重生,依赖②)。B11 登记于 2026-06-02(②-B 人工确认池 + 全局硬化回流)。B12 登记于 2026-06-03(三源接线 + 旧 business_view 消费隔离)。B13 登记于 2026-06-06(CONTRACT-REL-1:③ canonical 关系格式 vs 服务化 sync relation_mapper 对账,延后到 ③关系 apply 进 vault;服务化部署线 feat/service-deploy)→ ✅ done 2026-06-07。B14 登记于 2026-06-07(人工处理/反馈机制交互设计·盘点先行·等 L1 机制落盘·独立 session)。_
