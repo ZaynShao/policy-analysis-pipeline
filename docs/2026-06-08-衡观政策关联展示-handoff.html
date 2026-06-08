@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>衡观「政策关联」展示 handoff — PolicySemanticRelation</title>
+<style>
+  :root { --ink-1:#1a1a1a; --ink-2:#444; --ink-3:#777; --line:#e3e3e3; --bg:#fafafa;
+          --amber:#b25e00; --amber-soft:#fff4e3; --green:#1f7a34; --green-soft:#e9f6ec;
+          --blue:#1a5fb4; --blue-soft:#e8f0fb; --purple:#6c3fa3; --purple-soft:#f1ebfa; }
+  * { box-sizing:border-box; }
+  body { font:15px/1.7 -apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+         color:var(--ink-1); max-width:900px; margin:0 auto; padding:32px 24px; background:#fff; }
+  h1 { font-size:24px; margin:0 0 4px; }
+  .sub { color:var(--ink-3); font-size:14px; margin-bottom:24px; }
+  h2 { font-size:18px; margin:30px 0 10px; padding-bottom:6px; border-bottom:2px solid var(--line); }
+  h3 { font-size:15px; margin:18px 0 6px; }
+  table { border-collapse:collapse; width:100%; margin:12px 0; font-size:14px; }
+  th,td { border:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:top; }
+  th { background:var(--bg); font-weight:700; }
+  code { background:#f2f2f2; padding:1px 5px; border-radius:4px; font:13px/1.5 "SF Mono",Menlo,Consolas,monospace; }
+  pre { background:#1e1e1e; color:#e8e8e8; padding:14px 16px; border-radius:8px; overflow-x:auto;
+        font:12.5px/1.6 "SF Mono",Menlo,Consolas,monospace; }
+  pre code { background:none; color:inherit; padding:0; }
+  .box { border:1px solid var(--line); border-left-width:4px; border-radius:6px; padding:12px 16px; margin:14px 0; }
+  .box.amber { border-left-color:var(--amber); background:var(--amber-soft); }
+  .box.green { border-left-color:var(--green); background:var(--green-soft); }
+  .box.blue  { border-left-color:var(--blue);  background:var(--blue-soft); }
+  .box.purple{ border-left-color:var(--purple);background:var(--purple-soft); }
+  .box .t { font-weight:700; margin-bottom:4px; }
+  .dir { color:var(--ink-3); font-size:13px; }
+  .small { font-size:13px; color:var(--ink-3); }
+  .pill { display:inline-block; font-size:12px; padding:1px 7px; border-radius:10px; background:var(--blue-soft); color:var(--blue); font-family:monospace; }
+</style>
+</head>
+<body>
+
+<h1>衡观「政策关联」展示 handoff</h1>
+<div class="sub">政策↔政策语义关系已入库（<code>PolicySemanticRelation</code>），前端在政策详情呈现「相关政策」· 2026-06-08</div>
+
+<div class="box blue">
+  <div class="t">一句话</div>
+  pipeline 已产出政策间的 9 类语义关系，<strong>数据落在生产库 <code>PolicySemanticRelation</code> 表</strong>。本文交付给前端团队：用这张表，在政策详情页做一个「相关政策」区。数据由 pipeline cutover 灌入（约 <strong>998 条</strong>关系，紧随政策数据）。
+</div>
+
+<div class="box amber">
+  <div class="t">时序说明</div>
+  这张表的数据<strong>在 pipeline cutover 后到位</strong>（与政策数据同一趟 run_sync 灌入）。当前生产为 0 行。前端可<strong>先并行开发</strong>，cutover 完成即有数据。本页是未来「政策详情显示<u>相关政策 + 评论</u>」页的<strong>「相关政策」一半</strong>；「评论」一半由 pipeline 侧另行交付（评论投影正在做）。
+</div>
+
+<h2>一、数据在哪：<code>PolicySemanticRelation</code> 表</h2>
+<table>
+  <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+  <tr><td><code>id</code></td><td>String</td><td>主键</td></tr>
+  <tr><td><code>fromPolicyId</code></td><td>String → Policy.id</td><td>关系起点政策（cuid，已建索引）</td></tr>
+  <tr><td><code>toPolicyId</code></td><td>String → Policy.id</td><td>关系终点政策（cuid，已建索引）</td></tr>
+  <tr><td><code>relationType</code></td><td>String</td><td>9 类之一（见下表）</td></tr>
+  <tr><td><code>confidence</code></td><td>Float?</td><td>置信度 0~1（可用于排序/弱化展示）</td></tr>
+  <tr><td><code>evidence</code></td><td>String?</td><td>关系判定的原文证据摘录（可折叠展示）</td></tr>
+  <tr><td><code>pipelineVersion</code></td><td>Int?</td><td>版本</td></tr>
+</table>
+<p class="small">唯一约束 <code>(fromPolicyId, toPolicyId, relationType)</code>；<code>onDelete: Cascade</code>（政策删了关系自动清）。两端均已建索引，正反向查询都快。</p>
+
+<h2>二、9 类关系语义 + 方向</h2>
+<p>关系是<strong>有向的</strong>：<code>from</code> —[relationType]→ <code>to</code>。在政策详情展示时，要分清「本政策是起点」还是「本政策是终点」，用对应的措辞（正向 / 反向）。</p>
+<table>
+  <tr><th>relationType</th><th>含义（from → to）</th><th>本政策=起点(from) 显示</th><th>本政策=终点(to) 显示</th></tr>
+  <tr><td><span class="pill">derives_from</span></td><td>省/市派生自国家级（追溯）</td><td>派生自 →</td><td>← 被…落地(landed_by)</td></tr>
+  <tr><td><span class="pill">supersedes</span></td><td>显式废止</td><td>废止 →</td><td>← 被…废止(superseded_by)</td></tr>
+  <tr><td><span class="pill">iterates</span></td><td>升级 / v2</td><td>升级自 →</td><td>← 被…升级(iterated_by)</td></tr>
+  <tr><td><span class="pill">extends</span></td><td>范围扩展（试点 → 全国）</td><td>扩展 →</td><td>← 被…扩展(extended_by)</td></tr>
+  <tr><td><span class="pill">clarifies</span></td><td>实施细则 / 操作指引</td><td>细化 →</td><td>← 被…细化(clarified_by)</td></tr>
+  <tr><td><span class="pill">cites_basis</span></td><td>显式「作为制定依据」引用</td><td>以…为依据 →</td><td>← 被…引为依据(cited_as_basis_by)</td></tr>
+  <tr><td><span class="pill">references</span></td><td>引用但不修改</td><td>引用 →</td><td>← 被…引用(referenced_by)</td></tr>
+  <tr><td><span class="pill">aligns_with</span></td><td>不同部门同主题对齐（平行）</td><td colspan="2" style="text-align:center">对齐 ↔（对称，方向弱）</td></tr>
+  <tr><td><span class="pill">conflicts_with</span></td><td>内容冲突（罕见）</td><td colspan="2" style="text-align:center">冲突 ↔（对称）</td></tr>
+</table>
+<p class="small">当前生产数据里出现 8 类（<code>conflicts_with</code> 暂为 0）。分布参考：aligns_with 412 · references 391 · cites_basis 147 · derives_from 83 · clarifies 72 · extends 15 · iterates 13 · supersedes 5。</p>
+
+<h2>三、查一条政策的「相关政策」</h2>
+<p>本政策既可能是某关系的起点、也可能是终点，所以要查<strong>两个方向</strong>并合并：</p>
+<pre><code>// 出边：本政策 → 别人
+SELECT relationType, toPolicyId   AS otherId, confidence, evidence, 'out' AS dir
+FROM "PolicySemanticRelation" WHERE fromPolicyId = :policyId
+UNION ALL
+// 入边：别人 → 本政策
+SELECT relationType, fromPolicyId AS otherId, confidence, evidence, 'in'  AS dir
+FROM "PolicySemanticRelation" WHERE toPolicyId   = :policyId;</code></pre>
+<p class="small">再用 <code>otherId</code> 关联 <code>Policy</code> 取标题等；按 <code>relationType</code> 分组、<code>confidence</code> 降序展示。Prisma 侧也可用 <code>fromPolicy</code> / <code>toPolicy</code> relation 直接 include 关联政策。</p>
+
+<h2>四、建议 UI（政策详情「相关政策」区）</h2>
+<div class="box purple">
+  <ul style="margin:0; padding-left:20px">
+    <li>政策详情页加一个「相关政策」区块，按 <code>relationType</code> 分组（如：废止/升级/派生/依据/引用/对齐 …）。</li>
+    <li>每条显示：方向措辞（见第二节正/反向列）+ 对方政策标题（可点进对方政策）+ confidence（可做弱化/小字）+ evidence（默认折叠，点开看判定证据）。</li>
+    <li>演进类（supersedes/iterates/extends/derives_from）信息量最高，建议靠前；aligns_with/references 量大，可折叠或分页。</li>
+    <li>无相关政策时显示「暂无关联政策」。</li>
+  </ul>
+</div>
+
+<h2>五、与「评论」展示的关系</h2>
+<p>未来「政策详情」会同时显示<strong>相关政策（本文）</strong>和<strong>相关评论/舆情</strong>。评论侧 pipeline 正在做投影（<code>CommentarySignal</code> 表，含每条政策关联的舆情信号），交付后是同一个详情页的另一个区块。两者数据模型独立、可分别开发。</p>
+
+<p class="small" style="margin-top:28px; border-top:1px solid var(--line); padding-top:12px">
+  本文由 pipeline 侧基于 vault 语义关系（<code>relations_canonical.jsonl</code>，③ 分析节点产出）与生产 schema 整理。关系数据待 pipeline cutover 灌入后可见。
+</p>
+
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>衡观生产部署 handoff — 政策数据 / 通知 / L1 审核页 上线</title>
+<style>
+  :root { --ink-1:#1a1a1a; --ink-2:#444; --ink-3:#777; --line:#e3e3e3; --bg:#fafafa;
+          --amber:#b25e00; --amber-soft:#fff4e3; --green:#1f7a34; --green-soft:#e9f6ec;
+          --red:#b3261e; --red-soft:#fdeceb; --blue:#1a5fb4; --blue-soft:#e8f0fb; }
+  * { box-sizing:border-box; }
+  body { font:15px/1.7 -apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+         color:var(--ink-1); max-width:880px; margin:0 auto; padding:32px 24px; background:#fff; }
+  h1 { font-size:24px; margin:0 0 4px; }
+  .sub { color:var(--ink-3); font-size:14px; margin-bottom:24px; }
+  h2 { font-size:18px; margin:30px 0 10px; padding-bottom:6px; border-bottom:2px solid var(--line); }
+  h3 { font-size:15px; margin:18px 0 6px; }
+  table { border-collapse:collapse; width:100%; margin:12px 0; font-size:14px; }
+  th,td { border:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:top; }
+  th { background:var(--bg); font-weight:700; }
+  code { background:#f2f2f2; padding:1px 5px; border-radius:4px; font:13px/1.5 "SF Mono",Menlo,Consolas,monospace; }
+  pre { background:#1e1e1e; color:#e8e8e8; padding:14px 16px; border-radius:8px; overflow-x:auto;
+        font:13px/1.6 "SF Mono",Menlo,Consolas,monospace; }
+  pre code { background:none; color:inherit; padding:0; }
+  .box { border:1px solid var(--line); border-left-width:4px; border-radius:6px; padding:12px 16px; margin:14px 0; }
+  .box.amber { border-left-color:var(--amber); background:var(--amber-soft); }
+  .box.green { border-left-color:var(--green); background:var(--green-soft); }
+  .box.red   { border-left-color:var(--red);   background:var(--red-soft); }
+  .box.blue  { border-left-color:var(--blue);  background:var(--blue-soft); }
+  .box .t { font-weight:700; margin-bottom:4px; }
+  .who { display:inline-block; font-size:12px; font-weight:700; padding:2px 8px; border-radius:10px; vertical-align:middle; }
+  .who.team { background:var(--blue-soft); color:var(--blue); }
+  .who.pipe { background:var(--amber-soft); color:var(--amber); }
+  ol.steps { padding-left:0; counter-reset:s; list-style:none; }
+  ol.steps > li { counter-increment:s; padding:10px 0 10px 40px; position:relative; border-top:1px solid var(--line); }
+  ol.steps > li:first-child { border-top:none; }
+  ol.steps > li::before { content:counter(s); position:absolute; left:0; top:10px; width:26px; height:26px;
+        background:var(--ink-1); color:#fff; border-radius:50%; text-align:center; line-height:26px; font-weight:700; font-size:13px; }
+  .ok { color:var(--green); font-weight:700; }
+  .del { color:var(--red); font-weight:700; }
+  .small { font-size:13px; color:var(--ink-3); }
+  strong.k { color:var(--amber); }
+</style>
+</head>
+<body>
+
+<h1>衡观生产部署 handoff</h1>
+<div class="sub">一次生产部署，把 <strong>pipeline 政策数据 + 通知铃铛 + L1 源质量审核页</strong> 同时点亮 · 2026-06-08</div>
+
+<div class="box blue">
+  <div class="t">一句话</div>
+  <span class="who team">衡观团队</span> 把 master 最新代码 + schema 部署到生产（含 db push）→ 完成后告诉 <span class="who pipe">pipeline 侧</span> → pipeline 侧做数据灌入（run_sync）。两步接力，本文写清各自的活、确切命令、数据安全和回滚锚。
+</div>
+
+<h2>一、为什么需要这次部署（现状诊断）</h2>
+<p>排查生产库 <code>hengguan</code> 时发现：它的 schema 落后于已合并的代码，且不是迁移管理的活系统。具体：</p>
+<table>
+  <tr><th>诊断项</th><th>生产实测</th><th>影响</th></tr>
+  <tr><td>Policy 的 pipeline 列（<code>pipelinePid</code> 等）</td><td><span class="del">不存在</span></td><td>pipeline 的 run_sync 写入会直接失败</td></tr>
+  <tr><td><code>_prisma_migrations</code> 表</td><td><span class="del">不存在</span>（db push 建的库，非 migrate）</td><td><code>migrate deploy</code> 跑不通（会重放 init 到已存在的表 → 报「表已存在」）</td></tr>
+  <tr><td>已合并入 master、但未上生产的迁移</td><td>PR#14（pipeline 集成）、PR#16（通知）、PR#17（L1 页）<strong>三者均已合并</strong></td><td>代码已就绪，只差部署到生产</td></tr>
+  <tr><td>生产是否活系统</td><td><strong>是</strong>：Visit 163 · User 27 · Monthly 2 · Policy 50（demo）</td><td>部署/清理必须 additive + 有回滚锚</td></tr>
+</table>
+<p class="small">对照：staging 库 <code>hengguan_staging</code> 已有 pipeline 列（也是 db push 加的）、已 sync 767 政策正常运行 —— 证明「生产照同法 db push 一次」即可补齐 schema。</p>
+
+<div class="box amber">
+  <div class="t">关键纠正</div>
+  cutover 的真正前置不是「PR#14 已合并」，而是「<strong>生产实际部署了这些代码 + schema</strong>」。生产从未部署过 PR#14，所以这一步必须先做 —— 而它正好和「让通知铃铛、L1 审核页在生产可见」是<strong>同一次部署</strong>。
+</div>
+
+<h2>二、<span class="who team">衡观团队</span> 要做的：生产部署</h2>
+<p class="small">PR#14 / #16 / #17 均已合并入 master，代码已就绪——本节就是把它部署到生产。</p>
+<ol class="steps">
+  <li><strong>pg_dump 备份生产</strong>（回滚锚 #1，db push 前）。
+    <pre><code>pg_dump -Fc -d hengguan -f hengguan_predeploy_$(date +%s).dump</code></pre>
+  </li>
+  <li><strong>部署最新 master 的后端 + 前端代码到生产容器</strong>（走你们既有的 redeploy 流程）。前端含通知铃铛、L1 审核页（均 MANAGER 可见）。</li>
+  <li><strong>schema 跟上 = <code>prisma db push</code></strong>（指向生产 <code>DATABASE_URL</code>，从 <code>services/heng-guan/backend</code> 跑）：
+    <pre><code>DATABASE_URL=&lt;生产&gt; npx prisma db push</code></pre>
+    <div class="small" style="margin-top:6px">db push 会先打印将执行的变更，确认<strong>全是 additive</strong>（加列 / 加表）再 apply。它会补齐：Policy 的 pipeline 列、新表 <code>PolicySemanticRelation</code> / <code>ManualEntryRequest</code> / <code>L1FeedbackQueue</code>（PR#14）、<code>Notification</code>（PR#16）、<code>L1ReviewQueue</code>（PR#17）。<strong>不会删</strong>现有 50 政策 / 163 拜访 / 27 用户。</div>
+    <div class="box amber" style="margin:8px 0 0">
+      <div class="t">为什么是 db push 不是 migrate deploy</div>
+      生产无 <code>_prisma_migrations</code>（db push 建的库）。直接 <code>migrate deploy</code> 会从头重放迁移、撞上已存在的表报错。db push 按当前库与 schema 的差异增量同步，与你们建 staging 同法，对纯追加变更安全。
+    </div>
+  </li>
+  <li><strong>完成后告知 pipeline 侧</strong>（这条最后一步）。然后进第三节。</li>
+</ol>
+
+<h2>三、<span class="who pipe">pipeline 侧</span> 接着做的：数据 cutover</h2>
+<p class="small">列在这里让你知道接下来会发生什么；这一段由 pipeline 侧执行，不需要衡观团队动手。</p>
+<ol class="steps">
+  <li><strong>pg_dump 备份生产</strong>（回滚锚 #2，TRUNCATE 前）。</li>
+  <li><strong>清 demo 政策</strong>：<code>TRUNCATE "Policy" CASCADE;</code> —— 删掉 50 条 demo 政策及其到政策的关联链（见下节量化）。<strong>163 拜访 / 27 用户 / 2 月报本体全部存活。</strong></li>
+  <li><strong>切换 run_sync 的 <code>DATABASE_URL</code> → 生产</strong>，跑全量 run_sync：灌入约 <strong>761 政策 + 998 语义关系</strong>（当前 vault 投影数，以 run_sync 实际为准）。</li>
+  <li><strong>验收</strong>：核对生产 Policy 计数、抽查前端显示；异常则用回滚锚 pg_dump 还原。</li>
+</ol>
+
+<h2>四、数据安全 / 影响面（量化）</h2>
+<table>
+  <tr><th></th><th>操作</th><th>对现有数据</th></tr>
+  <tr><td><strong>① db push</strong></td><td>加列 / 加表</td><td><span class="ok">零删除</span>，纯追加</td></tr>
+  <tr><td rowspan="2"><strong>② TRUNCATE Policy CASCADE</strong></td>
+      <td><span class="del">删</span>：50 demo 政策 + 它们的关联</td>
+      <td>级联清空 <code>PolicyTag</code> / <code>PolicyRelation</code> / <code>PolicyLocalDiff</code> / <code>BriefingPolicy</code>(0) / <code>MonthlyPolicy</code>(4) / <code>PolicySemanticRelation</code> / <code>_PolicyToVisit</code>(6) / <code>ManualEntryRequest</code></td></tr>
+  <tr><td><span class="ok">留</span>：所有业务本体</td>
+      <td><span class="ok">163 拜访 · 27 用户 · 2 月报 · 全部机构</span> 不受影响（多对多设计，TRUNCATE 只断「政策↔拜访/月报」的 6+4 个链，本体存活）</td></tr>
+</table>
+<div class="box green">
+  <div class="t">回滚锚（双保险）</div>
+  pg_dump #1（db push 前）+ pg_dump #2（TRUNCATE 前）。任一步出问题都能 <code>pg_restore</code> 回到操作前。
+</div>
+<p class="small">关于那 6 个拜访链 / 4 个月报链：它们指向的是即将被删除的 demo 政策，断链是预期内的（demo 政策本就要换成真实数据）；真实政策入库后可重新关联。</p>
+
+<h2>五、完成后的效果</h2>
+<table>
+  <tr><th></th><th>之前</th><th>之后</th></tr>
+  <tr><td>政策数据</td><td>50 条 demo</td><td><span class="ok">约 761 条真实政策 + 998 语义关系</span></td></tr>
+  <tr><td>通知铃铛（MANAGER）</td><td>无</td><td><span class="ok">有</span>，pipeline 同步失败会推消息</td></tr>
+  <tr><td>L1 源质量审核页（MANAGER）</td><td>无</td><td><span class="ok">有</span>，人工裁决回灌 pipeline</td></tr>
+</table>
+
+<h2>六、衔接信号</h2>
+<div class="box blue">
+  衡观团队完成第二节（代码部署 + db push）后，<strong>回一句给 pipeline 侧</strong>即可。pipeline 侧随即执行第三节（数据 cutover），全程有 pg_dump 兜底。任何一步要中止都可立即停。
+</div>
+
+<p class="small" style="margin-top:28px; border-top:1px solid var(--line); padding-top:12px">
+  本文为生产部署衔接说明，由 pipeline 侧基于生产实测整理。命令中的生产 <code>DATABASE_URL</code> / 备份路径请以你们环境为准。
+</p>
+
+</body>
+</html>
