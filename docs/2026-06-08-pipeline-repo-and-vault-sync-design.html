@@ -1,0 +1,162 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>设计:L1/L2 代码归属 + vault 同步去 rsync(供决策)</title>
+<style>
+*{box-sizing:border-box}
+body{font:15px/1.75 -apple-system,"PingFang SC",sans-serif;margin:0;background:#eef1f6;color:#1c2530}
+.wrap{max-width:1040px;margin:0 auto;padding:28px 22px 90px}
+h1{font-size:24px;margin:0 0 4px}.sub{color:#5a6b80;font-size:13px;margin-bottom:22px}
+h2{font-size:18px;margin:34px 0 10px;padding-bottom:6px;border-bottom:2px solid #d3dceb;color:#16324f}
+h3{font-size:15px;margin:20px 0 6px;color:#33455c}
+.card{background:#fff;border-radius:12px;padding:16px 20px;margin:14px 0;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.verdict{background:#fff;border:2px solid #0a6b35;border-radius:12px;padding:18px 22px;margin:16px 0}
+.verdict h2{margin:0 0 8px;border:0;color:#0a6b35;font-size:19px}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13.5px;background:#fff;border-radius:8px;overflow:hidden}
+th,td{padding:9px 11px;text-align:left;border-bottom:1px solid #eef1f6;vertical-align:top}
+th{background:#f3f6fb;color:#46546a;font-weight:600}
+code{background:#eef1f6;border-radius:4px;padding:1px 5px;font-size:12.5px;font-family:ui-monospace,SFMono-Regular,monospace}
+pre{background:#1c2530;color:#e6edf3;border-radius:8px;padding:12px 14px;overflow:auto;font-size:12.5px;line-height:1.55}
+.pill{display:inline-block;border-radius:5px;padding:1px 9px;font-size:12px;font-weight:600}
+.green{background:#eafaf0;color:#0a6b35}.amber{background:#fff8e6;color:#8a5a00}.red{background:#fdecea;color:#b4451f}.blue{background:#e8f0fe;color:#1452c4}.grey{background:#eef1f6;color:#5a6b80}
+ul,ol{margin:6px 0;padding-left:22px}li{margin:5px 0}
+.flag{background:#fff8e6;border-left:3px solid #c79100;padding:10px 14px;border-radius:0 6px 6px 0;margin:10px 0;font-size:13.5px}
+.danger{background:#fdecea;border-left:3px solid #b4451f}
+.ok{background:#eafaf0;border-left:3px solid #0a6b35}
+.small{color:#8a98ad;font-size:12px}
+.rec{background:#eafaf0;border-radius:5px;padding:1px 8px;font-weight:600;color:#0a6b35;font-size:12px}
+.diagram{background:#f7f9fc;border:1px solid #dde4ee;border-radius:8px;padding:14px;margin:10px 0;font-family:ui-monospace,monospace;font-size:12px;line-height:1.5;white-space:pre;overflow:auto;color:#2a3a4d}
+</style></head><body><div class="wrap">
+
+<h1>设计:L1/L2 代码归属 + vault 同步去 rsync</h1>
+<div class="sub">2026-06-08 夜 · 供你明早决策(async 设计稿,非最终 spec) · 服务化部署线 · 作者 Claude(待你拍方向后再出最终 spec + 实施计划)</div>
+
+<div class="verdict">
+<h2>一句话结论</h2>
+<p>你把<b>两件事</b>捆在一起了,但它们应该<b>拆开</b>:</p>
+<ol style="margin:8px 0">
+<li><b>"rsync 不持久" — 这个有近乎免费的解,且与代码搬不搬无关。</b> 实测:vault <b>本来就是个 git 仓、已有 GitHub remote</b>(<code>ZaynShao/energy-policy-analysis</code>)。把 rsync 换成 <b>服务器 <code>git pull</code></b> 即可——原子、带版本、带校验,今晚就能定。这是真正该做的durability 升级。</li>
+<li><b>"把 L1/L2 代码并进 hengguan 仓" — 这个我<span style="color:#b4451f">不推荐(至少现在不)</span>。</b> 它<b>不解决 durability</b>(数据流问题,代码搬不搬都在),却会把你高速迭代的 pipeline 押进前端团队的 PR/boundary 治理,还和 hengguan 的"模块走 API、不直连库"规则冲突(你现在是直写 heng-pg)。运维协同你<b>已经拿到了</b>——pipeline 早已作为容器跑在同一台服务器、同一 <code>platform-net</code>,这本就是"并部署不并仓"。</li>
+</ol>
+<p style="margin:8px 0 0"><b>推荐路线:</b> ① 立刻把 vault 同步从 rsync 换 git(Stage 1,低风险);② pipeline <b>保持独立仓 + 容器co-deploy</b>,只把"schema↔sync 契约"加一道防漂移(Stage 2);③ "云端 24/7 产、本地只读阅览"是更大的独立阶段(Stage 3),到时再决定代码要不要更深耦合。<b>"并仓"目前弊大于利。</b></p>
+</div>
+
+<h2>1. 你的诉求 → 拆成 4 个独立决策</h2>
+<p>"把 L1L2 推到 hengguan 仓 + rsync 不持久"里其实缠了 4 个本应分开拍的决策。混在一起谈最容易做错。</p>
+<table>
+<tr><th>#</th><th>决策</th><th>现状</th><th>本质</th></tr>
+<tr><td>D1</td><td><b>vault 传输/durability</b></td><td>Mac→东京 <b>手动 rsync</b></td><td>数据流(与代码位置无关)</td></tr>
+<tr><td>D2</td><td><b>pipeline 代码位置</b></td><td>独立仓 <code>policy-analysis-pipeline</code></td><td>仓库/治理/协作</td></tr>
+<tr><td>D3</td><td><b>生成在哪跑</b></td><td>全在 <b>Mac</b> 本地</td><td>算力/形态(=你说的长期"云端产")</td></tr>
+<tr><td>D4</td><td><b>写 heng-pg 的方式</b></td><td><code>scripts/sync</code> <b>直连 PostgreSQL</b></td><td>集成契约(被 hengguan boundary 规则牵动)</td></tr>
+</table>
+<div class="flag"><b>关键洞察:</b> 你真正的痛(rsync 脆 + 想要运维协同)主要落在 <b>D1</b>;而你提的方案("并仓")动的是 <b>D2</b>。D2 不解决 D1。把它们分开,你会发现 D1 几乎免费、D2 该缓。</div>
+
+<h2>2. 关键实测事实(今晚查的)</h2>
+<table>
+<tr><th>事实</th><th>实测</th><th>对决策的意义</th></tr>
+<tr><td><b>vault 已是 git 仓 + 有 remote</b></td><td><code>origin = github.com/ZaynShao/energy-policy-analysis</code>(branch <code>main</code>);体积 267M 工作树 + 119M .git</td><td><span class="pill green">D1 解了</span>服务器 <code>git clone/pull</code> 即可替代 rsync,零新基建(原 P2 阻塞自动消除)</td></tr>
+<tr><td><b>pipeline 仓</b></td><td><code>github.com/ZaynShao/policy-analysis-pipeline</code>·py≥3.9·依赖极轻(pyyaml/anthropic/psycopg2);scripts/ 下 ~18 个包(l1_collect/l2_themescore/l2_attribution/l2_derive/analysis_*/commentary_signals/sync/service…)</td><td>是个高速迭代的数据工程仓,天然耦合的是 <b>vault(经 SCHEMA.md)</b>,不是前端</td></tr>
+<tr><td><b>hengguan 是 polyglot monorepo</b></td><td><code>services/</code> 下:heng-guan(NestJS+Vue+Prisma)、guardian(Node)、<b>intel-center(FastAPI·Python·生产在跑)</b>、enterprise-kb(FastAPI+Celery·遗留)。已有 Python 服务先例</td><td>"并仓会引入异构"这条<b>旧顾虑不成立</b>(它本就 polyglot)——但这只解决"能不能塞进去",不解决"该不该"</td></tr>
+<tr><td><b>治理 = 强 PR + 模块边界</b></td><td><code>SYSTEM_BOUNDARY.md</code>:master 仅 PR;commit 须 <code>type(module):</code>;<b>"业务模块不能直连对方,必须走 API"</b>;infra(compose/scripts/nginx)仅架构负责人改;<code>[DB-MIGRATION]</code>/<code>[CROSS-MODULE]</code> 标签;CODEOWNERS 全 = <code>@gloriahao0909</code></td><td><span class="pill amber">D2 的核心摩擦</span>并仓 = 你的 pipeline 每次改都过前端团队 PR-gate;且边界规则与你"直连库"冲突</td></tr>
+<tr><td><b>部署机制有歧义(待澄清)</b></td><td>仓内 canonical = <b>裸机 PM2(<code>scripts/manage.sh</code>)on 滴滴 dev-container</b>;但我实测的东京服务器(8.216.59.173)跑的是 <b>docker-compose</b></td><td><span class="pill red">未对齐</span>"并仓后怎么部署"取决于哪套是真 prod。我们这条线在<b>东京 = docker-compose</b>(实测真值);需跟前端确认两套关系</td></tr>
+<tr><td><b>直连库 vs boundary 规则</b></td><td>当前 <code>scripts/sync</code> 直写 heng-pg(决策#4);但 boundary 要求"走 heng-backend API"</td><td>并仓会把这点摆上台面 → 可能被要求改 API 写(=曾否决的方案C·更慢)</td></tr>
+<tr><td><b>L1 采集用 firecrawl(托管)</b></td><td>重庆样本 <code>fetched_via: firecrawl</code>——抓取由 firecrawl 的服务器发起,<b>与本机 IP 无关</b></td><td><span class="pill green">利好 D3</span>政策采集搬云端可行(不像 RSS 受微信地理风控)</td></tr>
+<tr><td><b>服务器约束</b></td><td>东京:磁盘<b>仅剩 ~4G</b>;platform-net;py3.12 镜像已验</td><td>vault(386M)+ state + 镜像放得下但紧;若云端跑全量生成需扩盘</td></tr>
+</table>
+
+<h2>3. 三个目标架构</h2>
+
+<h3>架构 A — 最小 durability 修(rsync → git)<span class="rec">推荐立刻做</span></h3>
+<div class="diagram">Mac(产 vault + OB 阅览)
+  ├─ git commit + push ──▶ GitHub: ZaynShao/energy-policy-analysis
+  │                                      │
+东京服务器 ◀── git pull(定时/钩子)──────┘
+  └─ pipeline 容器(独立仓·platform-net)读 vault → run_sync → heng-pg → 前端</div>
+<ul>
+<li>pipeline <b>保持独立仓</b>;只把 vault 传输从 rsync 换成 <b>git pull</b>(原子/版本/校验,且 vault 本就在 commit 打 tag,顺手 push)。</li>
+<li>生成仍在 Mac。前端继续从 heng-pg 读。</li>
+<li><b>解决了</b>:rsync 脆。<b>没动</b>:代码位置、生成位置。<b>风险</b>:几乎为零(基建已在)。</li>
+</ul>
+
+<h3>架构 B — pipeline 并入 hengguan monorepo(=你的提议)<span class="pill red">不推荐(现在)</span></h3>
+<div class="diagram">safety-platform 仓
+  └─ services/policy-pipeline/(并入·Python 服务)
+       同 compose/PM2 部署 · 同 PR/boundary 治理
+Mac 仍产 vault(经 git/rsync 上服务器)→ 容器读 → heng-pg</div>
+<ul>
+<li><b>真好处:</b> ① 运维同栈(同 compose/PM2 管理);② <b>schema↔sync 版本同仓耦合</b>,根治 CONTRACT-REL-1 那类跨仓漂移;③ polyglot 先例已在,塞得进。</li>
+<li><b>真代价(为什么我劝缓):</b>
+  <ul>
+  <li><b>速度被治理拖死</b>:你的 pipeline 是高速 solo(每天几十次 Codex 迭代);进 hengguan = 每次过 <code>@gloriahao0909</code> 的 PR-gate。前端团队的节奏 ≠ 你的节奏。</li>
+  <li><b>耦合方向错</b>:pipeline 天然耦合 <b>vault</b>(SCHEMA),不是前端。并进前端仓 = 把它和它真正的搭档(vault)拆开。</li>
+  <li><b>撞 boundary 规则</b>:"模块走 API 不直连库"——你现在直写 heng-pg,进仓后这点会被要求改成 NestJS API 写(=否决过的方案C,更慢、更绕)。</li>
+  <li><b>不解决 durability</b>:vault 还是单独的仓,代码并仓 ≠ 数据并仓。rsync 问题原样在。</li>
+  </ul></li>
+<li><b>结论:</b> 它给的"运维协同"你<b>用架构 A/现有 co-deploy 已基本拿到</b>;它独有的好处只有"版本耦合契约",而那个有更轻的拿法(见 §4)。所以现在弊大于利。</li>
+</ul>
+
+<h3>架构 C — 云端 24/7 产、本地只读阅览(你的长期愿景)<span class="pill blue">下一个独立阶段</span></h3>
+<div class="diagram">东京服务器(24/7 生产者)
+  ├─ L1 采集(firecrawl·IP 无关 ✓)+ L2(②-B/③/projector)→ 写 vault(可写)
+  ├─ run_sync → heng-pg → 前端
+  └─ vault git push ──▶ GitHub ──▶ Mac git pull → Obsidian 看最新(只读)
+国内常驻节点(必须·微信地理风控)
+  └─ wewe-rss + 评论 ingest → 写 commentaries → 并入 vault</div>
+<ul>
+<li>实现你说的"线上做完→本地 OB 最新":生成搬上云端,Mac 降级为<b>只读阅览</b>,靠 git pull 拿最新。</li>
+<li><b>可行性</b>:L2 LLM(MiniMax/deepseek)东京 egress 已验✓;L1 走 firecrawl 与 IP 无关✓。</li>
+<li><b>两个硬问题</b>:① <b>RSS 必须留国内</b>(微信),所以是"云端产政策 + 国内产评论"的<b>双写 vault</b> → 需按目录隔离的合并策略(政策/L2 在服务器写、评论在国内写,各管不同目录,git 按目录合并或分支合并);② <b>磁盘</b>:云端跑全量生成 + 持 vault + .git 历史,4G 不够,需<b>扩盘</b>。</li>
+<li>这是个<b>大阶段</b>,不该和眼下的 durability/RSS 收口混。建议 RSS 收口后单开 brainstorming 立项。</li>
+</ul>
+
+<h2>4. 那"版本耦合契约"——并仓的唯一独有好处,有更轻的拿法</h2>
+<p>并仓真正独有的价值是:schema(Prisma 在 hengguan)和 sync(在 pipeline)<b>同仓演进、一个 PR 落地</b>,避免我们踩过的 <b>CONTRACT-REL-1</b>(跨仓字段名漂移、关系表静默 0 行)。但这个不必靠并仓换,有三档更轻的:</p>
+<table>
+<tr><th>做法</th><th>成本</th><th>效果</th></tr>
+<tr><td><b>A. 契约测试</b>(pipeline 仓加一个测试:拿 hengguan 的 <code>schema.prisma</code> / 迁移 SQL 对账 sync 的列名映射)</td><td>低</td><td>漂移即测试红,CI 拦住。<span class="rec">推荐</span></td></tr>
+<tr><td>B. 版本钉死(sync 声明"吃 schema 版本 N",schema 变就 bump + 双侧对账清单)</td><td>低</td><td>显式契约,但靠纪律</td></tr>
+<tr><td>C. 抽一个共享 contract 包(字段映射单一真源,两仓都引)</td><td>中</td><td>最强,但多一个发布物</td></tr>
+</table>
+<p>所以:<b>保持独立仓 + 一道契约测试,就拿到了并仓 90% 的收益,而没有治理/速度/边界的代价。</b></p>
+
+<h2>5. 推荐路线(分阶段)</h2>
+<table>
+<tr><th>Stage</th><th>做什么</th><th>动哪个决策</th><th>风险</th></tr>
+<tr><td><b>1(立刻)</b></td><td>vault 同步 <b>rsync → git pull</b>(服务器从 GitHub 拉;Mac commit 后 push)。落一个简单拉取钩子/定时。</td><td>D1</td><td><span class="pill green">极低</span>基建已在</td></tr>
+<tr><td><b>2</b></td><td>pipeline <b>保持独立仓 + 容器 co-deploy</b>(现有形态);加 <b>schema↔sync 契约测试</b>。澄清东京 compose vs 滴滴 PM2 哪套是真 prod。</td><td>D2/D4</td><td>低</td></tr>
+<tr><td><b>3(独立立项)</b></td><td>"云端产 / 本地阅览"愿景:L1+L2 搬服务器、vault 可写、git 回流 Mac、RSS 留国内双写合并、扩盘。走 brainstorming。</td><td>D3</td><td>大·分阶段</td></tr>
+</table>
+<div class="flag ok"><b>为什么这个顺序:</b> Stage 1 解你今晚的痛(durability)且是<b>所有架构的共同前提</b>(A/B/C 都要 vault 可靠上服务器),无悔。Stage 2 用最小代价拿到并仓的真收益。Stage 3 才是"要不要更深耦合/搬云端"的大决策,留到它该被认真做的时候。</div>
+
+<h2>6. 明早你要拍的决策</h2>
+<table>
+<tr><th>#</th><th>决策</th><th>我的推荐</th></tr>
+<tr><td>1</td><td>vault 同步换 git pull?</td><td><b>是</b>(Stage 1,无悔)。</td></tr>
+<tr><td>2</td><td>现在并仓进 hengguan?</td><td><b>否</b>。保持独立仓 + co-deploy + 契约测试(拿 90% 收益、避治理/边界代价)。</td></tr>
+<tr><td>3</td><td>"云端产/本地阅览"何时启动?</td><td>RSS 收口后<b>单独立项</b>(Stage 3),别和眼下混。</td></tr>
+<tr><td>4</td><td>若你坚持并仓,可接受 PR-gate 拖慢 pipeline + 改 API 写库?</td><td>这是并仓的真代价,需你权衡(见 §3-B / §7)。</td></tr>
+</table>
+
+<h2>7. 风险与待澄清</h2>
+<ul>
+<li><b>部署机制歧义(需向前端确认)</b>:仓内说裸机 PM2(滴滴 dev-container)是 prod,但东京服务器实测是 docker-compose。哪套是真?并仓的部署路径取决于此。</li>
+<li><b>boundary "走 API 不直连库"</b>:当前直写 heng-pg 与此冲突;并仓会激化。不并仓则相安(我们是外部容器,边界对我们较松)。</li>
+<li><b>GitHub 仓体积</b>:vault .git 119M(OK);需确认无单文件 &gt;100M(GitHub 推送硬限);markdown 仓基本不会有,稳。</li>
+<li><b>git-vault 在服务器占盘</b>:多 119M .git;4G 紧但够(可 <code>--depth=1</code> 浅克隆省盘)。</li>
+<li><b>双写 vault(仅 Stage 3)</b>:云端写政策/L2 + 国内写评论 → 必须目录隔离 + 合并策略,否则 git 冲突。</li>
+<li><b>RSS 永远的例外</b>:微信 token 不能离开国内 IP——无论哪个架构,评论采集都在国内节点,不进东京。</li>
+</ul>
+
+<h2>8. 附:如果你看完仍要并仓,怎么并(为完整性)</h2>
+<p>(留作 §6-决策2 选"是"时的执行骨架,非推荐路径。)</p>
+<ol>
+<li>在 hengguan 仓建 <code>services/policy-pipeline/</code>(Python 服务,对齐 intel-center 的 Dockerfile/PM2 形态)。</li>
+<li>commit 走 <code>feat(infra/pipeline): …</code>;碰 compose/manage.sh = infra-owner 审;碰 Policy 表 = <code>[DB-MIGRATION]</code>。</li>
+<li>按 boundary 评估"直连库 vs 改 heng-backend 提供 sync 端点"——若被要求走 API,sync 重写为调 NestJS bulk-upsert 端点(成本中高)。</li>
+<li>vault 仍独立仓(并的是代码不是数据),D1 仍需 git-pull 解。</li>
+<li>pipeline 历史(独立仓的 commit)如何迁入:git subtree / 重新起 history(丢历史)——需定。</li>
+</ol>
+
+<p class="small">本稿为决策稿,非最终 spec。你拍方向后我再出正式 spec(<code>docs/superpowers/specs/</code>)+ 实施计划。— 2026-06-08 夜</p>
+
+</div></body></html>
