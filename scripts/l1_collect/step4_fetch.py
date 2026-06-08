@@ -13,7 +13,7 @@ def fetch_candidates(in_jsonl: Path, out_dir: Path, error_log: Path) -> tuple:
     error = 0
     errors: list = []
     out_dir.mkdir(parents=True, exist_ok=True)
-    for line in in_jsonl.read_text(encoding="utf-8").splitlines():
+    for line in in_jsonl.read_text(encoding="utf-8").split("\n"):
         if not line.strip():
             continue
         row = json.loads(line)
