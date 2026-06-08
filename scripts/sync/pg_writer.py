@@ -121,3 +121,46 @@ def build_notification_insert(*, level: str, title: str, body, source: str, targ
     )
     return sql, {"level": level, "title": title, "body": body, "source": source,
                  "target_user_id": target_user_id}
+
+
+def build_commentary_upsert(row: dict) -> tuple[str, dict]:
+    """INSERT ... ON CONFLICT (commentaryId) DO UPDATE。
+    themeIds/relatedPolicyPids 为 JSON 字符串（::jsonb 转）；relatedPolicyPids 是软引用，
+    悬挂 pid 原样存、不解析、不跳过。id=gen_random_uuid；createdAt/syncedAt=now。"""
+    sql = '''
+    INSERT INTO "CommentarySignal"
+      ("id", "commentaryId", "title", "evidence", "signalRole", "confidence",
+       "sourceAccount", "businessTag", "themeIds", "relatedPolicyPids",
+       "sourcePath", "pipelineVersion", "syncedAt", "createdAt")
+    VALUES
+      (gen_random_uuid()::text, %(commentary_id)s, %(title)s, %(evidence)s,
+       %(signal_role)s, %(confidence)s, %(source_account)s, %(business_tag)s,
+       %(theme_ids)s::jsonb, %(related_policy_pids)s::jsonb,
+       %(source_path)s, %(pipeline_version)s, now(), now())
+    ON CONFLICT ("commentaryId") DO UPDATE SET
+      "title"             = EXCLUDED."title",
+      "evidence"          = EXCLUDED."evidence",
+      "signalRole"        = EXCLUDED."signalRole",
+      "confidence"        = EXCLUDED."confidence",
+      "sourceAccount"     = EXCLUDED."sourceAccount",
+      "businessTag"       = EXCLUDED."businessTag",
+      "themeIds"          = EXCLUDED."themeIds",
+      "relatedPolicyPids" = EXCLUDED."relatedPolicyPids",
+      "sourcePath"        = EXCLUDED."sourcePath",
+      "pipelineVersion"   = EXCLUDED."pipelineVersion",
+      "syncedAt"          = now()
+    '''
+    params = {
+        "commentary_id": row["commentary_id"],
+        "title": row["title"],
+        "evidence": row.get("evidence"),
+        "signal_role": row.get("signal_role"),
+        "confidence": row.get("confidence"),
+        "source_account": row.get("source_account"),
+        "business_tag": row.get("business_tag"),
+        "theme_ids": row["theme_ids"],
+        "related_policy_pids": row["related_policy_pids"],
+        "source_path": row.get("source_path"),
+        "pipeline_version": row["pipeline_version"],
+    }
+    return sql, params

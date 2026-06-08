@@ -87,6 +87,33 @@ def test_collect_relation_rows_skips_missing_required_fields(tmp_path):
     rows = collect_relation_rows(tmp_path, pipeline_version=1)
     assert rows == []
 
+def test_collect_commentary_rows(tmp_path):
+    import json
+    from scripts.sync import run_sync as m
+    d = tmp_path / "1_extracted"
+    d.mkdir(parents=True)
+    lines = [
+        {"commentary_id": "C_1", "title": "T1", "evidence": "E1",
+         "related_policy_ids": ["P_in", "P_missing"], "theme_ids": ["power_market"],
+         "signal_role": "risk", "confidence": 0.7, "source_account": "中电联",
+         "business_tag": "power", "path": "0_raw/commentaries/x.md"},
+        {"title": "无id跳过", "related_policy_ids": []},  # 无 commentary_id → 跳过
+    ]
+    (d / "commentary_signals.jsonl").write_text(
+        "\n".join(json.dumps(x, ensure_ascii=False) for x in lines), encoding="utf-8")
+    rows = m.collect_commentary_rows(tmp_path, 1)
+    assert len(rows) == 1
+    r = rows[0]
+    assert r["commentary_id"] == "C_1"
+    assert json.loads(r["related_policy_pids"]) == ["P_in", "P_missing"]  # 悬挂原样
+    assert json.loads(r["theme_ids"]) == ["power_market"]
+    assert r["business_tag"] == "power"
+    assert r["pipeline_version"] == 1
+
+def test_collect_commentary_rows_absent_file(tmp_path):
+    from scripts.sync import run_sync as m
+    assert m.collect_commentary_rows(tmp_path, 1) == []  # 文件不存在→空
+
 def test_build_summary():
     s = build_summary(synced=10, skipped_override=2, relations=5, errors=["e1"])
     assert s["synced_count"] == 10
@@ -193,3 +220,31 @@ def test_run_notification_uses_target_account_and_forward_note(tmp_path, monkeyp
 
     assert seen_notification_params[0]["target_user_id"] == "gloriahao"
     assert seen_notification_params[0]["body"].startswith("请把这个问题转给邵子渊\n")
+
+
+def test_run_projects_commentary_and_counts(tmp_path, monkeypatch):
+    import types, sys
+    from scripts.sync import run_sync as m
+    calls = {"commentary": 0}
+    class FakeCur:
+        def __enter__(self): return self
+        def __exit__(self, *a): return False
+        def execute(self, *a): pass
+        def fetchone(self): return ("cuid1",)
+    class FakeConn:
+        def cursor(self): return FakeCur()
+        def commit(self): pass
+        def close(self): pass
+    monkeypatch.setitem(sys.modules, "psycopg2", types.SimpleNamespace(connect=lambda _: FakeConn()))
+    monkeypatch.setattr(m, "collect_policy_rows", lambda v, ver: ([], []))
+    monkeypatch.setattr(m, "collect_relation_rows", lambda v, ver: [])
+    monkeypatch.setattr(m, "collect_commentary_rows",
+                        lambda v, ver: [{"commentary_id": "C_1"}, {"commentary_id": "C_2"}])
+    def fake_upsert(row):
+        calls["commentary"] += 1
+        return "SQL", {"commentary_id": row["commentary_id"]}
+    monkeypatch.setattr(m.pg_writer, "build_commentary_upsert", fake_upsert)
+    monkeypatch.setattr(m.pg_writer, "execute_with_savepoint", lambda c, s, p: None)
+    summary = m.run(tmp_path, tmp_path, 1, "postg:///x")
+    assert calls["commentary"] == 2
+    assert summary["commentary_count"] == 2

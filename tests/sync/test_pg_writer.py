@@ -109,3 +109,22 @@ def test_build_notification_insert_targets_user_id():
     assert '"Notification"' in sql
     assert '"targetUserId"' in sql
     assert params["target_user_id"] == "gloriahao"
+
+def test_build_commentary_upsert():
+    from scripts.sync import pg_writer
+    row = {
+        "commentary_id": "C_abc", "title": "标题", "evidence": "摘录",
+        "signal_role": "risk", "confidence": 0.72, "source_account": "中电联",
+        "business_tag": "power",
+        "theme_ids": '["power_market"]',
+        "related_policy_pids": '["P_2026_SC_x","P_missing"]',
+        "source_path": "0_raw/commentaries/x.md", "pipeline_version": 1,
+    }
+    sql, params = pg_writer.build_commentary_upsert(row)
+    assert 'INSERT INTO "CommentarySignal"' in sql
+    assert 'ON CONFLICT ("commentaryId") DO UPDATE' in sql
+    assert '%(theme_ids)s::jsonb' in sql
+    assert '%(related_policy_pids)s::jsonb' in sql
+    assert params["commentary_id"] == "C_abc"
+    assert params["related_policy_pids"] == '["P_2026_SC_x","P_missing"]'  # 悬挂 pid 原样留
+    assert params["business_tag"] == "power"
