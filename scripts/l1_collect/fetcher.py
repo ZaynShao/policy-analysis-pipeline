@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from typing import Optional
 import requests
 
-MIN_BODY_LEN = 200  # 短于此视为抓取失败(摘要而非全文)
+MIN_BODY_LEN = 500  # 短于此视为抓取失败(摘要而非全文)
 UA = "Mozilla/5.0 (compatible; ZCE-Fetcher/0.1)"
 TIMEOUT = 30
 
@@ -28,7 +28,7 @@ def _fetch_via_firecrawl(url: str) -> Optional[str]:
         return None
     try:
         resp = requests.post(
-            "https://api.firecrawl.dev/v0/scrape",
+            "https://api.firecrawl.dev/v1/scrape",
             json={"url": url, "formats": ["markdown"]},
             headers={"Authorization": f"Bearer {key}"},
             timeout=TIMEOUT,
