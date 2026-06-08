@@ -108,3 +108,14 @@ def execute_with_savepoint(conn, sql, params, name="sp") -> None:
         except Exception:
             cur.execute(f"ROLLBACK TO SAVEPOINT {name}")
             raise
+
+
+def build_notification_insert(*, level: str, title: str, body, source: str):
+    """插入一条 Notification 的 SQL+params。
+    id 自带(Prisma cuid 非 DB 默认→gen_random_uuid);createdAt 走 DB 默认 now();readAt 默认 NULL。
+    """
+    sql = (
+        'INSERT INTO "Notification" ("id","level","title","body","source") '
+        'VALUES (gen_random_uuid()::text, %(level)s::"NotificationLevel", %(title)s, %(body)s, %(source)s)'
+    )
+    return sql, {"level": level, "title": title, "body": body, "source": source}
