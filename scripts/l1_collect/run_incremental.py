@@ -190,6 +190,9 @@ def run_incremental(cfg: IncrementalConfig) -> dict:
         "total_gate_review": sum(r.get("gate_review", 0) for r in results),
         "dry_run": cfg.dry_run,
     }
+    pool_summary = review_pool.summarize()
+    if pool_summary:
+        print(f"[run_incremental] review_pool: {pool_summary}")
     print(f"[run_incremental] DONE {summary}")
     return summary
 
