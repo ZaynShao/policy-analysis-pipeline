@@ -123,13 +123,14 @@ def collect_commentary_rows(vault: Path, pipeline_version: int) -> list[dict]:
 
 
 def build_summary(synced: int, skipped_override: int, relations: int, errors: list[str],
-                  skipped_invalid: int = 0) -> dict:
+                  skipped_invalid: int = 0, commentary: int = 0) -> dict:
     return {
         "synced_count": synced,
         "skipped_override_count": skipped_override,
         "relation_count": relations,
         "errors": errors,
         "skipped_invalid_count": skipped_invalid,
+        "commentary_count": commentary,
     }
 
 
@@ -160,6 +161,15 @@ def run(vault: Path, state_dir: Path, pipeline_version: int, database_url: str) 
                 rel_synced += 1
             except Exception as e:
                 errors.append(f"relation {row['from_pid']}->{row['to_pid']}: {e}")
+        commentary_rows = collect_commentary_rows(vault, pipeline_version)
+        commentary_synced = 0
+        for row in commentary_rows:
+            try:
+                sql, params = pg_writer.build_commentary_upsert(row)
+                pg_writer.execute_with_savepoint(conn, sql, params)
+                commentary_synced += 1
+            except Exception as e:  # 单条失败不崩整批
+                errors.append(f"commentary {row.get('commentary_id')}: {e}")
         conn.commit()
         if errors:
             try:
@@ -181,7 +191,8 @@ def run(vault: Path, state_dir: Path, pipeline_version: int, database_url: str) 
     finally:
         conn.close()
     summary = build_summary(synced, 0, rel_synced, errors,
-                            skipped_invalid=len(skipped_rows))
+                            skipped_invalid=len(skipped_rows),
+                            commentary=commentary_synced)
     state_dir = Path(state_dir)
     state_dir.mkdir(parents=True, exist_ok=True)
     (state_dir / "sync_skipped.jsonl").write_text(

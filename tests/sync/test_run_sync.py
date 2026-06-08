@@ -220,3 +220,31 @@ def test_run_notification_uses_target_account_and_forward_note(tmp_path, monkeyp
 
     assert seen_notification_params[0]["target_user_id"] == "gloriahao"
     assert seen_notification_params[0]["body"].startswith("请把这个问题转给邵子渊\n")
+
+
+def test_run_projects_commentary_and_counts(tmp_path, monkeypatch):
+    import types, sys
+    from scripts.sync import run_sync as m
+    calls = {"commentary": 0}
+    class FakeCur:
+        def __enter__(self): return self
+        def __exit__(self, *a): return False
+        def execute(self, *a): pass
+        def fetchone(self): return ("cuid1",)
+    class FakeConn:
+        def cursor(self): return FakeCur()
+        def commit(self): pass
+        def close(self): pass
+    monkeypatch.setitem(sys.modules, "psycopg2", types.SimpleNamespace(connect=lambda _: FakeConn()))
+    monkeypatch.setattr(m, "collect_policy_rows", lambda v, ver: ([], []))
+    monkeypatch.setattr(m, "collect_relation_rows", lambda v, ver: [])
+    monkeypatch.setattr(m, "collect_commentary_rows",
+                        lambda v, ver: [{"commentary_id": "C_1"}, {"commentary_id": "C_2"}])
+    def fake_upsert(row):
+        calls["commentary"] += 1
+        return "SQL", {"commentary_id": row["commentary_id"]}
+    monkeypatch.setattr(m.pg_writer, "build_commentary_upsert", fake_upsert)
+    monkeypatch.setattr(m.pg_writer, "execute_with_savepoint", lambda c, s, p: None)
+    summary = m.run(tmp_path, tmp_path, 1, "postg:///x")
+    assert calls["commentary"] == 2
+    assert summary["commentary_count"] == 2
