@@ -19,6 +19,8 @@ def fetch_candidates(in_jsonl: Path, out_dir: Path, error_log: Path) -> tuple:
         row = json.loads(line)
         url = row.get("url", "")
         res = fetch_article(url)
+        if res.via == "fetch_error":
+            res = fetch_article(url)          # 浅重试一次(瞬时失败兜底)
         fid = hashlib.sha1(url.encode()).hexdigest()[:16]
         outf = out_dir / f"{fid}.json"
         outf.write_text(json.dumps({

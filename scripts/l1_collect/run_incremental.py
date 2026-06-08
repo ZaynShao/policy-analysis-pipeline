@@ -134,6 +134,19 @@ def _run_channel(ch, cfg: IncrementalConfig, dedup, llm_fn) -> dict:
     if cfg.dry_run:
         return {"channel": label, "scanned": n_scan, "kept": kept, "ingested": 0}
     fetch_candidates(cand, sd / "fetch", sd / "quar" / f"{label}__ferr.txt")
+    ferr = sd / "quar" / f"{label}__ferr.txt"
+    if ferr.exists():
+        for u in ferr.read_text(encoding="utf-8").split("\n"):
+            if not u.strip():
+                continue
+            try:
+                review_pool.append({
+                    "kind": "fetch_fail", "ref": u.strip(),
+                    "reason": "fetch_error_after_retry", "suggested_action": "retry",
+                    "confidence": None, "evidence": "", "channel": label,
+                    "run_label": label})
+            except Exception as e:
+                print(f"  [pool-write 失败] fetch_fail: {str(e)[:80]}")
     extract_all(sd / "fetch", sd / "ext", sd / "quar" / f"{label}__s45.jsonl")
     n_pass, n_comm, n_rej, n_review = _gate_extracted_dir(
         sd / "ext", sd / "passed", sd / "comm_ext",
