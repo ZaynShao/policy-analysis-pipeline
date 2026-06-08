@@ -1,7 +1,10 @@
 from pathlib import Path
 import datetime
 import json
+import sys
+import types
 from scripts.sync.run_sync import collect_policy_rows, collect_relation_rows, build_summary
+from scripts.sync import run_sync as run_sync_mod
 
 def _write_bv(vault: Path, pid: str):
     d = vault / "_meta" / "business_view"
@@ -94,3 +97,68 @@ def test_build_summary():
     s = build_summary(synced=10, skipped_override=2, relations=5,
                       errors=["e1"], skipped_invalid=3)
     assert s["skipped_invalid_count"] == 3
+
+
+class FakeRunConn:
+    def __init__(self):
+        self.commits = 0
+        self.closed = False
+
+    def commit(self):
+        self.commits += 1
+
+    def close(self):
+        self.closed = True
+
+
+def test_run_writes_notification_when_errors(tmp_path, monkeypatch):
+    conn = FakeRunConn()
+    executed = []
+    monkeypatch.setitem(sys.modules, "psycopg2", types.SimpleNamespace(connect=lambda _: conn))
+    monkeypatch.setattr(run_sync_mod, "collect_policy_rows",
+                        lambda vault, version: ([{"pipeline_pid": "P_A"}], []))
+    monkeypatch.setattr(run_sync_mod, "collect_relation_rows", lambda vault, version: [])
+    monkeypatch.setattr(run_sync_mod.pg_writer, "build_policy_upsert",
+                        lambda row: ("INSERT Policy", {"pid": row["pipeline_pid"]}))
+    monkeypatch.setattr(run_sync_mod.pg_writer, "build_notification_insert",
+                        lambda **kw: ("INSERT INTO \"Notification\"", kw))
+
+    def fake_execute(conn_arg, sql, params):
+        executed.append(sql)
+        if sql == "INSERT Policy":
+            raise RuntimeError("policy failed")
+
+    monkeypatch.setattr(run_sync_mod.pg_writer, "execute_with_savepoint", fake_execute)
+
+    summary = run_sync_mod.run(tmp_path, tmp_path / "state", 1, "postgres://fake")
+
+    assert any('"Notification"' in sql for sql in executed)
+    assert summary["errors"] == ["policy P_A: policy failed"]
+    assert conn.commits == 2
+    assert conn.closed is True
+
+
+def test_run_records_notification_write_failure(tmp_path, monkeypatch):
+    conn = FakeRunConn()
+    monkeypatch.setitem(sys.modules, "psycopg2", types.SimpleNamespace(connect=lambda _: conn))
+    monkeypatch.setattr(run_sync_mod, "collect_policy_rows",
+                        lambda vault, version: ([{"pipeline_pid": "P_A"}], []))
+    monkeypatch.setattr(run_sync_mod, "collect_relation_rows", lambda vault, version: [])
+    monkeypatch.setattr(run_sync_mod.pg_writer, "build_policy_upsert",
+                        lambda row: ("INSERT Policy", {"pid": row["pipeline_pid"]}))
+    monkeypatch.setattr(run_sync_mod.pg_writer, "build_notification_insert",
+                        lambda **kw: ("INSERT INTO \"Notification\"", kw))
+
+    def fake_execute(conn_arg, sql, params):
+        if sql == "INSERT Policy":
+            raise RuntimeError("policy failed")
+        if '"Notification"' in sql:
+            raise RuntimeError("notify failed")
+
+    monkeypatch.setattr(run_sync_mod.pg_writer, "execute_with_savepoint", fake_execute)
+
+    summary = run_sync_mod.run(tmp_path, tmp_path / "state", 1, "postgres://fake")
+
+    assert "policy P_A: policy failed" in summary["errors"]
+    assert "notification write failed: notify failed" in summary["errors"]
+    assert conn.closed is True

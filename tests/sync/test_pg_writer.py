@@ -90,3 +90,12 @@ def test_execute_with_savepoint_rolls_back_and_reraises_on_failure():
     with pytest.raises(RuntimeError):
         execute_with_savepoint(conn, "INSERT bad", {"x": 1})
     assert conn.seen == ["SAVEPOINT sp", "INSERT bad", "ROLLBACK TO SAVEPOINT sp"]
+
+def test_build_notification_insert():
+    from scripts.sync.pg_writer import build_notification_insert
+    sql, params = build_notification_insert(level="ERROR", title="run_sync 失败", body="2 errors", source="sync")
+    assert '"Notification"' in sql
+    assert 'gen_random_uuid()::text' in sql
+    assert '"createdAt"' not in sql
+    assert '::"NotificationLevel"' in sql
+    assert params["level"] == "ERROR" and params["source"] == "sync"

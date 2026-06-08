@@ -131,6 +131,18 @@ def run(vault: Path, state_dir: Path, pipeline_version: int, database_url: str) 
             except Exception as e:
                 errors.append(f"relation {row['from_pid']}->{row['to_pid']}: {e}")
         conn.commit()
+        if errors:
+            try:
+                title = f"run_sync 失败:{len(errors)} 条错误"
+                body = ("; ".join(errors))[:1000]
+                if skipped_rows:
+                    body += f"(另 skipped_invalid={len(skipped_rows)})"
+                nsql, nparams = pg_writer.build_notification_insert(
+                    level="ERROR", title=title, body=body, source="sync")
+                pg_writer.execute_with_savepoint(conn, nsql, nparams)
+                conn.commit()
+            except Exception as e:          # 写消息失败绝不崩 sync
+                errors.append(f"notification write failed: {e}")
     finally:
         conn.close()
     summary = build_summary(synced, 0, rel_synced, errors,
