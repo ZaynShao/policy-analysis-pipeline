@@ -119,6 +119,34 @@ Mac 仍产 vault(经 git/rsync 上服务器)→ 容器读 → heng-pg</div>
 </table>
 <p>所以:<b>保持独立仓 + 一道契约测试,就拿到了并仓 90% 的收益,而没有治理/速度/边界的代价。</b></p>
 
+<h2>4.5 为什么"同机"不需要"并仓"(2026-06-08 问答固化)</h2>
+<p>常见误解:<i>"如果 L1/L2 迟早跟 hengguan 跑在同一台机器上,那是不是必须把 pipeline 代码并进 hengguan 仓?否则同一系统上两个 repo 同时更新会乱。"</i> —— 这里把<b>两件互相独立的事</b>当成一件了:</p>
+<table>
+<tr><th>动作</th><th>含义</th><th>本设计的裁决</th></tr>
+<tr><td><b>同机部署(co-deploy)</b></td><td>L1/L2 的代码跑在同一台<b>机器</b>上(和 hengguan 容器并排)</td><td><span class="pill green">可以,本就如此</span>已作为容器跑在同台、同 <code>platform-net</code></td></tr>
+<tr><td><b>并仓(monorepo)</b></td><td>pipeline 的<b>代码</b>合进 hengguan 的 <b>git 仓</b>、走它的提交/治理流程</td><td><span class="pill red">不需要</span>§3-B/§4 已否</td></tr>
+</table>
+<p><b>"同机 ⇒ 必须并仓"这个因果不成立。</b></p>
+<div class="flag ok"><b>两个 git 仓在同一台机器上 = 完全正常、零冲突。</b> git 是<b>按目录</b>管的:
+<div class="diagram">/root/policy-pipeline/   ← 自己的 .git,remote = ZaynShao/policy-analysis-pipeline
+/root/safety-platform/   ← 自己的 .git,remote = hengguan</div>
+两个目录、两套 <code>.git</code>、两个 remote、两套历史,文件系统层面互不知道对方存在。各自 <code>git pull</code> 各自的远端,<b>根本碰不到一起</b>——不存在"同时更新冲突"。这是任何服务器的常态(nginx 配置仓、应用仓、dotfiles 仓早就并存)。</div>
+<p><b>真正需要协调的是"运行时契约",不是"代码仓":</b></p>
+<table>
+<tr><th>共享资源</th><th>契约(耦合点)</th></tr>
+<tr><td>heng-pg</td><td>run_sync 写库必须符合 hengguan 的 Prisma schema(=列名对账教训 CONTRACT-REL-1)</td></tr>
+<tr><td>vault</td><td>vault 目录格式是契约</td></tr>
+<tr><td>docker 网络 <code>safety-platform_platform-net</code></td><td>两边 compose 各自引用同一 external network 即可并排跑</td></tr>
+</table>
+<p>这些耦合<b>无论代码在不在一个仓里都存在</b>。并仓<b>并不能</b>让"schema 改了 run_sync 自动跟上"——该对账还得对账。所以正解是 §4 的<b>契约测试</b>守住 schema 这条线,而非并仓。</p>
+<div class="flag"><b>并仓唯一的真好处 vs 代价(诚实摊开):</b>
+<ul>
+<li><b>唯一真好处</b>:一个 PR 能<b>原子地</b>同时改 schema + run_sync(消除"hengguan 改了列、pipeline 还没跟上"的窗口期)。</li>
+<li><b>代价</b>:pipeline 整个被拖进 hengguan 的 PR-gate(过 <code>@gloriahao0909</code>、<code>[DB-MIGRATION]</code> 标、CODEOWNERS),且和边界规则"模块走 API"直接冲突(run_sync 直连库)。</li>
+<li><b>权衡</b>:那个"原子跨切面改动"一年遇不上几次,契约测试 + 对账纪律足够覆盖;为它把整个 pipeline 塞进别人的 PR 闸门,不划算。</li>
+</ul></div>
+<div class="flag ok"><b>纠正前提:</b> 架构 C 里 L1/L2 的 producer 是<b>国内常开开发机</b>,<b>不是</b> Tokyo/hengguan 那台服务器(Tokyo 是消费端:run_sync→heng-pg→前端;且 WeChat/RSS token 须境内 IP,Tokyo 跑不了)。所以"L1/L2 搬到 hengguan 服务器"这个画面本身不会发生——它们搬去的是<b>国内那台机</b>,跟 hengguan 仓更是两码事。而 <b>Stage 1 根本还没搬生成</b>(只换 vault 传输 + run_sync 调度化),搬生成是后面的 C2/C3。</div>
+
 <h2>5. 推荐路线(分阶段)</h2>
 <table>
 <tr><th>Stage</th><th>做什么</th><th>动哪个决策</th><th>风险</th></tr>
