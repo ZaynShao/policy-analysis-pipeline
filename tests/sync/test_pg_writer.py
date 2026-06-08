@@ -95,7 +95,17 @@ def test_build_notification_insert():
     from scripts.sync.pg_writer import build_notification_insert
     sql, params = build_notification_insert(level="ERROR", title="run_sync 失败", body="2 errors", source="sync")
     assert '"Notification"' in sql
+    assert '"targetUserId"' in sql
     assert 'gen_random_uuid()::text' in sql
     assert '"createdAt"' not in sql
     assert '::"NotificationLevel"' in sql
     assert params["level"] == "ERROR" and params["source"] == "sync"
+    assert params["target_user_id"] is None
+
+def test_build_notification_insert_targets_user_id():
+    from scripts.sync.pg_writer import build_notification_insert
+    sql, params = build_notification_insert(level="ERROR", title="run_sync 失败", body="2 errors",
+                                            source="sync", target_user_id="gloriahao")
+    assert '"Notification"' in sql
+    assert '"targetUserId"' in sql
+    assert params["target_user_id"] == "gloriahao"
