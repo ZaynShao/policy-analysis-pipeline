@@ -36,6 +36,7 @@ def main(argv=None) -> int:
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("--vault-dir", required=True)
+    ap.add_argument("--pipeline-dir", required=True)
     ap.add_argument("--compose-file", required=True)
     ap.add_argument("--container-vault", default="/vault")
     ap.add_argument("--container-state", default="/state")
@@ -63,7 +64,7 @@ def main(argv=None) -> int:
         vault=args.container_vault, state=args.container_state,
         version=args.pipeline_version,
     )
-    proc = subprocess.run(cmd, cwd="/root/policy-pipeline")
+    proc = subprocess.run(cmd, cwd=args.pipeline_dir)
     print(f"[{ts}] run_sync exit={proc.returncode}")
     return proc.returncode
 
