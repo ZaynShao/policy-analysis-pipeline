@@ -92,6 +92,36 @@ def collect_relation_rows(vault: Path, pipeline_version: int) -> list[dict]:
     return rows
 
 
+def collect_commentary_rows(vault: Path, pipeline_version: int) -> list[dict]:
+    rows = []
+    fp = Path(vault) / "1_extracted" / "commentary_signals.jsonl"
+    if not fp.exists():
+        return rows
+    for line in fp.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        d = json.loads(line)
+        cid = d.get("commentary_id")
+        if not cid:
+            continue  # 无幂等键的跳过
+        rows.append({
+            "commentary_id": cid,
+            "title": d.get("title") or "",
+            "evidence": d.get("evidence"),
+            "signal_role": d.get("signal_role"),
+            "confidence": d.get("confidence"),
+            "source_account": d.get("source_account"),
+            "business_tag": d.get("business_tag") or None,
+            # jsonb 字段序列化为 JSON 字符串；软引用：related 原样不解析
+            "theme_ids": json.dumps(d.get("theme_ids") or [], ensure_ascii=False),
+            "related_policy_pids": json.dumps(d.get("related_policy_ids") or [], ensure_ascii=False),
+            "source_path": d.get("path") or d.get("sanitized_from"),
+            "pipeline_version": pipeline_version,
+        })
+    return rows
+
+
 def build_summary(synced: int, skipped_override: int, relations: int, errors: list[str],
                   skipped_invalid: int = 0) -> dict:
     return {
