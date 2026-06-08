@@ -49,15 +49,18 @@ def main(pool_path=POOL, sink=VERDICTS_SINK):
         cur = conn.cursor()
         cur.execute(
             'SELECT "pipelineRef","pipelineKind","verdict","corrections",'
-            '"reviewer","note","runLabel","verdictAt" '
+            '"reviewer","note","verdictAt" '
             'FROM "L1ReviewQueue" '
             'WHERE "verdict" IS NOT NULL AND "syncedBack" = false')
         n = 0
-        for ref, kind, verdict, corrections, reviewer, note, run_label, vat in cur.fetchall():
+        for ref, kind, verdict, corrections, reviewer, note, vat in cur.fetchall():
+            # decided_run 用 verdictAt(人裁决时刻),使 idem_key=kind:ref:verdictAt
+            # 稳定且每次裁决唯一;不用 runLabel(那是 pipeline 入池标签)。
+            decided = vat.isoformat() if vat else ""
             raw = {"ref": ref, "kind": kind, "verdict": verdict,
                    "corrections": corrections, "reviewer": reviewer,
-                   "note": note, "decided_run": run_label}
-            env = wrap_verdict(raw, decided_at=(vat.isoformat() if vat else ""))
+                   "note": note, "decided_run": decided}
+            env = wrap_verdict(raw, decided_at=decided)
             if persist_envelope(sink, env):
                 remove_from_pool(Path(pool_path), kind, ref)  # 继承语义②
                 cur.execute(

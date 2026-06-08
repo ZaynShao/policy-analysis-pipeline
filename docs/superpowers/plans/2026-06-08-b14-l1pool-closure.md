@@ -443,6 +443,7 @@ git commit -m "docs(b14): applier handoff 接口契约(verdicts.jsonl → L1 per
 ## Part 2 — 衡观审核页 `[衡观-spec]` · 出 spec 交前端团队
 
 > 非本 session 写码;以下是给前端团队的精确实现 spec。照现成 PolicyDrawer(审核流)、Notification(新表)、DeepseekService(叙述)、VisitList(MANAGER 门控)模式。
+> **独立 handoff(发前端团队直接用,自包含):`docs/B14-衡观页-handoff-2026-06-08.md`。** 下文为同内容摘要。
 
 **2.1 Prisma 新表**(`services/heng-guan/backend/prisma/schema.prisma`):
 ```prisma
