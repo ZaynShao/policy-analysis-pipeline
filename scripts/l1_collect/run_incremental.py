@@ -64,6 +64,7 @@ def _gate_extracted_dir(ext_dir: Path, passed_dir: Path, comm_dir: Path,
                         run_label: str = "") -> tuple:
     passed_dir.mkdir(parents=True, exist_ok=True)
     comm_dir.mkdir(parents=True, exist_ok=True)
+    review_dir.mkdir(parents=True, exist_ok=True)
     n_pass = n_comm = n_rej = n_review = 0
     rejects: list = []
     for jf in sorted(ext_dir.glob("*.json")):
@@ -79,7 +80,6 @@ def _gate_extracted_dir(ext_dir: Path, passed_dir: Path, comm_dir: Path,
                                             encoding="utf-8")
             n_comm += 1
         elif gr.action == "review_queue":
-            review_dir.mkdir(parents=True, exist_ok=True)
             (review_dir / jf.name).write_text(jf.read_text(encoding="utf-8"),
                                               encoding="utf-8")
             try:
@@ -137,7 +137,8 @@ def _run_channel(ch, cfg: IncrementalConfig, dedup, llm_fn) -> dict:
     extract_all(sd / "fetch", sd / "ext", sd / "quar" / f"{label}__s45.jsonl")
     n_pass, n_comm, n_rej, n_review = _gate_extracted_dir(
         sd / "ext", sd / "passed", sd / "comm_ext",
-        sd / "quar" / "gate_rejects.jsonl", llm_fn, run_label=label)
+        sd / "quar" / "gate_rejects.jsonl", llm_fn,
+        review_dir=sd / "review", run_label=label)
     ing_ok, _ = ingest_extracted(sd / "passed", sd / "ingest" / f"{label}.jsonl")
     try:
         n_comm_ing = _ingest_commentary(sd / "comm_ext", sd / "comm_stage")
