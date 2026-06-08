@@ -206,5 +206,17 @@
 
 **触发条件**:继续 ②-B 全量重生、启动 ③分析重生、或启动 ④消费层之前。**下一步**:做小范围 `commentary_signals` 闭环,再处理 market_intel representation。
 
+## B15 · L1 人工池 ↔ B14 接口
+
+**是什么**:L1 已落 4 个源质量池的进池 IN(gate/checkpoint/sweep/fetch_fail → `state/l1_review/pool.jsonl`,见 `scripts/l1_collect/review_pool.py`)+ OUT 契约(每 kind 裁决枚举 `review_pool.VERDICTS`)。**消费者(回灌 applier)+ 人交互面 = B14**(服务化线甩出的「人工审核线」,独立 session)。过渡期回灌用现有 oneshots(`promote_checkpoint_channels` / `sweep_existing_commentary APPLY`)。
+
+**捡起时**:B14 协议落地后,L1 加回灌消费者(按 `{ref,kind,verdict,...}` 消费,各 kind apply 见 spec OUT 契约表 `docs/superpowers/specs/2026-06-08-l1机制完善-design.md`)。handoff:`docs/B14-handoff-L1源质量池-2026-06-08.md`。
+
+**核验门标记法 ✅ 已修(2026-06-08)**:`_institution_match` 改 host 行政区(省/市拼音段)+ marker 双信号,消除 CHECKPOINT 手工提升依赖。
+
+**深度反爬 推后**:`swt.hebei` 类反爬站浅层(重试一次+失败入池)已做;UA轮换/代理/headless 归服务线。
+
+**注**:B13/B14 由服务化线占用,本项跳号 B15 避合并冲突。
+
 ---
-_登记于 2026-05-30。新增推后项往下追加,不删旧项;做掉的标 ✅ done 并注日期。B2–B5 登记于 2026-05-31。B6–B7 登记于 2026-05-31(采集未补齐 + 2线可操作 + 盲区反馈环)。B8 登记于 2026-05-31(②-A 71 入队残留)。B9 登记于 2026-05-31(月报原型退役 + 乡村去污染)。B10 登记于 2026-06-01(③分析=关系/演进/区域,现存8文件但 stale 待重生,依赖②)。B11 登记于 2026-06-02(②-B 人工确认池 + 全局硬化回流)。B12 登记于 2026-06-03(三源接线 + 旧 business_view 消费隔离)。_
+_登记于 2026-05-30。新增推后项往下追加,不删旧项;做掉的标 ✅ done 并注日期。B2–B5 登记于 2026-05-31。B6–B7 登记于 2026-05-31(采集未补齐 + 2线可操作 + 盲区反馈环)。B8 登记于 2026-05-31(②-A 71 入队残留)。B9 登记于 2026-05-31(月报原型退役 + 乡村去污染)。B10 登记于 2026-06-01(③分析=关系/演进/区域,现存8文件但 stale 待重生,依赖②)。B11 登记于 2026-06-02(②-B 人工确认池 + 全局硬化回流)。B12 登记于 2026-06-03(三源接线 + 旧 business_view 消费隔离)。B15 登记于 2026-06-08(L1 4 池 IN+OUT 契约,消费者/交互归 B14;核验门✅修;深度反爬推后;跳过服务化线占用的 B13/B14)。_
