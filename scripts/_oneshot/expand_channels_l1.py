@@ -44,6 +44,13 @@ def main() -> None:
         discovered.append(ch)
         print(f"  {ch.level:4s} {ch.status.value:3s} {ch.root_domain:26s} {ch.list_url}")
 
+    from scripts.l1_collect import review_pool
+    for c in discovered:
+        if c.status == ChannelStatus.候选:
+            try:
+                review_pool.append(review_pool.candidate_entry(c))
+            except Exception as e:
+                print(f"  [pool-write 失败] checkpoint/{c.root_domain}: {str(e)[:80]}")
     save_catalog(existing + discovered, CAT)
     print("=" * 56)
     v = sum(1 for c in discovered if c.status == ChannelStatus.验证)

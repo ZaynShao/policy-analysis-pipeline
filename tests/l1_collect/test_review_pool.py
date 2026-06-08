@@ -35,3 +35,16 @@ def test_summarize_counts_by_kind(tmp_path):
 
 def test_load_missing_returns_empty(tmp_path):
     assert rp.load(pool_path=tmp_path / "nope.jsonl") == []
+
+
+from scripts.l1_collect.channel_catalog import Channel, ChannelStatus
+
+
+def test_candidate_entry_shape():
+    from scripts.l1_collect import review_pool as rp
+    ch = Channel(city="浙江省商务厅", province="浙江省", level="省", city_code="330000",
+                 channel_type="商务", root_domain="x.zj.gov.cn", list_url="http://x.zj.gov.cn/l",
+                 source="discovery", status=ChannelStatus.候选)
+    e = rp.candidate_entry(ch)
+    assert e["kind"] == "checkpoint" and e["ref"] == "x.zj.gov.cn"
+    assert e["suggested_action"] == "promote" and "商务" in e["evidence"]

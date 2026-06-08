@@ -46,6 +46,14 @@ def append(entry: dict, pool_path: Path = POOL) -> bool:
     return True
 
 
+def candidate_entry(ch) -> dict:
+    """discovery 候选 Channel → 池条目(kind=checkpoint)。"""
+    return {"kind": "checkpoint", "ref": ch.root_domain,
+            "reason": "discovery_candidate_unverified", "suggested_action": "promote",
+            "confidence": None, "evidence": f"{ch.channel_type} {ch.city} {ch.list_url}"[:80],
+            "channel": ch.city, "run_label": "discovery"}
+
+
 def summarize(pool_path: Path = POOL) -> dict:
     out: dict = {}
     for r in load(pool_path):
