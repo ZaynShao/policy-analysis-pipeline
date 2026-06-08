@@ -119,7 +119,8 @@ _PROV_TOKENS = {
 }
 # 加油线 10 重点市国标码 → gov 域拼音段(缩写+全拼)
 _CITY_TOKENS = {
-    "441900": ("dg", "dongguan"), "440600": ("fs", "foshan"), "330400": ("jx", "jiaxing"),
+    "441900": ("dg", "dongguan"), "440600": ("fs", "foshan"),
+    "330400": ("jiaxing",),  # 不用 jx:与江西省 jx 段冲突;jiaxing 全拼足够,漏判则落候选/池人工提升
     "330300": ("wz", "wenzhou"), "350500": ("qz", "quanzhou"), "320600": ("nt", "nantong"),
     "370600": ("yt", "yantai"), "370700": ("wf", "weifang"), "320400": ("cz", "changzhou"),
     "441300": ("hz", "huizhou"),
