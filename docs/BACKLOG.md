@@ -206,8 +206,21 @@
 
 **触发条件**:继续 ②-B 全量重生、启动 ③分析重生、或启动 ④消费层之前。**下一步**:做小范围 `commentary_signals` 闭环,再处理 market_intel representation。
 
----
+## B15 · L1 人工池 ↔ B14 接口
 
+**是什么**:L1 已落 4 个源质量池的进池 IN(gate/checkpoint/sweep/fetch_fail → `state/l1_review/pool.jsonl`,见 `scripts/l1_collect/review_pool.py`)+ OUT 契约(每 kind 裁决枚举 `review_pool.VERDICTS`)。**消费者(回灌 applier)+ 人交互面 = B14**(服务化线甩出的「人工审核线」,独立 session)。过渡期回灌用现有 oneshots(`promote_checkpoint_channels` / `sweep_existing_commentary APPLY`)。
+
+**捡起时**:B14 协议落地后,L1 加回灌消费者(按 `{ref,kind,verdict,...}` 消费,各 kind apply 见 spec OUT 契约表 `docs/superpowers/specs/2026-06-08-l1机制完善-design.md`)。handoff:`docs/B14-handoff-L1源质量池-2026-06-08.md`。
+
+**核验门标记法 ✅ 已修(2026-06-08)**:`_institution_match` 改 host 行政区(省/市拼音段)+ marker 双信号,消除 CHECKPOINT 手工提升依赖。
+
+**深度反爬 推后**:`swt.hebei` 类反爬站浅层(重试一次+失败入池)已做;UA轮换/代理/headless 归服务线。
+
+**B14 继承的两条语义(本线落盘暴露,终审记)**:① `state/T1_incremental/review/` 暂存项 GC 归 B14(IN-only 不自清,消费/回灌后才删);② 池按 `(kind,ref)` 去重、无"已解决"态 → 排空前计数单调偏高,消费者须**重新核验**(如 `fetch_fail` 重抓确认成功则 drop,而非盲信仍失败)。
+
+**注**:B13/B14 由服务化线占用,本项跳号 B15 避合并冲突。
+
+---
 ## B13 — CONTRACT-REL-1:③ canonical 关系格式 ↔ 服务化 sync relation_mapper 对账 ✅ done 2026-06-07
 
 **✅ 已解(2026-06-07,commit `a6aba37`)**:③ 关系层已 apply 进 vault(HEAD `a6fb3c09`),关系=单文件 `1_extracted/relations/relations_canonical.jsonl`(字段 `from`/`to`/`rel`/`confidence`/`evidence`,1138 条,rel 词表 8 类全 ∈ VALID_RELATION_TYPES,仅缺 conflicts_with;`from`/`to` 全 P_ pid;evidence str)。修法=`collect_relation_rows` 读取边界把 `from`/`to`/`rel` 归一为 `from_pid`/`to_pid`/`relation_type`,`map_relation` 一字未动(3 测试覆盖 canonical/未知 rel/残缺行)。本地彩排实证:relation **998 行**落库(canonical 1138 中两端都在已同步 767 政策内的;140 条某端不在被丢=正确)。↓ 原始延后记录:
@@ -233,4 +246,4 @@
 **分阶段**:阶段0(现在)= 理解 + 进一步盘点(全仓 pipeline/vault/safety-platform/BACKLOG 找全)出 HTML;阶段1(等 L1 采集修复机制 Task11/12 落盘后)= 基于真实残留评估 + 设计交互面+回灌管道 + 建。**非阻塞·上生产前定下来**(否则池带上线无人消费)。可独立 session 做。
 
 ---
-_登记于 2026-05-30。新增推后项往下追加,不删旧项;做掉的标 ✅ done 并注日期。B2–B5 登记于 2026-05-31。B6–B7 登记于 2026-05-31(采集未补齐 + 2线可操作 + 盲区反馈环)。B8 登记于 2026-05-31(②-A 71 入队残留)。B9 登记于 2026-05-31(月报原型退役 + 乡村去污染)。B10 登记于 2026-06-01(③分析=关系/演进/区域,现存8文件但 stale 待重生,依赖②)。B11 登记于 2026-06-02(②-B 人工确认池 + 全局硬化回流)。B12 登记于 2026-06-03(三源接线 + 旧 business_view 消费隔离)。B13 登记于 2026-06-06(CONTRACT-REL-1:③ canonical 关系格式 vs 服务化 sync relation_mapper 对账,延后到 ③关系 apply 进 vault;服务化部署线 feat/service-deploy)→ ✅ done 2026-06-07。B14 登记于 2026-06-07(人工处理/反馈机制交互设计·盘点先行·等 L1 机制落盘·独立 session)。_
+_登记于 2026-05-30。新增推后项往下追加,不删旧项;做掉的标 ✅ done 并注日期。B2–B5 登记于 2026-05-31。B6–B7 登记于 2026-05-31(采集未补齐 + 2线可操作 + 盲区反馈环)。B8 登记于 2026-05-31(②-A 71 入队残留)。B9 登记于 2026-05-31(月报原型退役 + 乡村去污染)。B10 登记于 2026-06-01(③分析=关系/演进/区域,现存8文件但 stale 待重生,依赖②)。B11 登记于 2026-06-02(②-B 人工确认池 + 全局硬化回流)。B12 登记于 2026-06-03(三源接线 + 旧 business_view 消费隔离)。B13 登记于 2026-06-06(CONTRACT-REL-1:③ canonical 关系格式 vs 服务化 sync relation_mapper 对账,延后到 ③关系 apply 进 vault;服务化部署线 feat/service-deploy)→ ✅ done 2026-06-07。B14 登记于 2026-06-07(人工处理/反馈机制交互设计·盘点先行·等 L1 机制落盘·独立 session)。B15 登记于 2026-06-08(L1 4 池 IN+OUT 契约,消费者/交互归 B14;核验门✅修;深度反爬推后;跳过服务化线占用的 B13/B14)。_

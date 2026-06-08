@@ -50,8 +50,16 @@ def looks_like_list_page(html: str) -> bool:
     return False
 
 
-def probe_url(url: str) -> ProbeResult:
-    now = datetime.now(CST).isoformat(timespec="seconds")
+def _render_html(url: str) -> str:
+    """firecrawl 渲染兜底（选C：probe 与 scan 同走分层兜底，复用 step2_scan 的 v1 调用）。"""
+    try:
+        from .step2_scan import _firecrawl_get_html
+        return _firecrawl_get_html(url)
+    except Exception:
+        return ""
+
+
+def _probe_bs4(url: str, now: str) -> ProbeResult:
     try:
         resp = requests.get(url, headers={"User-Agent": UA}, timeout=TIMEOUT)
     except Exception as e:
@@ -75,3 +83,23 @@ def probe_url(url: str) -> ProbeResult:
         url=url, http_status=resp.status_code, page_has_list_pattern=has_list,
         verdict="ok" if has_list else "structure_unknown", probed_at=now,
     )
+
+
+def _maybe_firecrawl(url: str, bs4_result: ProbeResult, now: str) -> ProbeResult:
+    """BS4 非 ok（JS空壳/反爬/结构未确认）→ firecrawl 渲染再判列表结构。
+    渲染出列表 → ok(标 via_firecrawl)；否则保留 BS4 原判（不掩盖真失败）。"""
+    html = _render_html(url)
+    if html and looks_like_list_page(html):
+        return ProbeResult(
+            url=url, http_status=bs4_result.http_status, page_has_list_pattern=True,
+            verdict="ok", error="via_firecrawl", probed_at=now,
+        )
+    return bs4_result
+
+
+def probe_url(url: str, use_firecrawl: bool = True) -> ProbeResult:
+    now = datetime.now(CST).isoformat(timespec="seconds")
+    bs4_result = _probe_bs4(url, now)
+    if bs4_result.verdict == "ok" or not use_firecrawl:
+        return bs4_result
+    return _maybe_firecrawl(url, bs4_result, now)

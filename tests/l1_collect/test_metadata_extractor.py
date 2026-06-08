@@ -20,6 +20,17 @@ def test_extract_date_from_url_pattern():
     assert extract_date("https://www.gov.cn/zhengce/2024-08/15/content_xxx.html") == "2024-08-15"
 
 
+def test_extract_date_compact_url_format():
+    """/YYYYMM/tYYYYMMDD_ 紧凑格式(政府站常见,原delimited正则抓不到) → 抽到日期。"""
+    assert extract_date(
+        "https://fgw.shanxi.gov.cn/zcfb/zcjd/202505/t20250527_984313") == "2025-05-27"
+
+
+def test_extract_date_compact_rejects_invalid_month_day():
+    """紧凑匹配但月/日越界(20251340) → 不采用,回落(空)。"""
+    assert extract_date("https://x.gov.cn/202513/t20251340_1") == ""
+
+
 def test_extract_date_from_body_chinese():
     body = "...本通知自2025年3月1日起施行..."
     assert extract_date("", body=body) == "2025-03-01"

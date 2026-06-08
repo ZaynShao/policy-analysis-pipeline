@@ -3,11 +3,11 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from .ingester import ingest_one, validate_with_schema
+from .ingester import ingest_one, validate_with_schema, POLICIES_DIR
 
 
-def ingest_extracted(in_dir: Path, ingest_log: Path) -> tuple:
-    """返回 (ingested, failed)。"""
+def ingest_extracted(in_dir: Path, ingest_log: Path, out_dir: Path = None) -> tuple:
+    """返回 (ingested, failed)。out_dir 覆盖写入目录(默认 POLICIES_DIR)。"""
     ingested = 0
     failed = 0
     logs: list = []
@@ -24,6 +24,7 @@ def ingest_extracted(in_dir: Path, ingest_log: Path) -> tuple:
                 province=row.get("province") or None,
                 channel_type=row.get("channel_type") or None,
                 via=row.get("via", "trafilatura"),
+                out_dir=out_dir or POLICIES_DIR,
             )
             ok = validate_with_schema(md_path)
             if not ok:

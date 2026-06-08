@@ -44,5 +44,52 @@ def test_probe_url_ok(mock_get):
 @patch("scripts.l1_collect.connectivity_probe.requests.get")
 def test_probe_url_http_error(mock_get):
     mock_get.side_effect = Exception("ConnectionError")
-    result = probe_url("https://nonexistent.gov.cn/x")
+    result = probe_url("https://nonexistent.gov.cn/x", use_firecrawl=False)
     assert result.verdict == "http_error"
+
+
+_LIST_HTML = ('<ul><li><a href="/1.html">通知1</a> 2025-01-01</li>'
+              '<li><a href="/2.html">通知2</a> 2025-01-02</li>'
+              '<li><a href="/3.html">通知3</a> 2025-01-03</li></ul>')
+
+
+def test_probe_firecrawl_rescue(monkeypatch):
+    """BS4 拿到 JS 空壳(无列表) → firecrawl 渲染出列表 → verdict ok(via_firecrawl)。"""
+    from scripts.l1_collect import connectivity_probe as cp
+    shell = "<html><body><div id='app'></div></body></html>"
+    monkeypatch.setattr(cp.requests, "get",
+                        lambda *a, **k: MagicMock(status_code=200, text=shell))
+    monkeypatch.setattr(cp, "_render_html", lambda u: _LIST_HTML)
+    r = cp.probe_url("https://nea.gov.cn/policy/zxwj.htm")
+    assert r.verdict == "ok"
+    assert r.error == "via_firecrawl"
+    assert r.page_has_list_pattern is True
+
+
+def test_probe_firecrawl_keeps_bs4_when_still_no_list(monkeypatch):
+    """firecrawl 也渲不出列表 → 保留 BS4 原判(不掩盖真失败)。"""
+    from scripts.l1_collect import connectivity_probe as cp
+    shell = "<html><body>nothing here</body></html>"
+    monkeypatch.setattr(cp.requests, "get",
+                        lambda *a, **k: MagicMock(status_code=200, text=shell))
+    monkeypatch.setattr(cp, "_render_html", lambda u: "<html><body>still nothing</body></html>")
+    r = cp.probe_url("https://x.gov.cn/y")
+    assert r.verdict == "structure_unknown"
+
+
+def test_probe_no_firecrawl_when_disabled(monkeypatch):
+    """use_firecrawl=False → 不触发渲染兜底。"""
+    from scripts.l1_collect import connectivity_probe as cp
+    shell = "<html><body>nothing</body></html>"
+    monkeypatch.setattr(cp.requests, "get",
+                        lambda *a, **k: MagicMock(status_code=200, text=shell))
+    called = {"fc": False}
+
+    def fc(u):
+        called["fc"] = True
+        return ""
+
+    monkeypatch.setattr(cp, "_render_html", fc)
+    r = cp.probe_url("https://x.gov.cn/y", use_firecrawl=False)
+    assert r.verdict == "structure_unknown"
+    assert called["fc"] is False
