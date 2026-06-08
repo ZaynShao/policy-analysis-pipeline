@@ -22,7 +22,7 @@ def filter_scan_rows(
     dropped = 0
     out_lines: list = []
     quar_lines: list = []
-    for line in in_jsonl.read_text(encoding="utf-8").splitlines():
+    for line in in_jsonl.read_text(encoding="utf-8").split("\n"):
         if not line.strip():
             continue
         row = json.loads(line)
