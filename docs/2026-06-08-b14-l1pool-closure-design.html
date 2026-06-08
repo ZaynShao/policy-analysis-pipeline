@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B14 ⑦ L1 源质量池闭环 · 设计 + 路线 · 2026-06-08</title>
+<style>
+  :root{--bg:#0f1117;--surface:#1a1d27;--surface2:#20232f;--border:#2e3348;--text:#e2e8f0;--muted:#8892a4;--dim:#5a6478;--green:#22c55e;--green-d:#1a3a28;--red:#ef4444;--red-d:#3a1a1a;--orange:#f97316;--orange-d:#3a2010;--yellow:#eab308;--yellow-d:#332b00;--blue:#3b82f6;--blue-d:#1a2540;--purple:#a855f7;--purple-d:#2a1540;--teal:#14b8a6;--teal-d:#0a2520;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,'SF Pro Text','Segoe UI',sans-serif;font-size:14px;line-height:1.65;padding:40px 24px 80px}
+  .c{max-width:1100px;margin:0 auto}
+  h1{font-size:25px;color:#fff;margin-bottom:6px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:20px}
+  h2{font-size:17px;color:#fff;margin:34px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+  h3{font-size:14px;color:var(--text);margin:16px 0 6px}
+  p{margin-bottom:8px}
+  code{background:var(--surface2);padding:1px 5px;border-radius:3px;font-size:12px;font-family:'SF Mono',monospace}
+  .box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:14px}
+  .box.green{border-left:3px solid var(--green)} .box.red{border-left:3px solid var(--red)}
+  .box.orange{border-left:3px solid var(--orange)} .box.blue{border-left:3px solid var(--blue)}
+  .box.purple{border-left:3px solid var(--purple)} .box.teal{border-left:3px solid var(--teal)}
+  ul{margin:6px 0 6px 18px} li{margin-bottom:4px;color:var(--muted)} li b{color:var(--text)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  table{width:100%;border-collapse:collapse;margin:8px 0;font-size:12.5px}
+  th{background:var(--surface2);color:var(--muted);text-align:left;padding:8px 10px;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+  td{padding:8px 10px;border-top:1px solid var(--border);vertical-align:top;color:var(--muted)}
+  td b,td strong{color:var(--text)}
+  .flow{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px;margin:12px 0;font-family:'SF Mono',monospace;font-size:12px;line-height:1.9;overflow-x:auto;white-space:pre}
+  .tag{display:inline-block;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:600;white-space:nowrap}
+  .t-me{background:var(--blue-d);color:var(--blue)} .t-l1{background:var(--purple-d);color:var(--purple)} .t-svc{background:var(--teal-d);color:var(--teal)} .t-fe{background:var(--orange-d);color:var(--orange)}
+  .t-built{background:var(--green-d);color:var(--green)} .t-empty{background:var(--red-d);color:var(--red)} .t-green{background:var(--green-d);color:var(--green)}
+  .rec{color:var(--green);font-weight:600}
+  .decision{background:var(--surface);border:1px solid var(--yellow);border-left:3px solid var(--yellow);border-radius:10px;padding:16px 18px;margin-bottom:14px}
+  .decision h3{color:var(--yellow);margin-top:0}
+  .foot{margin-top:40px;padding-top:18px;border-top:1px solid var(--border);font-size:12px;color:var(--dim)}
+  .legend{font-size:12px;color:var(--muted);margin:6px 0 18px}
+  .legend .tag{margin-right:4px}
+</style>
+</head>
+<body>
+<div class="c">
+
+  <h1>B14 ⑦ · L1 源质量池闭环 — 设计 + 实施路线</h1>
+  <div class="sub">阶段1 · 2026-06-08 · 范围 = ⑦ 类 4 个 L1 源质量池(gate / checkpoint / sweep / fetch_fail)的 IN → 人判 → OUT 回灌闭环。<b>不含</b>其余 6 类(各自独立,按类逐一来)。</div>
+
+  <div class="legend">
+    <span class="tag t-me">B14=我</span> <span class="tag t-l1">L1 线</span> <span class="tag t-svc">service-deploy 线</span> <span class="tag t-fe">前端团队</span>
+    &nbsp;|&nbsp; <span class="tag t-built">已建</span> <span class="tag t-empty">空/未建</span>
+  </div>
+
+  <!-- 现实 -->
+  <h2>1 · 现实盘点(动手前先对齐,别照文字想象)</h2>
+  <div class="grid3">
+    <div class="box green">
+      <h3><span class="tag t-built">已建</span> L1 的"进池 + 契约"</h3>
+      <p style="font-size:12.5px;color:var(--muted)"><code>review_pool.py</code> 在 origin/main:append((kind,ref)去重)/load/summarize + <code>VERDICTS</code> 裁决枚举。IN 条目契约定死。B15 终审登记。</p>
+    </div>
+    <div class="box red">
+      <h3><span class="tag t-empty">空</span> 池子现在没数据</h3>
+      <p style="font-size:12.5px;color:var(--muted)"><code>state/l1_review/pool.jsonl</code> 不存在。真实残留还躺在老地方:十几个频道的 <code>ferr.txt</code>(fetch_fail)、<code>discover_checkpoint_2026-06-08.html</code>(checkpoint)。<b>残留非零,是没归集进新池。</b></p>
+    </div>
+    <div class="box red">
+      <h3><span class="tag t-empty">空地</span> "出"那半 = 我的活</h3>
+      <p style="font-size:12.5px;color:var(--muted)">标准信封 + 人交互面 + 回灌消费者,L1 明确留给 B14。过渡 oneshots 不读 verdict。一行没有。</p>
+    </div>
+  </div>
+
+  <div class="box orange">
+    <h3>⚠️ "上衡观"的真实成本(传输线调查结论)</h3>
+    <ul>
+      <li>现有同步是<b>单向 vault→衡观 Postgres</b>(<code>scripts/sync/run_sync.py</code> psycopg2 直写,Tokyo 服务器 cron),只搬 business_view→Policy、关系→PolicyRelation。</li>
+      <li>它<b>读 vault git</b>;L1 池在 pipeline <code>state/</code>(gitignore 运行产物)<b>不在它视野内</b>。</li>
+      <li><b>反向流(人判→回 pipeline)完全不存在。</b></li>
+      <li>那条同步线是 <span class="tag t-svc">service-deploy</span> 的地盘(你让我别碰)。</li>
+    </ul>
+    <p style="margin-top:8px">→ 结论:上衡观需要<b>新建一条双向传输</b>。我设计成<b>独立并行脚本</b>,复用 run_sync 的直连 PG 写法,但<b>不改</b> service-deploy 的 <code>run_sync</code>/<code>sync_tick</code>,避开撞线。</p>
+  </div>
+
+  <!-- 架构 -->
+  <h2>2 · 目标闭环架构</h2>
+  <div class="flow">  <span class="t-l1">[L1]</span> 采集/gate/sweep/fetch     <span class="t-me">[B14=我]</span>                      <span class="t-fe">[前端团队仓·我提PR]</span>
+        │                          │                                  │
+        ▼  append(去重)            │                                  │
+  state/l1_review/pool.jsonl ──────┼──► sync_l1_pool.py ──► PG 表 ─────┼──► 衡观 Vue 审核页
+        ▲                          │   (pool→PG,upsert)  L1ReviewQueue │    · DeepSeek 把每条讲人话
+        │                          │                          ▲        │    · 人选 verdict + note
+        │  ② backfill 老残留       │                          │        │    · builder 角色门控
+   ferr.txt / checkpoint HTML      │                          └────────┼──◄ PATCH 写 verdict 回 PG
+   (L1 的 IN 活)                   │                                   │
+        │                          ▼  poll_l1_verdicts.py ◄────────────┘
+        │                   verdicts.jsonl (标准信封)
+        ▼                          │
+   applier(L1 地盘,过渡 oneshots) ◄┘  按 kind apply:
+        → policies/ · commentaries/ · 渠道验证 · 重抓        守:消费时重核不盲信 / review GC / 判完删池行</div>
+
+  <!-- 信封 -->
+  <h2>3 · 标准信封(B14 owned · 跨池统一)</h2>
+  <p>L1 给的 OUT 记录是 <code>{ref, kind, verdict, corrections?, reviewer, note, decided_run}</code>。我在外面包一层跨池统一信封,补上 L1 没给的、闭环必需的:</p>
+  <table>
+    <tr><th>字段</th><th>来源</th><th>用途</th></tr>
+    <tr><td><code>envelope_v</code></td><td>B14</td><td>信封版本,跨池/跨类演进用</td></tr>
+    <tr><td><code>pool</code> = "l1_source_quality"</td><td>B14</td><td>哪个池来的(为将来别的类复用同一信封)</td></tr>
+    <tr><td><code>ref, kind, verdict, corrections?</code></td><td><span class="tag t-l1">L1</span></td><td>L1 的裁决语义,原样透传,我不动</td></tr>
+    <tr><td><code>reviewer, note</code></td><td>衡观(人填)</td><td>谁判的 + 备注</td></tr>
+    <tr><td><code>decided_at</code></td><td>B14 补</td><td>L1 缺的显式时间戳</td></tr>
+    <tr><td><code>idem_key</code> = <code>kind:ref:decided_run</code></td><td>B14 补</td><td>幂等键,回灌反复跑不重复 apply</td></tr>
+    <tr><td><code>applied, applied_at, apply_result</code></td><td>B14(消费者写)</td><td>回灌执行后回填,审计 + 防重</td></tr>
+  </table>
+
+  <!-- ownership -->
+  <h2>4 · 三线 ownership(谁建什么,别越界)</h2>
+  <table>
+    <tr><th>模块</th><th>归属</th><th>状态</th></tr>
+    <tr><td>进池 IN(4 kind 路由)+ VERDICTS 契约</td><td><span class="tag t-l1">L1</span></td><td><span class="tag t-built">已建</span></td></tr>
+    <tr><td>把老残留(ferr.txt/checkpoint)backfill 进 pool.jsonl</td><td><span class="tag t-l1">L1</span></td><td><span class="tag t-empty">待做</span></td></tr>
+    <tr><td>每 kind 的回灌 applier(只有 L1 知道能 apply 什么)</td><td><span class="tag t-l1">L1</span></td><td><span class="tag t-empty">待做·过渡 oneshots</span></td></tr>
+    <tr><td>标准信封 + 传输脚本(sync/poll)+ verdict sink + 消费者编排</td><td><span class="tag t-me">B14</span></td><td><span class="tag t-empty">本 plan 要建</span></td></tr>
+    <tr><td>衡观:表 + 模块 + Vue 页 + 叙述 + 门控</td><td><span class="tag t-me">B14</span>(代码)→ <span class="tag t-fe">PR 给前端团队</span></td><td><span class="tag t-empty">本 plan 要建</span></td></tr>
+    <tr><td><code>run_sync</code>/<code>sync_tick</code>/服务器 cron/DATABASE_URL 环境</td><td><span class="tag t-svc">service-deploy</span></td><td><span class="tag t-built">已建·我不碰只复用写法</span></td></tr>
+  </table>
+
+  <!-- 继承语义 -->
+  <h2>5 · 守住的两条继承语义(B15 终审)</h2>
+  <div class="grid2">
+    <div class="box purple">
+      <h3>① 消费时重核,不盲信</h3>
+      <p style="font-size:12.5px;color:var(--muted)">池按 (kind,ref) 去重、<b>无"已解决"态</b>。消费者 apply 前必须重新核验——如 <code>fetch_fail</code> 判 retry 后,<b>重抓确认成功才 drop</b>,不能盲信仍失败。判完<b>从池里删行</b>(否则计数单调偏高)。</p>
+    </div>
+    <div class="box purple">
+      <h3>② review/ 暂存 GC 归我</h3>
+      <p style="font-size:12.5px;color:var(--muted)"><code>state/T1_incremental/review/</code> 暂存项 IN-only 不自清,<b>消费/回灌后才删</b>。poll/applier 成功后负责 GC。</p>
+    </div>
+  </div>
+
+  <!-- 顺序 -->
+  <h2>6 · 实施顺序(三段,跨团队不能一个 session 合并)</h2>
+  <div class="box blue">
+    <h3>PR-A · 衡观侧 <span class="tag t-fe">safety-platform · PR 给 gloriahao0909</span></h3>
+    <p style="font-size:12.5px;color:var(--muted)">Prisma 新表 <code>L1ReviewQueue</code> + migration;NestJS 模块(GET 列未判 / PATCH 交 verdict)+ DeepSeek 叙述;Vue 审核页 + api + route + nav + 角色门控。<b>可独立起,对着 seed 数据建/演示,不依赖传输先通。</b>照现成 PolicyDrawer/Notification/DeepseekService 模式。</p>
+  </div>
+  <div class="box blue">
+    <h3>PR-B · pipeline 侧 <span class="tag t-me">我的仓(worktree 先 merge origin/main 拿 review_pool)</span></h3>
+    <p style="font-size:12.5px;color:var(--muted)"><code>scripts/sync/envelope.py</code>(标准信封)· <code>sync_l1_pool.py</code>(pool→PG upsert)· <code>poll_l1_verdicts.py</code>(PG→verdicts.jsonl,含重核 + GC + 删池行)· 交给 applier。<b>依赖 PR-A 的表结构定稿。</b></p>
+  </div>
+  <div class="box teal">
+    <h3>协调依赖(别的线交付,我标给他们)</h3>
+    <ul>
+      <li><span class="tag t-l1">L1</span>:把老残留 backfill 进 pool.jsonl;建正式 per-kind applier(过渡先用 oneshots)。</li>
+      <li><span class="tag t-svc">service-deploy</span>:知会新表 + 新脚本共享同一 DATABASE_URL/服务器 env(我并行不改它的 sync)。</li>
+    </ul>
+  </div>
+
+  <!-- 待决 -->
+  <h2>7 · 要你拍的 3 个决定(带我的建议)</h2>
+  <div class="decision">
+    <h3>决定 1 · 衡观角色门控(衡观没有"builder/技术"角色)</h3>
+    <p style="color:var(--muted)">衡观角色只有 OPERATOR / HQ_GA / FIELD_GA / MANAGER,没有"技术"这档。这几个是 builder 池,谁能看这页?</p>
+    <ul>
+      <li><span class="rec">建议(v0):门控到 MANAGER</span>——你本人是 业务+工具=MANAGER 级,先用现成角色最快,零 schema 改动。</li>
+      <li>备选:新增 <code>BUILDER</code> 角色(语义更干净,但要前端团队加枚举 + migration + 给账号授权)。</li>
+      <li>备选:平台账号白名单(像现有 SUPER_ACCOUNTS,硬编码几个人)。</li>
+    </ul>
+  </div>
+  <div class="decision">
+    <h3>决定 2 · 空池 → 拿什么建/验</h3>
+    <ul>
+      <li><span class="rec">建议:我 seed 几条真 fixture</span>(从 ferr.txt 的河北 swt.hebei 11 条 + checkpoint HTML 里抠真数据),建/演示用,不阻塞。L1 之后正式 backfill 全量。</li>
+      <li>备选:等 L1 先 backfill 真 pool,再动手(会卡住,不推荐)。</li>
+    </ul>
+  </div>
+  <div class="decision">
+    <h3>决定 3 · 本 session 动到哪</h3>
+    <ul>
+      <li><span class="rec">建议:你拍完决定 1/2 → 我写可执行 plan → 起 PR-A(衡观页,最干净可独立)</span>。PR-B 紧随。</li>
+      <li>提醒:<b>跨团队 PR 这个 session 合并不了</b>(等 gloriahao review)。本 session 终点 = plan 锁 + PR-A 提上 + PR-B 起头,不是"上线闭环"。</li>
+    </ul>
+  </div>
+
+  <div class="foot">
+    设计文档 · 阶段1 · 2026-06-08。审计来源:逐文件实测 + origin/main 代码 + 两份 Explore 调查(传输线 + 衡观 conventions)。<br>
+    待你拍 3 个决定 + 批准架构 → 写可执行 plan(docs/superpowers/plans/)→ 起 PR-A。
+  </div>
+
+</div>
+</body>
+</html>
