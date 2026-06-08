@@ -110,12 +110,14 @@ def execute_with_savepoint(conn, sql, params, name="sp") -> None:
             raise
 
 
-def build_notification_insert(*, level: str, title: str, body, source: str):
+def build_notification_insert(*, level: str, title: str, body, source: str, target_user_id=None):
     """插入一条 Notification 的 SQL+params。
     id 自带(Prisma cuid 非 DB 默认→gen_random_uuid);createdAt 走 DB 默认 now();readAt 默认 NULL。
+    target_user_id=None → targetUserId 列为 NULL（广播，按角色可见）；非 None → 仅该平台账号可见。
     """
     sql = (
-        'INSERT INTO "Notification" ("id","level","title","body","source") '
-        'VALUES (gen_random_uuid()::text, %(level)s::"NotificationLevel", %(title)s, %(body)s, %(source)s)'
+        'INSERT INTO "Notification" ("id","level","title","body","source","targetUserId") '
+        'VALUES (gen_random_uuid()::text, %(level)s::"NotificationLevel", %(title)s, %(body)s, %(source)s, %(target_user_id)s)'
     )
-    return sql, {"level": level, "title": title, "body": body, "source": source}
+    return sql, {"level": level, "title": title, "body": body, "source": source,
+                 "target_user_id": target_user_id}

@@ -162,3 +162,34 @@ def test_run_records_notification_write_failure(tmp_path, monkeypatch):
     assert "policy P_A: policy failed" in summary["errors"]
     assert "notification write failed: notify failed" in summary["errors"]
     assert conn.closed is True
+
+
+def test_run_notification_uses_target_account_and_forward_note(tmp_path, monkeypatch):
+    conn = FakeRunConn()
+    seen_notification_params = []
+    monkeypatch.setenv("NOTIFY_TARGET_ACCOUNT", "gloriahao")
+    monkeypatch.setenv("NOTIFY_FORWARD_NOTE", "请把这个问题转给邵子渊")
+    monkeypatch.setitem(sys.modules, "psycopg2", types.SimpleNamespace(connect=lambda _: conn))
+    monkeypatch.setattr(run_sync_mod, "collect_policy_rows",
+                        lambda vault, version: ([{"pipeline_pid": "P_A"}], []))
+    monkeypatch.setattr(run_sync_mod, "collect_relation_rows", lambda vault, version: [])
+    monkeypatch.setattr(run_sync_mod.pg_writer, "build_policy_upsert",
+                        lambda row: ("INSERT Policy", {"pid": row["pipeline_pid"]}))
+
+    def fake_build_notification_insert(**kw):
+        seen_notification_params.append(kw)
+        return ("INSERT INTO \"Notification\"", kw)
+
+    monkeypatch.setattr(run_sync_mod.pg_writer, "build_notification_insert",
+                        fake_build_notification_insert)
+
+    def fake_execute(conn_arg, sql, params):
+        if sql == "INSERT Policy":
+            raise RuntimeError("policy failed")
+
+    monkeypatch.setattr(run_sync_mod.pg_writer, "execute_with_savepoint", fake_execute)
+
+    run_sync_mod.run(tmp_path, tmp_path / "state", 1, "postgres://fake")
+
+    assert seen_notification_params[0]["target_user_id"] == "gloriahao"
+    assert seen_notification_params[0]["body"].startswith("请把这个问题转给邵子渊\n")

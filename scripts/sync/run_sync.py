@@ -133,12 +133,17 @@ def run(vault: Path, state_dir: Path, pipeline_version: int, database_url: str) 
         conn.commit()
         if errors:
             try:
+                target = os.environ.get("NOTIFY_TARGET_ACCOUNT") or None
+                note = os.environ.get("NOTIFY_FORWARD_NOTE") or ""
                 title = f"run_sync 失败:{len(errors)} 条错误"
                 body = ("; ".join(errors))[:1000]
                 if skipped_rows:
                     body += f"(另 skipped_invalid={len(skipped_rows)})"
+                if note:
+                    body = f"{note}\n{body}"
                 nsql, nparams = pg_writer.build_notification_insert(
-                    level="ERROR", title=title, body=body, source="sync")
+                    level="ERROR", title=title, body=body, source="sync",
+                    target_user_id=target)
                 pg_writer.execute_with_savepoint(conn, nsql, nparams)
                 conn.commit()
             except Exception as e:          # 写消息失败绝不崩 sync
