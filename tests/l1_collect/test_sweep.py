@@ -7,6 +7,20 @@ def _pol(d, name, title):
                           encoding="utf-8")
 
 
+def test_sweep_writes_hits_to_pool(tmp_path):
+    import scripts._oneshot.sweep_existing_commentary as sw
+    from scripts.l1_collect import review_pool as rp
+    pool = tmp_path / "pool.jsonl"
+    hit = tmp_path / "【某政策解读】-x.md"
+    hit.write_text("---\ntitle: 某政策解读\n---\n正文", encoding="utf-8")
+    entries = sw.pool_entries([hit])
+    for e in entries:
+        rp.append(e, pool_path=pool)
+    rows = rp.load(pool_path=pool)
+    assert len(rows) == 1 and rows[0]["kind"] == "sweep"
+    assert rows[0]["suggested_action"] == "confirm"
+
+
 def test_sweep_detects_marker_titles(tmp_path, monkeypatch):
     from scripts._oneshot import sweep_existing_commentary as sw
     pol = tmp_path / "policies"
