@@ -38,7 +38,7 @@ def test_gate_extracted_routes_pass_and_reject(tmp_path):
     (ext / "b.json").write_text(json.dumps({
         "url": "https://in-en.com/x.html", "title": "市场快讯", "body": "据记者"}),
         encoding="utf-8")
-    n_pass, n_comm, n_rej = _gate_extracted_dir(ext, passed, comm, quar, llm_fn=None)
+    n_pass, n_comm, n_rej, n_review = _gate_extracted_dir(ext, passed, comm, quar, llm_fn=None)
     assert n_pass == 1 and n_rej == 1
     assert (passed / "a.json").exists()
     assert not (passed / "b.json").exists()
@@ -57,7 +57,7 @@ def test_gate_dir_three_way_split(tmp_path):
         encoding="utf-8")
     passed = tmp_path / "passed"; comm = tmp_path / "comm"
     quar = tmp_path / "q.jsonl"
-    n_pass, n_comm, n_rej = _gate_extracted_dir(ext, passed, comm, quar, llm_fn=None)
+    n_pass, n_comm, n_rej, n_review = _gate_extracted_dir(ext, passed, comm, quar, llm_fn=None)
     assert n_pass == 1 and n_comm == 1
     assert (passed / "a.json").exists()
     assert (comm / "b.json").exists()

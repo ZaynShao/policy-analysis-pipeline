@@ -17,6 +17,7 @@ from .step5_ingest import ingest_extracted
 from .dedup import DedupIndex
 from .policy_gate import gate_one
 from .common_llm_client import make_judge_client
+from . import review_pool
 
 ROOT = Path(__file__).resolve().parents[2]
 STATE = ROOT / "state"
@@ -57,10 +58,13 @@ def _select_channels(channels, levels: list, channel_types=None):
 
 
 def _gate_extracted_dir(ext_dir: Path, passed_dir: Path, comm_dir: Path,
-                        quar_jsonl: Path, llm_fn) -> tuple:
+                        quar_jsonl: Path, llm_fn, *,
+                        pool_path: Path = review_pool.POOL,
+                        review_dir: Path = STATE / "T1_incremental" / "review",
+                        run_label: str = "") -> tuple:
     passed_dir.mkdir(parents=True, exist_ok=True)
     comm_dir.mkdir(parents=True, exist_ok=True)
-    n_pass = n_comm = n_rej = 0
+    n_pass = n_comm = n_rej = n_review = 0
     rejects: list = []
     for jf in sorted(ext_dir.glob("*.json")):
         rec = json.loads(jf.read_text(encoding="utf-8"))
@@ -74,6 +78,19 @@ def _gate_extracted_dir(ext_dir: Path, passed_dir: Path, comm_dir: Path,
             (comm_dir / jf.name).write_text(jf.read_text(encoding="utf-8"),
                                             encoding="utf-8")
             n_comm += 1
+        elif gr.action == "review_queue":
+            review_dir.mkdir(parents=True, exist_ok=True)
+            (review_dir / jf.name).write_text(jf.read_text(encoding="utf-8"),
+                                              encoding="utf-8")
+            try:
+                review_pool.append({
+                    "kind": "gate", "ref": jf.stem, "reason": gr.evidence or "low_conf",
+                    "suggested_action": "review", "confidence": gr.confidence,
+                    "evidence": rec.get("title", "")[:60], "channel": run_label,
+                    "run_label": run_label}, pool_path=pool_path)
+            except Exception as e:
+                print(f"  [pool-write 失败] gate/{jf.stem}: {str(e)[:80]}")
+            n_review += 1
         else:
             rejects.append({"file": jf.name, "url": rec.get("url", ""),
                             "title": rec.get("title", ""), **gr.to_dict()})
@@ -83,7 +100,7 @@ def _gate_extracted_dir(ext_dir: Path, passed_dir: Path, comm_dir: Path,
         with open(quar_jsonl, "a", encoding="utf-8") as f:
             for r in rejects:
                 f.write(json.dumps(r, ensure_ascii=False) + "\n")
-    return n_pass, n_comm, n_rej
+    return n_pass, n_comm, n_rej, n_review
 
 
 def _ingest_commentary(comm_ext_dir: Path, staging_dir: Path) -> int:
@@ -118,9 +135,9 @@ def _run_channel(ch, cfg: IncrementalConfig, dedup, llm_fn) -> dict:
         return {"channel": label, "scanned": n_scan, "kept": kept, "ingested": 0}
     fetch_candidates(cand, sd / "fetch", sd / "quar" / f"{label}__ferr.txt")
     extract_all(sd / "fetch", sd / "ext", sd / "quar" / f"{label}__s45.jsonl")
-    n_pass, n_comm, n_rej = _gate_extracted_dir(
+    n_pass, n_comm, n_rej, n_review = _gate_extracted_dir(
         sd / "ext", sd / "passed", sd / "comm_ext",
-        sd / "quar" / "gate_rejects.jsonl", llm_fn)
+        sd / "quar" / "gate_rejects.jsonl", llm_fn, run_label=label)
     ing_ok, _ = ingest_extracted(sd / "passed", sd / "ingest" / f"{label}.jsonl")
     try:
         n_comm_ing = _ingest_commentary(sd / "comm_ext", sd / "comm_stage")
@@ -134,6 +151,7 @@ def _run_channel(ch, cfg: IncrementalConfig, dedup, llm_fn) -> dict:
                 f.unlink()
     return {"channel": label, "scanned": n_scan, "kept": kept,
             "gate_passed": n_pass, "gate_commentary": n_comm, "gate_rejected": n_rej,
+            "gate_review": n_review,
             "ingested": ing_ok, "ingested_commentary": n_comm_ing}
 
 
@@ -155,6 +173,7 @@ def run_incremental(cfg: IncrementalConfig) -> dict:
         "total_ingested": sum(r.get("ingested", 0) for r in results),
         "total_commentary": sum(r.get("ingested_commentary", 0) for r in results),
         "total_gate_rejected": sum(r.get("gate_rejected", 0) for r in results),
+        "total_gate_review": sum(r.get("gate_review", 0) for r in results),
         "dry_run": cfg.dry_run,
     }
     print(f"[run_incremental] DONE {summary}")
