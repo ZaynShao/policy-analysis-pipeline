@@ -230,7 +230,7 @@ Producer(Mac/国内常开机)产 vault → git commit + push
 
 | 项 | 路径 |
 |---|---|
-| pipeline 代码 | `/root/policy-pipeline-src` ⚠️ **非 git 仓**(tarball 部署;sync_tick.py 经 scp 落地) |
+| pipeline 代码 | `/root/policy-pipeline-src` = **git clone of main**(deploy key `github-pipeline` 只读;更新 = `git fetch --depth=1 origin main && git reset --hard origin/main` 后 `docker compose build`)。路 B 已于 2026-06-08 把 tarball 换成 git clone |
 | vault | `/root/policy-vault`(git 仓·deploy key `github-vault`) |
 | state | `/root/policy-pipeline-state`(含 `last_sync_run.json`) |
 | 环境变量 | `/etc/policy-pipeline/pipeline.env`(含 DATABASE_URL,**out-of-git**) |
@@ -266,7 +266,7 @@ deploy key:服务器 `~/.ssh/vault_deploy`(只读)+ `~/.ssh/config` 的 `Host gi
 
 ### 8.6 已知 caveat
 
-- **代码漂移**:`/root/policy-pipeline-src` 是非 git tarball,且其中 L2 常驻服务代码(`run_l2`/`orchestrate`/…)**未在 pipeline git 仓**。服务器一挂即丢。修复 = 后续"代码 git 化部署"(路 B / Stage 1.5)。
+- **代码漂移 ✅ 已清除(路 B done 2026-06-08)**:曾经 `scripts/sync/`(run_sync/pg_writer)+ `scripts/service/`(run_l2/orchestrate…)在未合的 `feat/service-deploy` 分支、服务器跑 tarball。已 reconcile 回 main(`e018860`)+ 把 server src 换成 git clone of main + rebuild 镜像。server 现全 git(vault + pipeline 码),更新走 `git pull`,无漂移。
 - **upsert 不 prune**:run_sync 只 upsert,不删 vault 已移除的政策。生产 cutover 先 TRUNCATE 拿干净基线;staging 长期累积无害。
 - **producer 不常开(现 Mac)**:Mac 不开不 push,服务器当天拉不到新 → 迁国内常开机后消失。
 
