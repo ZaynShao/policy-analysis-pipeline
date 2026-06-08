@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>衡观前端「不撞车」声明 + handoff — pipeline 侧本轮所加前端清单</title>
+<style>
+  :root { --ink-1:#1a1a1a; --ink-2:#444; --ink-3:#777; --line:#e3e3e3; --bg:#fafafa;
+          --amber:#b25e00; --amber-soft:#fff4e3; --green:#1f7a34; --green-soft:#e9f6ec;
+          --red:#b3261e; --red-soft:#fdeceb; --blue:#1a5fb4; --blue-soft:#e8f0fb;
+          --purple:#6c3fa3; --purple-soft:#f1ebfa; }
+  * { box-sizing:border-box; }
+  body { font:15px/1.7 -apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+         color:var(--ink-1); max-width:920px; margin:0 auto; padding:32px 24px; background:#fff; }
+  h1 { font-size:23px; margin:0 0 4px; }
+  .sub { color:var(--ink-3); font-size:14px; margin-bottom:22px; }
+  h2 { font-size:18px; margin:30px 0 10px; padding-bottom:6px; border-bottom:2px solid var(--line); }
+  h3 { font-size:15px; margin:18px 0 6px; }
+  table { border-collapse:collapse; width:100%; margin:12px 0; font-size:13.5px; }
+  th,td { border:1px solid var(--line); padding:7px 9px; text-align:left; vertical-align:top; }
+  th { background:var(--bg); font-weight:700; }
+  code { background:#f2f2f2; padding:1px 5px; border-radius:4px; font:12.5px/1.5 "SF Mono",Menlo,Consolas,monospace; }
+  pre { background:#1e1e1e; color:#e8e8e8; padding:12px 14px; border-radius:8px; overflow-x:auto;
+        font:12.5px/1.6 "SF Mono",Menlo,Consolas,monospace; }
+  pre code { background:none; color:inherit; padding:0; }
+  .box { border:1px solid var(--line); border-left-width:4px; border-radius:6px; padding:12px 16px; margin:14px 0; }
+  .box.amber { border-left-color:var(--amber); background:var(--amber-soft); }
+  .box.green { border-left-color:var(--green); background:var(--green-soft); }
+  .box.red   { border-left-color:var(--red);   background:var(--red-soft); }
+  .box.blue  { border-left-color:var(--blue);  background:var(--blue-soft); }
+  .box.purple{ border-left-color:var(--purple);background:var(--purple-soft); }
+  .box .t { font-weight:700; margin-bottom:4px; }
+  .new  { display:inline-block; font-size:11px; font-weight:700; padding:1px 7px; border-radius:10px; background:var(--green-soft); color:var(--green); }
+  .mod  { display:inline-block; font-size:11px; font-weight:700; padding:1px 7px; border-radius:10px; background:var(--amber-soft); color:var(--amber); }
+  .todo { display:inline-block; font-size:11px; font-weight:700; padding:1px 7px; border-radius:10px; background:var(--purple-soft); color:var(--purple); }
+  .small { font-size:13px; color:var(--ink-3); }
+  .mono { font-family:"SF Mono",Menlo,Consolas,monospace; font-size:12.5px; }
+  ul.tight { margin:6px 0; padding-left:20px; }
+  ul.tight li { margin:3px 0; }
+</style>
+</head>
+<body>
+
+<h1>衡观前端「不撞车」声明 + handoff</h1>
+<div class="sub">pipeline 侧本轮往 <code>safety-platform</code> 前端加了什么 · 团队动前端前请避开这些位置 · 2026-06-08 · 基线 master <code>6297ab2</code></div>
+
+<div class="box blue">
+  <div class="t">一句话</div>
+  本轮 pipeline 侧通过两个已合并 PR（<strong>#16 消息通知</strong> / <strong>#17 L1 源质量审核页</strong>）往前端加了 <strong>3 个新文件 + 改了 4 个共享文件</strong>，并占用了若干<strong>路由名 / 路径 / 目录 / 后端端点</strong>。本文把它们逐一列清，<strong>你们动前端前对一眼，避免覆盖或重名</strong>。注：<code>PolicySemanticRelation</code> / <code>CommentarySignal</code> 两块数据已就位但<strong>前端尚未建</strong>，是留给你们的（见最后一节）。
+</div>
+
+<h2>一、新增整文件 —— 勿重建 / 勿覆盖</h2>
+<p class="small">这些是本轮新建的文件。你们若新建同名文件会撞，请直接复用或绕开。</p>
+<table>
+  <tr><th>文件</th><th>来源</th><th>作用</th></tr>
+  <tr><td class="mono">src/api/notification.ts</td><td>#16</td><td>消息通知 API 封装（<code>list(unreadOnly)</code> / <code>markRead(id)</code>）</td></tr>
+  <tr><td class="mono">src/api/l1Review.ts</td><td>#17</td><td>L1 审核 API 封装（列待判 / narrate / verdict）</td></tr>
+  <tr><td class="mono">src/views/quality/L1ReviewQueue.vue</td><td>#17</td><td>L1 源质量审核页（卡片列 + AI 叙述 + verdict 提交，MANAGER 可见）。<strong>新开了 <code>views/quality/</code> 目录</strong></td></tr>
+</table>
+
+<h2>二、改过的<strong>共享文件</strong> —— 撞车高风险区</h2>
+<div class="box red">
+  <div class="t">⚠ 重点</div>
+  下面 4 个是<strong>多人会碰的公共文件</strong>。如果你们也要编辑它们，<strong>请保留本轮加入的增量</strong>（合并而非覆盖），否则会把通知铃铛 / 审核入口 / 路由 / toast 类型弄掉。
+</div>
+
+<h3><span class="mod">改</span> <span class="mono">src/components/layout/TopBar.vue</span> <span class="small">（+178 行，#16）</span></h3>
+<ul class="tight">
+  <li>加了<strong>消息铃铛 🔔</strong> + 下拉消息列表 + 未读角标 + 拉取逻辑。</li>
+  <li><strong>MANAGER 门控</strong>：<code>const isManager = computed(() =&gt; userStore.current?.role === 'MANAGER')</code>；非 MANAGER 不渲染、不拉取（<code>loadNotifications</code> / <code>loadUnread</code> 开头 <code>if (!isManager.value) return</code>）；<code>watch(isManager, …)</code> 角色切换时清空。</li>
+  <li>依赖 <code>@/api/notification</code> 与 <code>@/stores/user</code>。</li>
+  <li class="small">若你们要重构 TopBar 布局：铃铛那段（<code>notification-wrap</code> / <code>notification-dropdown</code> / 相关 ref 与函数）请整体保留。</li>
+</ul>
+
+<h3><span class="mod">改</span> <span class="mono">src/components/layout/Sidebar.vue</span> <span class="small">（+9 行，#17）</span></h3>
+<ul class="tight">
+  <li>加了导航项 <strong>「🔍 源质量审核」</strong> → 跳 <code>/quality/l1-review</code>，<strong>MANAGER 门控</strong>（<code>v-if="isManager"</code>）。</li>
+  <li>为此在 <code>&lt;script setup&gt;</code> 引入了 <code>useUserStore</code> + <code>computed isManager</code> + <code>isQualityActive()</code>（<code>isActive('/quality')</code>）。</li>
+  <li class="small">若你们也要往 Sidebar 加菜单项：这段已占用 <code>isManager</code> 和 <code>/quality</code> 前缀的高亮判断，按现有模式追加即可。</li>
+</ul>
+
+<h3><span class="mod">改</span> <span class="mono">src/router/index.ts</span> <span class="small">（+5 行，#17）</span></h3>
+<pre><code>{ path: '/quality/l1-review', name: 'l1-review',
+  component: () =&gt; import('@/views/quality/L1ReviewQueue.vue') }</code></pre>
+<ul class="tight">
+  <li><strong>已占用路由名 <code>l1-review</code>、路径 <code>/quality/l1-review</code>、路径前缀 <code>/quality</code></strong>。新路由别撞这几个。</li>
+</ul>
+
+<h3><span class="mod">改</span> <span class="mono">src/stores/toast.ts</span> <span class="small">（+1 行，#16）</span></h3>
+<pre><code>// Toast.type 联合类型新增 'warning'
+type: 'success' | 'error' | 'info' | 'warning'</code></pre>
+<ul class="tight">
+  <li>通知里用了 <code>'warning'</code> 这一档。<strong>若你们也改这个联合类型，请保留 <code>'warning'</code></strong>，否则通知 toast 会 TS 报错。</li>
+</ul>
+
+<h2>三、已占用的命名 / 路径 / 端点（避免重名）</h2>
+<table>
+  <tr><th>类别</th><th>已占用</th></tr>
+  <tr><td>路由 name</td><td class="mono">l1-review</td></tr>
+  <tr><td>路由 path</td><td class="mono">/quality/l1-review（前缀 <code>/quality</code> 整段本轮起用）</td></tr>
+  <tr><td>view 目录</td><td class="mono">src/views/quality/</td></tr>
+  <tr><td>api 模块</td><td class="mono">api/notification.ts · api/l1Review.ts</td></tr>
+  <tr><td>后端端点（消息）</td><td class="mono">/api/v1/notifications · /api/v1/notifications/:id/read</td></tr>
+  <tr><td>后端端点（L1 审核）</td><td class="mono">/api/v1/l1-review · /api/v1/l1-review/:id/narrate · /api/v1/l1-review/:id/verdict</td></tr>
+  <tr><td>新增 DB 表</td><td class="mono">Notification · L1ReviewQueue · CommentarySignal · PolicySemanticRelation（+ Policy 加了 pipeline 列）</td></tr>
+</table>
+
+<h2>四、本轮<strong>没动</strong>、留给你们建的前端（别误以为已存在）</h2>
+<div class="box purple">
+  <div class="t">这两块是纯前端增量读，数据已就位，<strong>前端尚未建</strong></div>
+  <ul class="tight">
+    <li><span class="todo">待建</span> <strong>政策详情「相关政策」区</strong> —— 数据在 <code>PolicySemanticRelation</code>（992 条，9 类语义关系）。建法见另一份 handoff《衡观政策关联展示》。</li>
+    <li><span class="todo">待建</span> <strong>政策详情「相关评论」区</strong> —— 数据在 <code>CommentarySignal</code>（171 条舆情信号，<code>relatedPolicyPids</code> 软引用政策）。后端 only，前端是读时按 pid 解析。</li>
+  </ul>
+  <div class="small">这两块 pipeline 侧<strong>只产数据、不碰前端</strong>。前端归你们，且互不依赖、可分别开发；它们将落在同一个「政策详情」页的两个区块。</div>
+</div>
+
+<h2>五、动手前 30 秒自检清单</h2>
+<div class="box amber">
+  你要做下面任一件事，请先回看本声明对应条目：
+  <ul class="tight">
+    <li>改 <code>TopBar.vue</code> / <code>Sidebar.vue</code> / <code>router/index.ts</code> / <code>stores/toast.ts</code> / <code>stores/user.ts</code>？→ 保留本轮增量。</li>
+    <li>新开 <code>/quality</code> 下的页，或新建 <code>views/quality/</code> 下的文件？→ 已有 L1 审核页占着。</li>
+    <li>加新路由名 / 路径？→ 避开 <code>l1-review</code> / <code>/quality/l1-review</code>。</li>
+    <li>加 MANAGER 门控的入口？→ 复用现有 <code>userStore.current?.role === 'MANAGER'</code> 模式（TopBar / Sidebar 都这么写）。</li>
+    <li>以为「相关政策 / 相关评论」已经有了？→ 没有，是留给你们的（第四节）。</li>
+  </ul>
+</div>
+
+<p class="small" style="margin-top:28px; border-top:1px solid var(--line); padding-top:12px">
+  本声明基于 <code>gloriahao0909/safety-platform</code> master <code>6297ab2</code> 实测整理，仅覆盖 pipeline 侧本轮（PR #16 / #17）所加前端；你们自己的提交（如 #19 hotfix、scope visits）不在此列。如这两个 PR 之后前端又有变动，以仓库实际为准。
+</p>
+
+</body>
+</html>
