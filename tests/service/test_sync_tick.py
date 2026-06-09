@@ -1,4 +1,4 @@
-from scripts.service.sync_tick import should_sync, build_run_sync_cmd
+from scripts.service.sync_tick import should_sync, build_run_sync_cmd, decide_sync_action
 
 
 def test_should_sync_true_when_shas_differ():
@@ -23,3 +23,15 @@ def test_build_run_sync_cmd_shape():
     assert cmd[cmd.index("--vault") + 1] == "/vault"
     assert cmd[cmd.index("--state-dir") + 1] == "/state"
     assert cmd[cmd.index("--pipeline-version") + 1] == "1"
+
+
+def test_decide_reset_when_clean_and_not_ahead():
+    assert decide_sync_action(local_ahead=0, dirty=False) == "reset"
+
+
+def test_decide_abort_when_local_commits():
+    assert decide_sync_action(local_ahead=2, dirty=False) == "abort"
+
+
+def test_decide_abort_when_dirty():
+    assert decide_sync_action(local_ahead=0, dirty=True) == "abort"

@@ -18,6 +18,14 @@ def should_sync(local_sha: str, remote_sha: str) -> bool:
     return bool(l) and bool(r) and l != r
 
 
+def decide_sync_action(local_ahead: int, dirty: bool) -> str:
+    """服务器有未推送的本地产物(领先提交)或工作树脏 → 中止报警,绝不 reset 删除;
+    否则(纯消费者态)维持 reset --hard 的自清洁行为。"""
+    if local_ahead > 0 or dirty:
+        return "abort"
+    return "reset"
+
+
 def build_run_sync_cmd(*, compose_file: str, vault: str, state: str, version: int) -> list:
     """构造容器内跑 run_sync 的命令(便于测试/复用)。"""
     return [
@@ -56,6 +64,16 @@ def main(argv=None) -> int:
     if not should_sync(local, remote):
         print(f"[{ts}] no change (HEAD={local[:8]}), skip sync")
         return 0
+
+    local_ahead = int(_git(["rev-list", "--count", f"origin/{args.branch}..HEAD"], args.vault_dir) or "0")
+    dirty = bool(_git(["status", "--porcelain"], args.vault_dir))
+    if decide_sync_action(local_ahead, dirty) == "abort":
+        # 服务器有未推送本地产物:绝不 reset 删除。
+        # TODO(S2): 接 Notification 告警通道;S1 阶段先 stderr + 非零退出码由 cron 日志捕获。
+        print(f"[{ts}] sync_tick 中止:服务器 vault 有未推送本地改动"
+              f"(领先 {local_ahead} 提交, dirty={dirty}),不执行 reset 以免误删",
+              file=sys.stderr)
+        return 3
 
     _git(["reset", "--hard", f"origin/{args.branch}"], args.vault_dir)
     print(f"[{ts}] vault {local[:8]} -> {remote[:8]}, running run_sync")
