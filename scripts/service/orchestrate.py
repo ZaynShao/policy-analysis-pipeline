@@ -8,6 +8,7 @@ from __future__ import annotations
 import subprocess
 import tempfile
 import json
+from datetime import datetime, timezone
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
@@ -41,6 +42,15 @@ def process_pid(pid: str, raw_text: str, version: int,
     return StageResult(pid, True, None)
 
 
+def _record_failure(queue_path: Path, pid: str, error: str | None) -> None:
+    """失败 pid 落死信(队列同目录 l2_failures.jsonl),append-only,可人工/sweep 重排。"""
+    dead = Path(queue_path).parent / "l2_failures.jsonl"
+    rec = {"pid": pid, "error": (error or "")[:300],
+           "ts": datetime.now(timezone.utc).isoformat()}
+    with open(dead, "a", encoding="utf-8") as f:
+        f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+
+
 def drain_queue(queue_path: Path, ledger: dict, ledger_path: Path,
                 raw_text_for: Callable[[str], str], version: int,
                 run_attribution: Callable[[str], None],
@@ -56,14 +66,19 @@ def drain_queue(queue_path: Path, ledger: dict, ledger_path: Path,
             raw_text = raw_text_for(item.pid)
         except Exception as e:
             results.append(StageResult(item.pid, False, f"raw_missing: {e}"))
+            _record_failure(queue_path, item.pid, f"raw_missing: {e}")
             l2_queue.mark_complete(queue_path, item.pid)
             processed_any = True
             continue
         res = process_pid(item.pid, raw_text, version, ledger,
                           run_attribution, run_crystallize)
         results.append(res)
-        l2_queue.mark_complete(queue_path, item.pid)
-        save_ledger(ledger_path, ledger)
+        if res.ok:
+            l2_queue.mark_complete(queue_path, item.pid)
+            save_ledger(ledger_path, ledger)
+        else:
+            _record_failure(queue_path, item.pid, res.error)
+            l2_queue.mark_complete(queue_path, item.pid)
         processed_any = True
     if processed_any:
         run_sync()

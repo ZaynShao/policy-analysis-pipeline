@@ -1,5 +1,7 @@
 from pathlib import Path
 from scripts.service.hash_ledger import LedgerEntry, compute_hash
+import json
+
 from scripts.service.l2_queue import QueueItem, enqueue
 from scripts.service.orchestrate import StageResult, process_pid, drain_queue
 
@@ -94,3 +96,42 @@ def test_drain_queue_missing_raw_does_not_block(tmp_path):
     # 队列最终为空
     from scripts.service.l2_queue import read_queue
     assert read_queue(q) == []
+    dead_rows = [
+        json.loads(line)
+        for line in (tmp_path / "l2_failures.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    assert dead_rows[0]["pid"] == "P_MISSING"
+    assert "raw_missing" in dead_rows[0]["error"]
+
+
+def test_drain_failed_pid_to_dead_letter_and_dequeued(tmp_path):
+    """run_attribution 抛错的 pid → ① 进 l2_failures.jsonl ② 出主队 ③ 不进 ledger。"""
+    q = tmp_path / "q.jsonl"
+    ledger_path = tmp_path / "ledger.json"
+    ledger = {}
+    enqueue(q, QueueItem("P_FAIL", "cron", "normal", "t1"))
+
+    def boom(pid: str) -> None:
+        raise RuntimeError("llm failed")
+
+    results = drain_queue(
+        queue_path=q,
+        ledger=ledger,
+        ledger_path=ledger_path,
+        raw_text_for=lambda pid: "RAW",
+        version=1,
+        run_attribution=boom,
+        run_sync=lambda: None,
+    )
+
+    assert results == [StageResult("P_FAIL", False, "llm failed")]
+    from scripts.service.l2_queue import next_item
+    assert next_item(q) is None
+    dead_rows = [
+        json.loads(line)
+        for line in (tmp_path / "l2_failures.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    assert dead_rows[0]["pid"] == "P_FAIL"
+    assert "llm failed" in dead_rows[0]["error"]
+    assert "P_FAIL" not in ledger
+    assert not ledger_path.exists()

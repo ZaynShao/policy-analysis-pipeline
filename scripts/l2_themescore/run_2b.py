@@ -1,4 +1,4 @@
-import argparse, html, json
+import argparse, html, json, sys
 from pathlib import Path
 from scripts.l1_audit.corpus import load_policies
 from scripts.common.llm import LLMClient, OpenAICompatClient
@@ -23,6 +23,13 @@ def make_client(provider: str, model: str, log_path: str):
     if provider == "openai":
         return OpenAICompatClient(model=model, log_path=log_path)
     return LLMClient(model=model, log_path=log_path)
+
+
+def warn_if_same_model(gen_model: str, judge_model: str) -> None:
+    """gen==judge 时告警(judge 退化为自评),不再硬阻断——单模型部署的有意放宽。"""
+    if gen_model == judge_model:
+        print(f"[warn] gen 与 judge 同模型({gen_model}):judge 独立性退化为自评，质量打折",
+              file=sys.stderr)
 
 def _draft_row(d):
     return {"pid": d.pid, "themes": d.themes, "primary": d.primary_theme,
@@ -359,7 +366,7 @@ def main():
     if args.mode in {"dry-run", "apply"}:
         if not args.gen_model or not args.judge_model:
             raise SystemExit(f"{args.mode} 需要 --gen-model 和 --judge-model")
-        assert args.gen_model != args.judge_model, "judge 模型必须 ≠ generator 模型"
+        warn_if_same_model(args.gen_model, args.judge_model)
 
     sc_text = _scoring_text(args.vault)
     gen_client = make_client(args.gen_provider, args.gen_model, f"{args.state}/gen_calls.jsonl")

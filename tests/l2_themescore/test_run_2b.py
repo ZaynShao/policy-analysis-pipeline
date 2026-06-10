@@ -224,6 +224,18 @@ def test_plan_allows_zero_theme_without_deep_generation(tmp_path):
     assert to_write[0][1].影响分析 is None
 
 
+def test_warn_if_same_model_warns_not_raises(capsys):
+    from scripts.l2_themescore.run_2b import warn_if_same_model
+    warn_if_same_model("deepseek-v4-flash", "deepseek-v4-flash")
+    assert "退化" in capsys.readouterr().err
+
+
+def test_warn_if_same_model_silent_when_different(capsys):
+    from scripts.l2_themescore.run_2b import warn_if_same_model
+    warn_if_same_model("a", "b")
+    assert capsys.readouterr().err == ""
+
+
 def test_evidence_normalizer_drops_unsupported_equipment_and_residential_themes():
     from scripts.l2_themescore.models import BusinessViewDraft, Scores
     from scripts.l2_themescore.run_2b import _normalize_theme_evidence
