@@ -24,6 +24,7 @@
 - **flock 串行化**:所有写 vault / 写 L2 队列的行共持 `/var/lock/policy-pipeline-producer.lock`(`flock -w 7200` 等待不跳过)——评审定论:l2_queue 是无锁读改写,07:30/09:00/09:30/10:00 必须串行;慢 L1 自然把 L2 推后。
 - **代理纪律**:`POLICY_FETCH_PROXY_URL` 只许出现在 09:00 L1 行内 `-e` 注入(W3 按需解开),其它行绝不 source fetch-proxy.env。
 - **`--since 2026-06-06` 是固定回填边界**(vault 评论存量边界 2026-06-07 往前推一天对冲时区),写死在 cron 行,**不进 commentary.env**(防变成漂移配置毁掉 coverage_warning 信号)。
+- **`--feed-timeout 600`**:wewe-rss 冷缓存时 fulltext limit=400 的 feed 生成可 >120s(实测热缓存 0.2s);每日 07:00 discovery 后缓存变冷,默认 120s 必超时。
 - 失败告警:行内 `|| notify`(泛化)+ produce_and_push 内部告警(带细节),可能双发,可接受。
 
 ```cron
@@ -31,7 +32,7 @@ SHELL=/bin/bash
 # ───────── S2 单生产者编排(时刻=CST;UTC 机器全部 -8h)─────────
 
 # 07:30 评论 ingest(容器,经 platform-net 访问 wewe-rss)→ vault → push
-30 7 * * * ( /usr/bin/flock -w 7200 9 || { set -a; . /etc/policy-pipeline/notify.env; set +a; /usr/bin/python3 -m scripts.service.notify "[S2] producer 锁等待超时(7200s),本轮跳过"; exit 1; }; set -a; . /etc/policy-pipeline/notify.env; . /etc/policy-pipeline/commentary.env; set +a; cd /root/policy-pipeline-src && docker compose -f docker-compose.server.yml run --rm -e WEWE_FEED_URL -e WEWE_AUTH_CODE policy-producer python -m scripts.l1_collect.commentary_ingest.run --feed-url "$WEWE_FEED_URL" --auth-code "$WEWE_AUTH_CODE" --vault-dir /vault --state-dir /state --since 2026-06-06 && /usr/bin/python3 -m scripts.service.produce_and_push --vault-dir /root/policy-vault --whitelist 0_raw/commentaries/ --message "l1(commentary): daily ingest" || /usr/bin/python3 -m scripts.service.notify "[S2] 07:30 评论 ingest 失败,查 ingest.log" ) 9>/var/lock/policy-pipeline-producer.lock >> /var/log/policy-pipeline/ingest.log 2>&1
+30 7 * * * ( /usr/bin/flock -w 7200 9 || { set -a; . /etc/policy-pipeline/notify.env; set +a; /usr/bin/python3 -m scripts.service.notify "[S2] producer 锁等待超时(7200s),本轮跳过"; exit 1; }; set -a; . /etc/policy-pipeline/notify.env; . /etc/policy-pipeline/commentary.env; set +a; cd /root/policy-pipeline-src && docker compose -f docker-compose.server.yml run --rm -e WEWE_FEED_URL -e WEWE_AUTH_CODE policy-producer python -m scripts.l1_collect.commentary_ingest.run --feed-url "$WEWE_FEED_URL" --auth-code "$WEWE_AUTH_CODE" --vault-dir /vault --state-dir /state --since 2026-06-06 --feed-timeout 600 && /usr/bin/python3 -m scripts.service.produce_and_push --vault-dir /root/policy-vault --whitelist 0_raw/commentaries/ --message "l1(commentary): daily ingest" || /usr/bin/python3 -m scripts.service.notify "[S2] 07:30 评论 ingest 失败,查 ingest.log" ) 9>/var/lock/policy-pipeline-producer.lock >> /var/log/policy-pipeline/ingest.log 2>&1
 
 # 09:00 L1 政策增量(容器)→ vault → push → L2 队列(W3 验证后解开注释)
 #0 9 * * * ( /usr/bin/flock -w 7200 9 || { set -a; . /etc/policy-pipeline/notify.env; set +a; /usr/bin/python3 -m scripts.service.notify "[S2] producer 锁等待超时(7200s),本轮跳过"; exit 1; }; set -a; . /etc/policy-pipeline/notify.env; set +a; cd /root/policy-pipeline-src && docker compose -f docker-compose.server.yml run --rm policy-producer python -m scripts.l1_collect.run_incremental --vault-dir /vault/0_raw/policies --l2-queue /state/l2_queue.jsonl && /usr/bin/python3 -m scripts.service.produce_and_push --vault-dir /root/policy-vault --whitelist 0_raw/policies/,0_raw/commentaries/ --message "l1(policy): daily incremental" || /usr/bin/python3 -m scripts.service.notify "[S2] 09:00 L1 失败,查 l1.log" ) 9>/var/lock/policy-pipeline-producer.lock >> /var/log/policy-pipeline/l1.log 2>&1
@@ -60,7 +61,7 @@ cd /root/policy-pipeline-src
 docker compose -f docker-compose.server.yml run --rm -e WEWE_FEED_URL -e WEWE_AUTH_CODE \
   policy-producer python -m scripts.l1_collect.commentary_ingest.run \
   --feed-url "$WEWE_FEED_URL" --auth-code "$WEWE_AUTH_CODE" \
-  --vault-dir /vault --state-dir /state --since 2026-06-06
+  --vault-dir /vault --state-dir /state --since 2026-06-06 --feed-timeout 600
 # 看 summary JSON 后:
 /usr/bin/python3 -m scripts.service.produce_and_push --vault-dir /root/policy-vault \
   --whitelist 0_raw/commentaries/ --message "l1(commentary): W1 supervised first run"
