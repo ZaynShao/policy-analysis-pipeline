@@ -82,3 +82,45 @@ def test_select_channels_channel_type_filter():
     types = {c.channel_type for c in sel}
     assert types == {"商务", "市监", "商务部"}   # 子串匹配:商务部 含"商务"
     assert "发改委" not in types
+
+
+def test_scan_phase_preserves_order_and_passes_counts(tmp_path, monkeypatch):
+    import types
+    import scripts.l1_collect.run_incremental as ri
+    chans = [_ch("国家", f"ch{i}.gov.cn") for i in range(5)]
+    monkeypatch.setattr(ri, "load_catalog", lambda *a, **k: chans)
+    monkeypatch.setattr(ri, "_select_channels", lambda *a, **k: chans)
+    monkeypatch.setattr(ri, "DedupIndex",
+                        types.SimpleNamespace(from_vault_policies=lambda d: None))
+    monkeypatch.setattr(ri, "scan_channel", lambda ch, d: int(ch.root_domain[2]))
+    captured = []
+    def fake_proc(ch, cfg, dedup, llm_fn, n_scan):
+        captured.append((ch.root_domain, n_scan))
+        return {"channel": ch.root_domain, "scanned": n_scan, "ingested": 0}
+    monkeypatch.setattr(ri, "_run_channel", fake_proc)
+    ri.run_incremental(ri.IncrementalConfig(
+        state_dir=tmp_path, vault_dir=tmp_path, dry_run=True))
+    assert captured == [(f"ch{i}.gov.cn", i) for i in range(5)]
+
+
+def test_scan_failure_isolated(tmp_path, monkeypatch):
+    import types
+    import scripts.l1_collect.run_incremental as ri
+    chans = [_ch("国家", "good.gov.cn"), _ch("国家", "bad.gov.cn"), _ch("国家", "good2.gov.cn")]
+    monkeypatch.setattr(ri, "load_catalog", lambda *a, **k: chans)
+    monkeypatch.setattr(ri, "_select_channels", lambda *a, **k: chans)
+    monkeypatch.setattr(ri, "DedupIndex",
+                        types.SimpleNamespace(from_vault_policies=lambda d: None))
+    def scan(ch, d):
+        if ch.root_domain == "bad.gov.cn":
+            raise RuntimeError("boom")
+        return 7
+    monkeypatch.setattr(ri, "scan_channel", scan)
+    seen = {}
+    monkeypatch.setattr(ri, "_run_channel",
+                        lambda ch, cfg, dedup, llm_fn, n_scan: seen.__setitem__(ch.root_domain, n_scan)
+                        or {"channel": ch.root_domain, "scanned": n_scan, "ingested": 0})
+    summary = ri.run_incremental(ri.IncrementalConfig(
+        state_dir=tmp_path, vault_dir=tmp_path, dry_run=True))
+    assert seen == {"good.gov.cn": 7, "bad.gov.cn": 0, "good2.gov.cn": 7}
+    assert summary["total_scanned"] == 14

@@ -4,6 +4,7 @@
 from __future__ import annotations
 import argparse
 import json
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
@@ -37,6 +38,7 @@ class IncrementalConfig:
     vault_dir: Path = VAULT_POLICIES
     channel_types: list = field(default_factory=list)
     l2_queue_path: Path = STATE / "l2_queue.jsonl"
+    scan_workers: int = 12
 
 
 def enqueue_ingested(queue_path, pids: list, *, requested_at: str) -> None:
@@ -130,12 +132,20 @@ def _ingest_commentary(comm_ext_dir: Path, staging_dir: Path,
     return n
 
 
-def _run_channel(ch, cfg: IncrementalConfig, dedup, llm_fn) -> dict:
+def _safe_scan(ch, scan_dir: Path) -> int:
+    """单渠道扫描包装:异常→记日志返回 0,不让一个渠道拖垮并发池或中断全局。"""
+    try:
+        return scan_channel(ch, scan_dir)
+    except Exception as e:
+        print(f"  [scan 失败] {ch.city}/{ch.root_domain}: {str(e)[:80]}")
+        return 0
+
+
+def _run_channel(ch, cfg: IncrementalConfig, dedup, llm_fn, n_scan: int) -> dict:
     sd = cfg.state_dir
     for d in ["scan", "cand", "quar", "fetch", "ext", "passed", "comm_ext", "comm_stage", "ingest"]:
         (sd / d).mkdir(parents=True, exist_ok=True)
     label = f"{ch.city}__{ch.channel_type}__{ch.root_domain}"
-    n_scan = scan_channel(ch, sd / "scan")
     if n_scan == 0:
         return {"channel": label, "scanned": 0, "ingested": 0}
     merged = sd / "scan" / f"_merged_{ch.root_domain}.jsonl"
@@ -193,8 +203,12 @@ def run_incremental(cfg: IncrementalConfig) -> dict:
     results = []
     with _l1_lock():
         dedup = DedupIndex.from_vault_policies(cfg.vault_dir)
-        for ch in channels:
-            r = _run_channel(ch, cfg, dedup, llm_fn)
+        scan_dir = cfg.state_dir / "scan"
+        scan_dir.mkdir(parents=True, exist_ok=True)
+        with ThreadPoolExecutor(max_workers=cfg.scan_workers) as ex:
+            scan_counts = list(ex.map(lambda c: _safe_scan(c, scan_dir), channels))
+        for ch, n_scan in zip(channels, scan_counts):
+            r = _run_channel(ch, cfg, dedup, llm_fn, n_scan)
             results.append(r)
             if not cfg.dry_run and r.get("pids"):
                 enqueue_ingested(cfg.l2_queue_path, r["pids"],
@@ -226,6 +240,7 @@ def main():
     ap.add_argument("--channel-type", default="")
     ap.add_argument("--vault-dir", default="")
     ap.add_argument("--l2-queue", default="")
+    ap.add_argument("--scan-workers", type=int, default=12)
     a = ap.parse_args()
     run_incremental(IncrementalConfig(
         level=a.level.split(","), since=a.since,
@@ -233,6 +248,7 @@ def main():
         channel_types=[s for s in a.channel_type.split(",") if s],
         vault_dir=Path(a.vault_dir) if a.vault_dir else VAULT_POLICIES,
         l2_queue_path=Path(a.l2_queue) if a.l2_queue else STATE / "l2_queue.jsonl",
+        scan_workers=a.scan_workers,
     ))
 
 
