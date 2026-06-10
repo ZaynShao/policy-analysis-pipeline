@@ -98,10 +98,14 @@ def test_drain_failed_pid_to_dead_letter_and_dequeued(tmp_path):
 ---
 
 ## Part 2 · 合并 + 部署(镜像重建,代码在容器内跑)
+**重建的是 `policy-pipeline` 服务**(它有 `build: .`);`policy-producer` 只引用同一 `image: policy-pipeline:latest`,对它 build = `No services to build` 的 no-op(2026-06-10 踩过:l2-relax 没更新镜像、队列被旧镜像二次抽空)。
 ```bash
 cd /root/policy-pipeline-src && git fetch origin && git reset --hard origin/main
-docker compose -f docker-compose.server.yml build policy-producer
+docker compose -f docker-compose.server.yml build policy-pipeline   # ← 是 policy-pipeline,不是 policy-producer!
 docker run --rm policy-pipeline:latest python -c "import trafilatura, bs4; print('build ok')"
+# 镜像验证闸(两处改必须都在镜像里,否则停,别往下跑——否则旧镜像又抽空队列):
+docker run --rm policy-pipeline:latest sh -c "grep -c warn_if_same_model scripts/l2_themescore/run_2b.py; grep -c _record_failure scripts/service/orchestrate.py"
+# ↑ 两行都应输出 ≥1;若 run_2b 仍含旧 assert 或 orchestrate 无 _record_failure → 镜像没更新,停下排查
 ```
 
 ## Part 3 · 恢复 32 pid 重排(host 取文件清单 → 容器读 id 入队)
