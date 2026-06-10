@@ -7,14 +7,15 @@ from .ingester import ingest_one, validate_with_schema, POLICIES_DIR
 
 
 def ingest_extracted(in_dir: Path, ingest_log: Path, out_dir: Path = None) -> tuple:
-    """返回 (ingested, failed)。out_dir 覆盖写入目录(默认 POLICIES_DIR)。"""
+    """返回 (ingested, failed, pids)。out_dir 覆盖写入目录(默认 POLICIES_DIR)。"""
     ingested = 0
     failed = 0
+    pids: list = []
     logs: list = []
     for f in in_dir.glob("*.json"):
         row = json.loads(f.read_text(encoding="utf-8"))
         try:
-            md_path = ingest_one(
+            md_path, pid = ingest_one(
                 url=row["url"], title=row["title"],
                 official_number=row.get("official_number", ""),
                 date=row.get("date", ""), issuer=row.get("issuer"),
@@ -33,9 +34,10 @@ def ingest_extracted(in_dir: Path, ingest_log: Path, out_dir: Path = None) -> tu
                 logs.append({"url": row["url"], "result": "schema_fail"})
                 continue
             ingested += 1
+            pids.append(pid)
             logs.append({
                 "url": row["url"], "result": "ok", "file": md_path.name,
-                "city": row.get("city", ""),
+                "city": row.get("city", ""), "pid": pid,
             })
         except Exception as e:
             failed += 1
@@ -45,4 +47,4 @@ def ingest_extracted(in_dir: Path, ingest_log: Path, out_dir: Path = None) -> tu
         "\n".join(json.dumps(x, ensure_ascii=False) for x in logs),
         encoding="utf-8",
     )
-    return ingested, failed
+    return ingested, failed, pids

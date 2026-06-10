@@ -132,7 +132,7 @@ def ingest_one(*, url: str, title: str, official_number: str, date: str,
         n += 1
     content = "---\n" + yaml.dump(fm, allow_unicode=True, sort_keys=False) + "---\n\n" + body_md
     fn.write_text(content, encoding="utf-8")
-    return fn
+    return fn, pid
 
 
 # 内嵌 minimal schema check(白名单 + 必填,与 audit/validate_schema.py 对齐)

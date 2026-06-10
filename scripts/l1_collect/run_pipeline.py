@@ -105,7 +105,7 @@ def main() -> None:
     ingest_log_dir = STATE / "T1_ingest_log"
     ingest_log_dir.mkdir(exist_ok=True)
     ingest_log = ingest_log_dir / f"{label}.jsonl"
-    ing_ok, ing_fail = ingest_extracted(extract_dir, ingest_log)
+    ing_ok, ing_fail, _ = ingest_extracted(extract_dir, ingest_log)
     print(f"[Step 5] ingested={ing_ok} failed={ing_fail}")
     print(f"[run_pipeline] DONE batch={label}")
 
