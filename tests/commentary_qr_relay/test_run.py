@@ -119,3 +119,31 @@ def test_relay_once_falls_back_when_openclaw_push_raises(tmp_path, monkeypatch):
     assert result.restored is False
     assert result.detail == "QR push failed; fallback alert sent"
     assert notices
+
+
+class TokenLogin(FakeLogin):
+    def __init__(self):
+        self.added = None
+
+    def poll_until_success(self, uuid, timeout_seconds=0, interval_seconds=0, sleeper=None):
+        return {"message": "success", "vid": 46732154, "token": "jwt-xyz", "username": "读书账号"}
+
+    def add_account(self, account_id, token, name, status=1):
+        self.added = (account_id, token, name, status)
+        return {"id": account_id}
+
+
+def test_relay_once_persists_account_via_add_after_successful_scan(tmp_path):
+    login = TokenLogin()
+
+    result = relay_once(
+        QRRelayConfig(db_path=tmp_path / "db.sqlite", qr_dir=tmp_path, target="dm-1"),
+        detector=FakeDetector(),
+        login_client=login,
+        adapter=FakeAdapter(),
+        qr_renderer=lambda _scan_url, output_path: output_path.write_bytes(b"qr") or output_path,
+        sleeper=lambda _: None,
+    )
+
+    assert login.added == ("46732154", "jwt-xyz", "读书账号", 1)
+    assert result.restored is True

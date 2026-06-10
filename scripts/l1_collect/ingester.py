@@ -101,8 +101,8 @@ def ingest_one(*, url: str, title: str, official_number: str, date: str,
                city: Optional[str] = None, city_code: Optional[str] = None,
                province: Optional[str] = None, channel_type: Optional[str] = None,
                via: str = "trafilatura", confidence: float = 0.85,
-               out_dir: Path = POLICIES_DIR) -> Path:
-    """生成 vault md 文件,返回路径。out_dir 默认 POLICIES_DIR,可覆盖用于 staging。"""
+               out_dir: Path = POLICIES_DIR) -> tuple:
+    """生成 vault md 文件,返回 (md 路径, pid)。out_dir 默认 POLICIES_DIR,可覆盖用于 staging。"""
     pid = compute_pid(date, issuer, official_number, title, city_code, channel_type)
     region = _infer_region(issuer, city, city_code)
     fm = {
@@ -132,7 +132,7 @@ def ingest_one(*, url: str, title: str, official_number: str, date: str,
         n += 1
     content = "---\n" + yaml.dump(fm, allow_unicode=True, sort_keys=False) + "---\n\n" + body_md
     fn.write_text(content, encoding="utf-8")
-    return fn
+    return fn, pid
 
 
 # 内嵌 minimal schema check(白名单 + 必填,与 audit/validate_schema.py 对齐)

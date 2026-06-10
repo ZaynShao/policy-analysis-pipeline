@@ -56,3 +56,41 @@ def test_drain_queue_empty_no_sync(tmp_path):
                 run_attribution=lambda pid: None,
                 run_sync=lambda: sync_calls.append("x"))
     assert sync_calls == []  # 空队列不触发 sync
+
+
+def test_drain_queue_missing_raw_does_not_block(tmp_path):
+    """drain 防卡死: 第一条 raw_text_for 抛 KeyError，标错误出队，第二条正常处理，队列最终为空。"""
+    q = tmp_path / "q.jsonl"
+    enqueue(q, QueueItem("P_MISSING", "cron", "normal", "t1"))
+    enqueue(q, QueueItem("P_OK", "cron", "normal", "t2"))
+
+    processed = []
+
+    def raw_text_for(pid: str) -> str:
+        if pid == "P_MISSING":
+            raise KeyError(f"raw not found: {pid}")
+        return pid + "_txt"
+
+    results = drain_queue(
+        queue_path=q,
+        ledger={},
+        ledger_path=tmp_path / "ledger.json",
+        raw_text_for=raw_text_for,
+        version=1,
+        run_attribution=lambda pid: processed.append(pid),
+        run_sync=lambda: None,
+    )
+
+    # P_MISSING: StageResult ok=False, error 含 raw_missing
+    missing_res = next(r for r in results if r.pid == "P_MISSING")
+    assert missing_res.ok is False
+    assert "raw_missing" in missing_res.error
+
+    # P_OK: 正常处理
+    ok_res = next(r for r in results if r.pid == "P_OK")
+    assert ok_res.ok is True
+    assert "P_OK" in processed
+
+    # 队列最终为空
+    from scripts.service.l2_queue import read_queue
+    assert read_queue(q) == []

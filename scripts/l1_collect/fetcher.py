@@ -71,6 +71,42 @@ def _fetch_via_bs4(url: str) -> Optional[str]:
         return None
 
 
+def _extract_trafilatura(html: str | bytes) -> Optional[str]:
+    """从 HTML 字符串或 bytes 抽取正文(trafilatura,不发网络请求)。接受 str|bytes 均可。"""
+    try:
+        import trafilatura
+        text = trafilatura.extract(html, include_comments=False, include_tables=True)
+        return text if text and len(text) >= MIN_BODY_LEN else None
+    except Exception:
+        return None
+
+
+def _extract_bs4(html: str | bytes) -> Optional[str]:
+    """从 HTML 字符串或 bytes 抽取正文(BeautifulSoup)。接受 str|bytes 均可。"""
+    try:
+        from bs4 import BeautifulSoup
+        soup = BeautifulSoup(html, "html.parser")
+        for tag in soup(["script", "style", "nav", "header", "footer"]):
+            tag.decompose()
+        text = soup.get_text("\n", strip=True)
+        return text if len(text) >= MIN_BODY_LEN else None
+    except Exception:
+        return None
+
+
+def _fetch_via_proxy(url: str, proxy_url: str, extractor) -> Optional[str]:
+    """经显式 proxies= 抓 HTML 后用指定抽取器。绝不写 os.environ。
+    传 resp.content(bytes)给抽取器,由抽取器自带编码探测(含 meta charset GBK 等)。"""
+    try:
+        resp = requests.get(url, headers={"User-Agent": UA}, timeout=TIMEOUT,
+                            proxies={"http": proxy_url, "https": proxy_url})
+        if resp.status_code >= 400:
+            return None
+        return extractor(resp.content)
+    except Exception:
+        return None
+
+
 def fetch_article(url: str) -> FetchResult:
     for via, fn in [
         ("firecrawl", _fetch_via_firecrawl),
@@ -80,4 +116,13 @@ def fetch_article(url: str) -> FetchResult:
         body = fn(url)
         if body:
             return FetchResult(url=url, via=via, body=body)
+    proxy_url = os.environ.get("POLICY_FETCH_PROXY_URL", "")
+    if proxy_url:
+        for via, extractor in [
+            ("trafilatura+proxy", _extract_trafilatura),
+            ("bs4+proxy", _extract_bs4),
+        ]:
+            body = _fetch_via_proxy(url, proxy_url, extractor)
+            if body:
+                return FetchResult(url=url, via=via, body=body)
     return FetchResult(url=url, via="fetch_error", body=None)

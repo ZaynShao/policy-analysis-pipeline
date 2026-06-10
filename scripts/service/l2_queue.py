@@ -10,7 +10,7 @@ _PRIORITY_RANK = {"high": 0, "normal": 1}
 @dataclass
 class QueueItem:
     pid: str
-    trigger: str     # "manual" | "cron"
+    trigger: str     # "manual" | "cron" | "l1_incremental"
     priority: str    # "high" | "normal"
     requested_at: str
 

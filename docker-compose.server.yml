@@ -15,6 +15,22 @@ services:
               "--judge-model", "deepseek-v4-flash", "--judge-provider", "openai"]
     restart: "no"
 
+  # S2 生产线服务(评论 ingest / L1 政策 / L2 派生),vault 可写。
+  # 与 policy-pipeline(投影消费,vault:ro)分开:消费侧永远只读。
+  # 无默认 command:由 cron `docker compose run --rm policy-producer python -m ...` 指定。
+  # 代理 env(POLICY_FETCH_PROXY_URL)按纪律不进 env_file,需要时 cron 行内 `-e` 显式注入 L1。
+  policy-producer:
+    image: policy-pipeline:latest
+    env_file:
+      - /etc/policy-pipeline/pipeline.env
+      - /etc/policy-pipeline/models.env   # LLM keys(policy_gate/run_2b);W0 落位,缺了起不来=故意 fail-fast
+    volumes:
+      - /root/policy-vault:/vault                  # 生产线写 vault(raw 只增不删纪律由代码层守)
+      - /root/policy-pipeline-state:/state         # 运行时 state:l2_queue / ledger / last_run
+      - /root/policy-pipeline-src/state:/app/state # 仓内 state:channel_catalog(git-tracked)+ T1 staging(ROOT 相对路径在容器内=/app/state)
+    networks: [platform-net]
+    restart: "no"
+
 networks:
   platform-net:
     external: true

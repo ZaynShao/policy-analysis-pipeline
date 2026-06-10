@@ -15,6 +15,8 @@
       + related_policy_source: l1_title_match
       + related_policy_confidence: 0.7
 DRY_RUN=1 只打印计划不写盘。
+
+2026-06-10 转正自 scripts/_oneshot:进入每日 L1 cron 路径(run_incremental._ingest_commentary)。
 """
 from __future__ import annotations
 import os
@@ -91,10 +93,12 @@ def ref_policy_name(title: str) -> str:
     return t.strip("：: 　")
 
 
-def build_title_index(skip_paths: set) -> list:
-    """全 policies/ 标题→pid 索引(排除将移走的18篇)。返回 [(norm_title, pid, raw_title)]。"""
+def build_title_index(skip_paths: set, vault_root: Path | None = None) -> list:
+    """全 policies/ 标题→pid 索引(排除将移走的18篇)。返回 [(norm_title, pid, raw_title)]。
+    vault_root: vault 根目录;None → 使用模块常量 VAULT(保持旧默认)。容器内须显式传入。"""
+    policies_dir = (vault_root / "0_raw/policies") if vault_root is not None else POLICIES
     idx = []
-    for p in POLICIES.glob("*.md"):
+    for p in policies_dir.glob("*.md"):
         if p.name in skip_paths:
             continue
         fm, _ = _front_body(p.read_text(encoding="utf-8", errors="ignore"))
@@ -142,8 +146,12 @@ def _is_tracked(p: Path) -> bool:
     return r.returncode == 0
 
 
-def route_files(paths: list, index: list, dry: bool, now: str = "") -> int:
-    """转换给定文件 → commentaries/。tracked 走 git rm,untracked unlink。返回处理数(dry=True 时为满足条件数,非实际写入数)。"""
+def route_files(paths: list, index: list, dry: bool, now: str = "",
+                vault_root: Path | None = None) -> int:
+    """转换给定文件 → commentaries/。tracked 走 git rm,untracked unlink。返回处理数(dry=True 时为满足条件数,非实际写入数)。
+    vault_root: vault 根目录;None → 使用模块常量 VAULT/COMMENTARIES(保持旧默认)。容器内须显式传入。"""
+    _vault = vault_root if vault_root is not None else VAULT
+    _commentaries = (vault_root / "0_raw/commentaries") if vault_root is not None else COMMENTARIES
     now = now or datetime.now(timezone(timedelta(hours=8))).isoformat(timespec="seconds")
     n = 0
     for p in paths:
@@ -171,12 +179,19 @@ def route_files(paths: list, index: list, dry: bool, now: str = "") -> int:
         if dry:
             continue
         new_fm = yaml.dump(fm, allow_unicode=True, sort_keys=False)
-        (COMMENTARIES / p.name).write_text(f"---\n{new_fm}---\n{body}", encoding="utf-8")
+        (_commentaries / p.name).write_text(f"---\n{new_fm}---\n{body}", encoding="utf-8")
         if _is_tracked(p):
-            r = subprocess.run(["git", "-C", str(VAULT), "rm", "-q", "--", _rel(p)],
-                                capture_output=True)
-            if r.returncode != 0:
-                raise RuntimeError(f"git rm failed for {p.name}: {r.stderr.decode(errors='ignore')[:200]}")
+            try:
+                rel = str(p.relative_to(_vault))
+            except ValueError:
+                rel = None
+            if rel:
+                r = subprocess.run(["git", "-C", str(_vault), "rm", "-q", "--", rel],
+                                    capture_output=True)
+                if r.returncode != 0:
+                    raise RuntimeError(f"git rm failed for {p.name}: {r.stderr.decode(errors='ignore')[:200]}")
+            else:
+                p.unlink()
         else:
             p.unlink()
     return n

@@ -6,6 +6,7 @@ import argparse
 import json
 from contextlib import contextmanager
 from dataclasses import dataclass, field
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from .channel_catalog import load_catalog, ChannelStatus
@@ -18,8 +19,10 @@ from .dedup import DedupIndex
 from .policy_gate import gate_one
 from .common_llm_client import make_judge_client
 from . import review_pool
+from scripts.service.l2_queue import enqueue_batch
 
 ROOT = Path(__file__).resolve().parents[2]
+CST = timezone(timedelta(hours=8))
 STATE = ROOT / "state"
 VAULT_POLICIES = Path.home() / "Documents" / "Zayn Main" / "政策分析" / "0_raw" / "policies"
 LEVEL_MAP = {"national": "国家", "province": "省", "city": "市"}
@@ -33,6 +36,14 @@ class IncrementalConfig:
     state_dir: Path = STATE / "T1_incremental"
     vault_dir: Path = VAULT_POLICIES
     channel_types: list = field(default_factory=list)
+    l2_queue_path: Path = STATE / "l2_queue.jsonl"
+
+
+def enqueue_ingested(queue_path, pids: list, *, requested_at: str) -> None:
+    """L1 新入库 pid → L2 队列(trigger=l1_incremental)。空列表 no-op。"""
+    if not pids:
+        return
+    enqueue_batch(Path(queue_path), pids, "l1_incremental", "normal", requested_at)
 
 
 @contextmanager
@@ -103,16 +114,18 @@ def _gate_extracted_dir(ext_dir: Path, passed_dir: Path, comm_dir: Path,
     return n_pass, n_comm, n_rej, n_review
 
 
-def _ingest_commentary(comm_ext_dir: Path, staging_dir: Path) -> int:
-    """commentary extracted → ingest 成 staging raw(out_dir=staging)→ route_files 转 commentaries/。"""
-    from scripts._oneshot.route_interpretations import route_files, build_title_index
+def _ingest_commentary(comm_ext_dir: Path, staging_dir: Path,
+                       vault_root: Path | None = None) -> int:
+    """commentary extracted → ingest 成 staging raw(out_dir=staging)→ route_files 转 commentaries/。
+    vault_root: 透传给 build_title_index/route_files(容器路径用);None → 旧默认(Mac 本地)。"""
+    from .route_interpretations import route_files, build_title_index
     staging_dir.mkdir(parents=True, exist_ok=True)
     ingest_extracted(comm_ext_dir, staging_dir / "_ingest_log.jsonl", out_dir=staging_dir)
     paths = [p for p in staging_dir.glob("*.md")]
     if not paths:
         return 0
-    idx = build_title_index(skip_paths=set())
-    n = route_files(paths, index=idx, dry=False)
+    idx = build_title_index(skip_paths=set(), vault_root=vault_root)
+    n = route_files(paths, index=idx, dry=False, vault_root=vault_root)
     (staging_dir / "_ingest_log.jsonl").unlink(missing_ok=True)
     return n
 
@@ -152,9 +165,12 @@ def _run_channel(ch, cfg: IncrementalConfig, dedup, llm_fn) -> dict:
         sd / "ext", sd / "passed", sd / "comm_ext",
         sd / "quar" / "gate_rejects.jsonl", llm_fn,
         review_dir=sd / "review", run_label=label)
-    ing_ok, _ = ingest_extracted(sd / "passed", sd / "ingest" / f"{label}.jsonl")
+    ing_ok, _, pids = ingest_extracted(sd / "passed", sd / "ingest" / f"{label}.jsonl",
+                                       out_dir=cfg.vault_dir)
     try:
-        n_comm_ing = _ingest_commentary(sd / "comm_ext", sd / "comm_stage")
+        # cfg.vault_dir 是 policies 子目录;parent.parent = vault 根
+        n_comm_ing = _ingest_commentary(sd / "comm_ext", sd / "comm_stage",
+                                        vault_root=cfg.vault_dir.parent.parent)
     except Exception as e:
         n_comm_ing = 0
         print(f"  [commentary-ingest 失败] {label[:40]}: {str(e)[:120]}")
@@ -166,7 +182,7 @@ def _run_channel(ch, cfg: IncrementalConfig, dedup, llm_fn) -> dict:
     return {"channel": label, "scanned": n_scan, "kept": kept,
             "gate_passed": n_pass, "gate_commentary": n_comm, "gate_rejected": n_rej,
             "gate_review": n_review,
-            "ingested": ing_ok, "ingested_commentary": n_comm_ing}
+            "ingested": ing_ok, "ingested_commentary": n_comm_ing, "pids": pids}
 
 
 def run_incremental(cfg: IncrementalConfig) -> dict:
@@ -180,7 +196,11 @@ def run_incremental(cfg: IncrementalConfig) -> dict:
         for ch in channels:
             r = _run_channel(ch, cfg, dedup, llm_fn)
             results.append(r)
+            if not cfg.dry_run and r.get("pids"):
+                enqueue_ingested(cfg.l2_queue_path, r["pids"],
+                                 requested_at=datetime.now(CST).isoformat(timespec="seconds"))
             print(f"  {r['channel'][:48]:48s} scan={r['scanned']} ing={r.get('ingested',0)}")
+    all_pids = [p for r in results for p in r.get("pids", [])]
     summary = {
         "channels_run": len(results),
         "total_scanned": sum(r["scanned"] for r in results),
@@ -189,6 +209,7 @@ def run_incremental(cfg: IncrementalConfig) -> dict:
         "total_gate_rejected": sum(r.get("gate_rejected", 0) for r in results),
         "total_gate_review": sum(r.get("gate_review", 0) for r in results),
         "dry_run": cfg.dry_run,
+        "l2_enqueued": len(all_pids) if not cfg.dry_run else 0,
     }
     pool_summary = review_pool.summarize()
     if pool_summary:
@@ -203,10 +224,16 @@ def main():
     ap.add_argument("--since", default="2026-01-01")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--channel-type", default="")
+    ap.add_argument("--vault-dir", default="")
+    ap.add_argument("--l2-queue", default="")
     a = ap.parse_args()
-    run_incremental(IncrementalConfig(level=a.level.split(","), since=a.since,
-                                      dry_run=a.dry_run,
-                                      channel_types=[s for s in a.channel_type.split(",") if s]))
+    run_incremental(IncrementalConfig(
+        level=a.level.split(","), since=a.since,
+        dry_run=a.dry_run,
+        channel_types=[s for s in a.channel_type.split(",") if s],
+        vault_dir=Path(a.vault_dir) if a.vault_dir else VAULT_POLICIES,
+        l2_queue_path=Path(a.l2_queue) if a.l2_queue else STATE / "l2_queue.jsonl",
+    ))
 
 
 if __name__ == "__main__":
