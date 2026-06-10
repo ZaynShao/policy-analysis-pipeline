@@ -125,3 +125,17 @@ def test_poll_until_success_treats_http_error_as_pending_scan_failure():
 
     assert result == {"status": "confirmed"}
     assert session.calls == 2
+
+
+def test_add_account_posts_id_token_name_status_to_trpc_account_add():
+    session = FakeSession()
+    client = WeweLoginClient("http://localhost:4000", "secret-code", session=session)
+
+    client.add_account(account_id="46732154", token="jwt-xyz", name="读书账号")
+
+    method, url, headers, body, timeout = session.calls[-1]
+    assert method == "POST"
+    assert url == "http://localhost:4000/trpc/account.add"
+    assert headers == {"Authorization": "secret-code"}
+    assert body == {"id": "46732154", "token": "jwt-xyz", "name": "读书账号", "status": 1}
+    assert timeout == 15

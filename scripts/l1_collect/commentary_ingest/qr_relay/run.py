@@ -70,7 +70,7 @@ def relay_once(
         return RelayResult(True, False, False, "QR push failed; fallback alert sent", qr_path)
 
     try:
-        client.poll_until_success(
+        login_result = client.poll_until_success(
             login.uuid,
             timeout_seconds=config.poll_timeout_seconds,
             interval_seconds=config.poll_interval_seconds,
@@ -80,6 +80,17 @@ def relay_once(
         _push_text(adapter, "[policy-pipeline] 微信读书扫码超时,wewe-rss token 未恢复。", config.target)
         _fallback_notice(f"{caption}；扫码超时:{exc}", config, qr_path)
         return RelayResult(True, True, False, "login poll timed out", qr_path)
+
+    # getLoginResult 是只读 query,不落库;扫码成功后必须显式调 account.add
+    # (upsert，按 id=vid;旧账号更新、新账号新建)才能把新 token 写进 DB。
+    vid = login_result.get("vid") if isinstance(login_result, dict) else None
+    token = login_result.get("token") if isinstance(login_result, dict) else None
+    if vid and token:
+        client.add_account(
+            account_id=str(vid),
+            token=token,
+            name=login_result.get("username") or status.account_name or "wewe-rss",
+        )
 
     restored = _confirm_token_restored(config, detector, sleeper)
     if restored:

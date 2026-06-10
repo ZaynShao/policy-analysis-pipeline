@@ -54,6 +54,27 @@ class WeweLoginClient:
         resp.raise_for_status()
         return _trpc_data(resp.json())
 
+    def add_account(
+        self,
+        account_id: str,
+        token: str,
+        name: str,
+        status: int = 1,
+    ) -> dict[str, Any]:
+        """Persist a logged-in account via the account.add upsert mutation.
+
+        getLoginResult is a read-only tRPC query and does NOT write the token to
+        the DB; account.add (upsert keyed by id=vid) is what actually persists it.
+        """
+        resp = self.session.post(
+            f"{self.base_url}/trpc/account.add",
+            headers=self._headers,
+            json={"id": account_id, "token": token, "name": name, "status": status},
+            timeout=self.timeout,
+        )
+        resp.raise_for_status()
+        return _trpc_data(resp.json())
+
     def poll_until_success(
         self,
         uuid: str,
