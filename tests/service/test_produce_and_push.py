@@ -87,3 +87,71 @@ def test_run_keeps_local_commit_when_push_fails(vault_with_remote, monkeypatch):
     log = subprocess.run(["git", "log", "--oneline"], cwd=vault,
                          capture_output=True, text=True, check=True).stdout
     assert log.count("\n") == 2  # seed + 新 commit 保留
+
+
+def test_run_handles_chinese_and_space_filenames(vault_with_remote):
+    vault = vault_with_remote
+    (vault / "0_raw" / "commentaries").mkdir(parents=True)
+    (vault / "0_raw" / "commentaries" / "储能价值 最大化—难在哪.md").write_text("c", encoding="utf-8")
+    rc = run(vault, ["0_raw/commentaries/"], "test: chinese filename")
+    assert rc == 0
+    remote = subprocess.run(["git", "rev-parse", "origin/main"], cwd=vault,
+                            capture_output=True, text=True, check=True).stdout
+    local = subprocess.run(["git", "rev-parse", "HEAD"], cwd=vault,
+                           capture_output=True, text=True, check=True).stdout
+    assert local == remote
+
+
+def test_run_aborts_rebase_on_conflict_leaving_clean_tree(tmp_path, monkeypatch):
+    monkeypatch.setattr("scripts.service.produce_and_push.notify_send",
+                        lambda m: True)
+    remote = tmp_path / "remote.git"
+    subprocess.run(["git", "init", "--bare", str(remote)], check=True, capture_output=True)
+    # clone A(本地 vault)
+    vault = tmp_path / "vault"
+    subprocess.run(["git", "clone", str(remote), str(vault)], check=True, capture_output=True)
+    _git(["config", "user.name", "t"], vault)
+    _git(["config", "user.email", "t@t"], vault)
+    _git(["checkout", "-b", "main"], vault)
+    (vault / "0_raw" / "commentaries").mkdir(parents=True)
+    (vault / "0_raw" / "commentaries" / "c.md").write_text("base", encoding="utf-8")
+    _git(["add", "."], vault)
+    _git(["commit", "-m", "base"], vault)
+    _git(["push", "-u", "origin", "main"], vault)
+    # clone B 推一个冲突版本
+    other = tmp_path / "other"
+    subprocess.run(["git", "clone", str(remote), str(other)], check=True, capture_output=True)
+    _git(["config", "user.name", "o"], other)
+    _git(["config", "user.email", "o@o"], other)
+    (other / "0_raw" / "commentaries" / "c.md").write_text("theirs", encoding="utf-8")
+    _git(["add", "."], other)
+    _git(["commit", "-m", "theirs"], other)
+    _git(["push", "origin", "main"], other)
+    # 本地 vault 改同一文件 → run → rebase 冲突 → 应 exit 5 且树干净(rebase 已 abort)
+    (vault / "0_raw" / "commentaries" / "c.md").write_text("ours", encoding="utf-8")
+    rc = run(vault, ["0_raw/commentaries/"], "ours change")
+    assert rc == 5
+    assert not (vault / ".git" / "rebase-merge").exists()
+    assert not (vault / ".git" / "rebase-apply").exists()
+    status = subprocess.run(["git", "status", "--porcelain"], cwd=vault,
+                            capture_output=True, text=True, check=True).stdout
+    assert status.strip() == ""  # 树干净:本地 commit 保留在 HEAD,无 UU 残留
+
+
+def test_run_retries_stranded_commit_on_quiet_round(vault_with_remote, monkeypatch):
+    monkeypatch.setattr("scripts.service.produce_and_push.notify_send",
+                        lambda m: True)
+    vault = vault_with_remote
+    good_url = subprocess.run(["git", "remote", "get-url", "origin"], cwd=vault,
+                              capture_output=True, text=True, check=True).stdout.strip()
+    _git(["remote", "set-url", "origin", str(vault / "nonexistent.git")], vault)
+    (vault / "0_raw" / "commentaries").mkdir(parents=True)
+    (vault / "0_raw" / "commentaries" / "z.md").write_text("c", encoding="utf-8")
+    assert run(vault, ["0_raw/commentaries/"], "first try") == 5   # push 失败,commit 滞留
+    _git(["remote", "set-url", "origin", good_url], vault)
+    assert run(vault, ["0_raw/commentaries/"], "quiet round") == 0  # 安静轮重推成功
+    local = subprocess.run(["git", "rev-parse", "HEAD"], cwd=vault,
+                           capture_output=True, text=True, check=True).stdout
+    remote = subprocess.run(["git", "rev-parse", "origin/main"], cwd=vault,
+                            capture_output=True, text=True, check=True).stdout
+    assert local == remote

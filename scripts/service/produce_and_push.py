@@ -35,8 +35,9 @@ def classify_changes(porcelain: str, whitelist: list) -> tuple:
 
 def run(vault_dir, whitelist: list, message: str) -> int:
     vault_dir = Path(vault_dir)
-    porcelain = subprocess.run(["git", "status", "--porcelain", "-u"], cwd=str(vault_dir),
-                               check=True, capture_output=True, text=True).stdout
+    porcelain = subprocess.run(
+        ["git", "-c", "core.quotepath=false", "status", "--porcelain", "-u"],
+        cwd=str(vault_dir), check=True, capture_output=True, text=True).stdout
     to_add, violations = classify_changes(porcelain, whitelist)
     ts = datetime.now(timezone.utc).isoformat(timespec="seconds")
     if violations:
@@ -45,6 +46,20 @@ def run(vault_dir, whitelist: list, message: str) -> int:
         notify_send(msg)
         return 4
     if not to_add:
+        ahead = _git(["rev-list", "--count", "origin/main..HEAD"], vault_dir)
+        if ahead != "0":
+            try:
+                _git(["pull", "--rebase", "origin", "main"], vault_dir)
+                _git(["push", "origin", "main"], vault_dir)
+            except subprocess.CalledProcessError as e:
+                subprocess.run(["git", "rebase", "--abort"], cwd=str(vault_dir),
+                               capture_output=True)
+                msg = f"[produce_and_push] 滞留 commit 重推失败: {e.stderr[:200] if e.stderr else e}"
+                print(f"[{ts}] {msg}", file=sys.stderr)
+                notify_send(msg)
+                return 5
+            print(f"[{ts}] pushed stranded commits ({ahead})")
+            return 0
         print(f"[{ts}] no change, skip")
         return 0
     _git(["add", "--", *to_add], vault_dir)
@@ -53,6 +68,8 @@ def run(vault_dir, whitelist: list, message: str) -> int:
         _git(["pull", "--rebase", "origin", "main"], vault_dir)
         _git(["push", "origin", "main"], vault_dir)
     except subprocess.CalledProcessError as e:
+        subprocess.run(["git", "rebase", "--abort"], cwd=str(vault_dir),
+                       capture_output=True)
         msg = f"[produce_and_push] push 失败(本地 commit 保留待重试): {e.stderr[:200] if e.stderr else e}"
         print(f"[{ts}] {msg}", file=sys.stderr)
         notify_send(msg)
