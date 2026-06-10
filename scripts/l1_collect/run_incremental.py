@@ -114,16 +114,18 @@ def _gate_extracted_dir(ext_dir: Path, passed_dir: Path, comm_dir: Path,
     return n_pass, n_comm, n_rej, n_review
 
 
-def _ingest_commentary(comm_ext_dir: Path, staging_dir: Path) -> int:
-    """commentary extracted → ingest 成 staging raw(out_dir=staging)→ route_files 转 commentaries/。"""
+def _ingest_commentary(comm_ext_dir: Path, staging_dir: Path,
+                       vault_root: Path | None = None) -> int:
+    """commentary extracted → ingest 成 staging raw(out_dir=staging)→ route_files 转 commentaries/。
+    vault_root: 透传给 build_title_index/route_files(容器路径用);None → 旧默认(Mac 本地)。"""
     from .route_interpretations import route_files, build_title_index
     staging_dir.mkdir(parents=True, exist_ok=True)
     ingest_extracted(comm_ext_dir, staging_dir / "_ingest_log.jsonl", out_dir=staging_dir)
     paths = [p for p in staging_dir.glob("*.md")]
     if not paths:
         return 0
-    idx = build_title_index(skip_paths=set())
-    n = route_files(paths, index=idx, dry=False)
+    idx = build_title_index(skip_paths=set(), vault_root=vault_root)
+    n = route_files(paths, index=idx, dry=False, vault_root=vault_root)
     (staging_dir / "_ingest_log.jsonl").unlink(missing_ok=True)
     return n
 
@@ -166,7 +168,9 @@ def _run_channel(ch, cfg: IncrementalConfig, dedup, llm_fn) -> dict:
     ing_ok, _, pids = ingest_extracted(sd / "passed", sd / "ingest" / f"{label}.jsonl",
                                        out_dir=cfg.vault_dir)
     try:
-        n_comm_ing = _ingest_commentary(sd / "comm_ext", sd / "comm_stage")
+        # cfg.vault_dir 是 policies 子目录;parent.parent = vault 根
+        n_comm_ing = _ingest_commentary(sd / "comm_ext", sd / "comm_stage",
+                                        vault_root=cfg.vault_dir.parent.parent)
     except Exception as e:
         n_comm_ing = 0
         print(f"  [commentary-ingest 失败] {label[:40]}: {str(e)[:120]}")
