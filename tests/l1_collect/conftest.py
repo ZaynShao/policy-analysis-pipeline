@@ -4,6 +4,12 @@ from pathlib import Path
 import pytest
 
 
+@pytest.fixture(autouse=True)
+def _isolate_fetch_proxy_env(monkeypatch):
+    """测试默认无代理 env;需要时各测试自行 setenv。"""
+    monkeypatch.delenv("POLICY_FETCH_PROXY_URL", raising=False)
+
+
 @pytest.fixture
 def tmp_state_dir(tmp_path: Path) -> Path:
     """临时 state/ 目录,模拟 pipeline state 结构。"""

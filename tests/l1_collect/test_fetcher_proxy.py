@@ -41,6 +41,36 @@ def test_direct_success_never_touches_proxy(monkeypatch):
     assert r.via == "firecrawl" and not called
 
 
+class _FakeResp:
+    def __init__(self, content: bytes, status_code: int = 200):
+        self.content = content
+        self.status_code = status_code
+
+
+def test_fetch_via_proxy_passes_explicit_proxies_and_decodes_gbk(monkeypatch):
+    seen = {}
+    body = ("中文测试正文。" * 200)
+    gbk_html = ("<html><head><meta charset=\"gbk\"></head><body><p>"
+                + body + "</p></body></html>").encode("gbk")
+
+    def fake_get(url, headers=None, timeout=None, proxies=None):
+        seen["proxies"] = proxies
+        return _FakeResp(gbk_html)
+
+    monkeypatch.setattr(fetcher.requests, "get", fake_get)
+    text = fetcher._fetch_via_proxy("https://example.gov.cn/a", "http://proxy:1",
+                                    fetcher._extract_bs4)
+    assert seen["proxies"] == {"http": "http://proxy:1", "https": "http://proxy:1"}
+    assert text and "中文测试正文" in text   # 不是 mojibake
+
+
+def test_fetch_via_proxy_rejects_http_error(monkeypatch):
+    monkeypatch.setattr(fetcher.requests, "get",
+                        lambda *a, **k: _FakeResp(b"x", status_code=403))
+    assert fetcher._fetch_via_proxy("https://e.gov.cn/a", "http://proxy:1",
+                                    fetcher._extract_bs4) is None
+
+
 def test_proxy_path_does_not_mutate_environ(monkeypatch):
     # 纪律:fetcher 不得向 os.environ 写入 HTTP(S)_PROXY
     # 用 monkeypatch 先清除,再验证 fetcher 没有重写
