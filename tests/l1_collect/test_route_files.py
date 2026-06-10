@@ -23,7 +23,7 @@ def _write_policy(d: Path, name: str, title: str):
 
 
 def test_route_files_transforms_and_moves(tmp_path, monkeypatch):
-    from scripts._oneshot import route_interpretations as ri
+    from scripts.l1_collect import route_interpretations as ri
     pol = tmp_path / "policies"; com = tmp_path / "commentaries"
     com.mkdir(parents=True)
     _write_policy(pol, "解读.md", "《某细则》政策解读")
@@ -39,7 +39,7 @@ def test_route_files_transforms_and_moves(tmp_path, monkeypatch):
 
 
 def test_route_files_dry_no_write(tmp_path, monkeypatch):
-    from scripts._oneshot import route_interpretations as ri
+    from scripts.l1_collect import route_interpretations as ri
     pol = tmp_path / "policies"; com = tmp_path / "commentaries"; com.mkdir(parents=True)
     _write_policy(pol, "x.md", "《Y办法》问答")
     monkeypatch.setattr(ri, "POLICIES", pol); monkeypatch.setattr(ri, "COMMENTARIES", com)

@@ -15,6 +15,8 @@
       + related_policy_source: l1_title_match
       + related_policy_confidence: 0.7
 DRY_RUN=1 只打印计划不写盘。
+
+2026-06-10 转正自 scripts/_oneshot:进入每日 L1 cron 路径(run_incremental._ingest_commentary)。
 """
 from __future__ import annotations
 import os

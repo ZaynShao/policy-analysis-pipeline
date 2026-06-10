@@ -116,7 +116,7 @@ def _gate_extracted_dir(ext_dir: Path, passed_dir: Path, comm_dir: Path,
 
 def _ingest_commentary(comm_ext_dir: Path, staging_dir: Path) -> int:
     """commentary extracted → ingest 成 staging raw(out_dir=staging)→ route_files 转 commentaries/。"""
-    from scripts._oneshot.route_interpretations import route_files, build_title_index
+    from .route_interpretations import route_files, build_title_index
     staging_dir.mkdir(parents=True, exist_ok=True)
     ingest_extracted(comm_ext_dir, staging_dir / "_ingest_log.jsonl", out_dir=staging_dir)
     paths = [p for p in staging_dir.glob("*.md")]
