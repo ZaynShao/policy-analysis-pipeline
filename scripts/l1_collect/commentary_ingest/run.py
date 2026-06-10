@@ -32,6 +32,16 @@ from .writer import stage_market_intel, write_commentary
 CST = timezone(timedelta(hours=8))
 
 
+def validate_since(since: str) -> str:
+    """--since 格式校验:空串或严格 YYYY-MM-DD,否则 ValueError(防静默全丢)。"""
+    if since:
+        # 严格验证:YYYY-MM-DD 格式(年 4 位,月/日各 2 位)
+        if not (len(since) == 10 and since[4] == '-' and since[7] == '-'):
+            raise ValueError(f"--since 格式须为 YYYY-MM-DD(收到: {since!r})")
+        datetime.strptime(since, "%Y-%m-%d")  # 验证日期有效性
+    return since
+
+
 def filter_since(items: list, since: str) -> list:
     """--since 下限:date 非空且 < since 的丢弃;date 为空保留(去重兜底)。"""
     if not since:
@@ -115,6 +125,12 @@ def main() -> int:
     ap.add_argument("--since", default=os.environ.get("WEWE_SINCE", ""),
                     help="日期下限 YYYY-MM-DD;date 早于此的 feed item 跳过")
     args = ap.parse_args()
+
+    # 严格校验 --since 格式(防错误格式静默全丢)
+    try:
+        validate_since(args.since)
+    except ValueError:
+        ap.error(f"--since 格式须为 YYYY-MM-DD(收到: {args.since!r})")
 
     # token 健康检查。注意:token 失效时**不中止入库**——wewe-rss 仍能 serve 已存
     # 文章的 feed(token 只挡"发现新文章"),故照常消费并告警提醒补扫。
