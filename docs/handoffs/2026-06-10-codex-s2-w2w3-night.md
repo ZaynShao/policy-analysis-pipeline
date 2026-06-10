@@ -42,10 +42,11 @@ git -C /root/policy-vault status --short | head -40    # 列新增文件(预期 
 用户挑 2–3 份新入库 policy,`sed -n '1,40p' '/root/policy-vault/0_raw/policies/<文件名>'` 贴头部给用户抽查。**用户点头才 push**:
 
 ```bash
-/usr/bin/python3 -m scripts.service.produce_and_push --vault-dir /root/policy-vault \
+cd /root/policy-pipeline-src && /usr/bin/python3 -m scripts.service.produce_and_push --vault-dir /root/policy-vault \
   --whitelist 0_raw/policies/,0_raw/commentaries/ --message "l1(policy): W3 supervised verification run"
 wc -l /root/policy-pipeline-state/l2_queue.jsonl    # 应 >0(L2 有活干了)
 ```
+（`produce_and_push` 是 host python 跑的 module,**必须先 `cd /root/policy-pipeline-src`** 否则 `No module named 'scripts'`。）
 
 预期 exit 0、打印 pushed N paths;exit 4(白名单外改动)/ exit 5(push 失败)→ 停,报 stderr。
 
@@ -65,7 +66,7 @@ wc -l /root/policy-pipeline-state/l2_queue.jsonl    # 应 >0(L2 有活干了)
 通过后:
 
 ```bash
-/usr/bin/python3 -m scripts.service.produce_and_push --vault-dir /root/policy-vault \
+cd /root/policy-pipeline-src && /usr/bin/python3 -m scripts.service.produce_and_push --vault-dir /root/policy-vault \
   --whitelist 1_extracted/,_meta/business_view/,2_crystallized/ --message "l2: W2 supervised first run (deepseek)"
 ```
 
