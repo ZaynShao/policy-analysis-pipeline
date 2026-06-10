@@ -163,7 +163,8 @@ def _run_channel(ch, cfg: IncrementalConfig, dedup, llm_fn) -> dict:
         sd / "ext", sd / "passed", sd / "comm_ext",
         sd / "quar" / "gate_rejects.jsonl", llm_fn,
         review_dir=sd / "review", run_label=label)
-    ing_ok, _, pids = ingest_extracted(sd / "passed", sd / "ingest" / f"{label}.jsonl")
+    ing_ok, _, pids = ingest_extracted(sd / "passed", sd / "ingest" / f"{label}.jsonl",
+                                       out_dir=cfg.vault_dir)
     try:
         n_comm_ing = _ingest_commentary(sd / "comm_ext", sd / "comm_stage")
     except Exception as e:
@@ -191,11 +192,11 @@ def run_incremental(cfg: IncrementalConfig) -> dict:
         for ch in channels:
             r = _run_channel(ch, cfg, dedup, llm_fn)
             results.append(r)
+            if not cfg.dry_run and r.get("pids"):
+                enqueue_ingested(cfg.l2_queue_path, r["pids"],
+                                 requested_at=datetime.now(CST).isoformat(timespec="seconds"))
             print(f"  {r['channel'][:48]:48s} scan={r['scanned']} ing={r.get('ingested',0)}")
     all_pids = [p for r in results for p in r.get("pids", [])]
-    if not cfg.dry_run and all_pids:
-        enqueue_ingested(cfg.l2_queue_path, all_pids,
-                         requested_at=datetime.now(CST).isoformat(timespec="seconds"))
     summary = {
         "channels_run": len(results),
         "total_scanned": sum(r["scanned"] for r in results),

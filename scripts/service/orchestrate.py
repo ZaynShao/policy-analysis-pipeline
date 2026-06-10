@@ -52,7 +52,14 @@ def drain_queue(queue_path: Path, ledger: dict, ledger_path: Path,
         item = l2_queue.next_item(queue_path)
         if item is None:
             break
-        res = process_pid(item.pid, raw_text_for(item.pid), version, ledger,
+        try:
+            raw_text = raw_text_for(item.pid)
+        except Exception as e:
+            results.append(StageResult(item.pid, False, f"raw_missing: {e}"))
+            l2_queue.mark_complete(queue_path, item.pid)
+            processed_any = True
+            continue
+        res = process_pid(item.pid, raw_text, version, ledger,
                           run_attribution, run_crystallize)
         results.append(res)
         l2_queue.mark_complete(queue_path, item.pid)
