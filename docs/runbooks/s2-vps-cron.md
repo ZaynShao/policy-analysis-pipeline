@@ -41,6 +41,12 @@ SHELL=/bin/bash
 # 09:30 L2 drain(容器)→ vault → push(W2 验证后解开注释)
 #30 9 * * * ( /usr/bin/flock -w 7200 9 || { set -a; . /etc/policy-pipeline/notify.env; set +a; /usr/bin/python3 -m scripts.service.notify "[S2] producer 锁等待超时(7200s),本轮跳过"; exit 1; }; set -a; . /etc/policy-pipeline/notify.env; set +a; cd /root/policy-pipeline-src && docker compose -f docker-compose.server.yml run --rm policy-producer python -m scripts.service.run_l2 --vault /vault --state-dir /state --gen-model deepseek-v4-flash --gen-provider openai --judge-model deepseek-v4-flash --judge-provider openai && /usr/bin/python3 -m scripts.service.produce_and_push --vault-dir /root/policy-vault --whitelist 1_extracted/,_meta/business_view/,2_crystallized/ --message "l2: daily derive" || /usr/bin/python3 -m scripts.service.notify "[S2] 09:30 L2 失败,查 l2.log" ) 9>/var/lock/policy-pipeline-producer.lock >> /var/log/policy-pipeline/l2.log 2>&1
 
+# 09:55 死信增长告警(host python,只读死信+自身state,不需 flock)
+55 9 * * * set -a; . /etc/policy-pipeline/notify.env; set +a; cd /root/policy-pipeline-src && /usr/bin/python3 -m scripts.service.deadletter_alert --state-dir /root/policy-pipeline-state >> /var/log/policy-pipeline/deadletter.log 2>&1
+
+# 周日 08:30 死信 sweep 回队(写队列,必须持 producer flock;回队项当日 09:30 L2 顺手消化)
+30 8 * * 0 ( /usr/bin/flock -w 7200 9 || exit 1; set -a; . /etc/policy-pipeline/notify.env; set +a; cd /root/policy-pipeline-src && /usr/bin/python3 -m scripts.service.deadletter_sweep --state-dir /root/policy-pipeline-state ) 9>/var/lock/policy-pipeline-producer.lock >> /var/log/policy-pipeline/deadletter.log 2>&1
+
 # 10:00 投影 heng-pg(消费侧 ro 服务;持锁防读到产线写一半的 vault)
 0 10 * * * ( /usr/bin/flock -w 7200 9 || { set -a; . /etc/policy-pipeline/notify.env; set +a; /usr/bin/python3 -m scripts.service.notify "[S2] producer 锁等待超时(7200s),本轮跳过"; exit 1; }; cd /root/policy-pipeline-src && docker compose -f docker-compose.server.yml run --rm policy-pipeline python -m scripts.sync.run_sync --vault /vault --state-dir /state --pipeline-version 1 || { set -a; . /etc/policy-pipeline/notify.env; set +a; /usr/bin/python3 -m scripts.service.notify "[S2] 10:00 投影失败"; } ) 9>/var/lock/policy-pipeline-producer.lock >> /var/log/policy-pipeline/sync_tick.log 2>&1
 
@@ -84,6 +90,7 @@ cat /root/policy-pipeline-state/last_sync_run.json | head -3
 - **l2_queue 无锁读改写**:并发安全完全靠本文 flock 串行化;绕过 cron 手跑生产命令时**必须**也拿锁(`flock /var/lock/policy-pipeline-producer.lock <cmd>`)。队列级 fcntl 锁 + 原子写是 W2 前的可选加固。
 - **vault↔ledger 对账 sweep 未建**:channel 崩溃窗口(入库后、入队前)的残余缺口,靠每 channel 即时入队已收窄到单 channel;周度对账(vault pids − ledger pids → 补队)留 W2+。
 - **drain 对 missing-raw pid 已防卡死**(出队 + StageResult error),失败项看 run_l2 输出的 failed 计数。
+- **死信 sweep 状态文件**:`l2_sweep_history.json` 记录每个 pid 已回队次数;`l2_failures.archived.jsonl` 保存已处理死信,放弃项永留归档,供人工追查。
 - **文件名控制字符缺口**:sanitize 未滤 \x00-\x1f,若标题携带会让 produce_and_push 的 quotepath 处理失效(概率极低);出现即修 sanitize 正则。
 - **重复 pid 双文件 wart**(同 pid 重入库产生 `__1` 同 id 文件)= 既有行为,S3 cleanup 项。
 - run_incremental 容器路径拓扑:运行时 state(队列/ledger)在 `/state`,仓内 state(catalog/staging)在 `/app/state`(compose 挂载,见 docker-compose.server.yml policy-producer 注释)。
