@@ -6,6 +6,7 @@ run_sync/sync_tick。纯映射逻辑可单测;真 PG 写入在 main()(需 DATABA
 
 ON CONFLICT 只在 verdict IS NULL 时更新 → 已被人判过的行不被新一轮 sync 覆盖。
 """
+import hashlib
 import os
 from scripts.l1_collect.review_pool import load, POOL
 
@@ -18,8 +19,10 @@ _COLS = ("dedupeKey", "pipelineKind", "pipelineRef", "reason",
 
 
 def pool_row_to_pg(r: dict) -> dict:
+    dedupe_key = f'{r["kind"]}::{r["ref"]}'
     return {
-        "dedupeKey": f'{r["kind"]}::{r["ref"]}',
+        "id": "l1_" + hashlib.sha1(dedupe_key.encode("utf-8")).hexdigest()[:24],
+        "dedupeKey": dedupe_key,
         "pipelineKind": r["kind"],
         "pipelineRef": r["ref"],
         "reason": r.get("reason"),
