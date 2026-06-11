@@ -1,6 +1,6 @@
 import json
 
-from scripts.market_intel_signals.run import run_dryrun
+from scripts.market_intel_signals.run import main, run_dryrun
 
 
 def test_dryrun_writes_state_and_html_without_modifying_vault(tmp_path):
@@ -69,3 +69,32 @@ def test_dryrun_queues_missing_pid(tmp_path):
     assert result["summary"]["review_queue"] == 1
     row = json.loads((state / "market" / "review_queue.jsonl").read_text(encoding="utf-8").strip())
     assert row["reason"] == "manifest_pid_not_found"
+
+
+def test_cli_dryrun_uses_default_manifest_path(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    vault = tmp_path / "vault"
+    state = tmp_path / "state_out"
+    policies = vault / "0_raw" / "policies"
+    policies.mkdir(parents=True)
+    (vault / "_meta").mkdir(parents=True)
+    (vault / "_meta" / "themes_registry.yaml").write_text("themes: []\n", encoding="utf-8")
+    (policies / "p.md").write_text(
+        "---\n"
+        "id: P_DEFAULT_MANIFEST\n"
+        "title: 默认 manifest 政策\n"
+        "date: '2026-06-01'\n"
+        "region: {level: 国家, code: '000000', name: 全国}\n"
+        "---\n"
+        "正文\n",
+        encoding="utf-8",
+    )
+    manifest = tmp_path / "state" / "source_ready" / "market_intel_manifest.jsonl"
+    manifest.parent.mkdir(parents=True)
+    manifest.write_text(
+        json.dumps({"pid": "P_DEFAULT_MANIFEST", "class": "market_intel"}, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+
+    assert main(["dry-run", "--vault", str(vault), "--state", str(state)]) == 0
+    assert json.loads((state / "summary.json").read_text(encoding="utf-8"))["manifest_rows"] == 1

@@ -52,6 +52,29 @@ def test_daily_check_does_not_relay_when_feed_valid(tmp_path):
     assert calls == []
 
 
+def test_daily_check_relays_when_token_invalid_even_if_feed_valid(tmp_path):
+    captured = []
+
+    def fake_relay(config, **_kwargs):
+        captured.append(config)
+        return RelayResult(True, True, False, "pushed")
+
+    result = run_daily_check(
+        db_path=tmp_path / "wewe.db",
+        qr_dir=tmp_path,
+        target="target-1",
+        wewe_base_url="http://localhost:4000",
+        auth_code="auth-code",
+        feed_checker=lambda base_url, auth_code: TokenStatus(True, "account", "feed ok"),
+        token_checker=lambda db_path: TokenStatus(False, "account", f"token invalid: {db_path.name}"),
+        relay=fake_relay,
+    )
+
+    assert result.relayed is True
+    assert result.restored is False
+    assert captured
+
+
 def test_daily_check_relays_when_feed_invalid(tmp_path):
     adapter = FakeAdapter()
 
