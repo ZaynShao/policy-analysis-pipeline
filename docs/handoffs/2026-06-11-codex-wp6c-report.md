@@ -184,3 +184,131 @@ crontab -l | wc -l
 ### Recommended next step
 
 Fix the host-side Postgres connection address for `/usr/bin/python3` runs before installing these host cron lines. The current `DATABASE_URL` hostname `heng-pg` is not resolvable from the server host namespace, so either the cron path needs a host-resolvable DSN or the consumer needs to run in a namespace where `heng-pg` resolves.
+
+## 续跑 3
+
+Date: 2026-06-11
+Executor: Codex
+Target: `root@8.216.59.173`, repo `/root/policy-pipeline-src`
+
+### Result
+
+Cron installed in container form.
+
+Important caveat: `sync_l1_pool` connected to PG and exited `0`, but it was not a pure empty-pool no-op. It saw 15 `fetch_fail` rows and skipped all 15 because PG `L1ReviewQueue.id` is `NOT NULL` while the current insert shape sends `id = null`. No connection failure occurred.
+
+### 1. Sync server repo to main
+
+Command shape:
+
+```bash
+cd /root/policy-pipeline-src
+git fetch --depth=1 origin main
+git reset --hard origin/main
+git rev-parse --short HEAD
+```
+
+Observed output:
+
+```text
+From github-pipeline:ZaynShao/policy-analysis-pipeline
+ * branch            main       -> FETCH_HEAD
+ + b131883...397b719 main       -> origin/main  (forced update)
+HEAD is now at 397b719 docs(runbook): review_consumer cron runs in policy-producer container (heng-pg only resolvable on platform-net)
+397b719
+```
+
+Exit code: `0`
+
+### 2. Manual run: `sync_l1_pool`
+
+Command shape:
+
+```bash
+cd /root/policy-pipeline-src
+docker compose -f docker-compose.server.yml run --rm policy-producer \
+  python -m scripts.l1_review_consumer.sync_l1_pool
+```
+
+No env values were printed.
+
+Observed output:
+
+```text
+Container policy-pipeline-src-policy-producer-run-c5fca638bcf0 Creating
+Container policy-pipeline-src-policy-producer-run-c5fca638bcf0 Created
+skip fetch_fail::http://scjg.tj.gov.cn/: null value in column "id" of relation "L1ReviewQueue" violates not-null constraint
+DETAIL:  Failing row contains (null, fetch_fail::http://scjg.tj.gov.cn/, fetch_fail, http://scjg.tj.gov.cn/, fetch_error_after_retry, retry, null, , 天津市__政府网__www.tj.gov.cn, 天津市__政府网__www.tj.gov.cn, null, null, null, null, null, null, null, f, 2026-06-11 10:01:47.545).
+
+skip fetch_fail::https://zz.hnzwfw.gov.cn/zzzw/item/frindex.do?type=2&areaCode=410100000000&themeName=%E6%8A%95%E8%B5%84%E5%AE%A1%E6%89%B9&dictValue=08: null value in column "id" of relation "L1ReviewQueue" violates not-null constraint
+skip fetch_fail::https://www.changzhou.gov.cn/vote/survey.php?a=vinfo&bid=1861: null value in column "id" of relation "L1ReviewQueue" violates not-null constraint
+skip fetch_fail::https://www.ndrc.gov.cn/xwdt/202606/t20260601_1405631.html: null value in column "id" of relation "L1ReviewQueue" violates not-null constraint
+skip fetch_fail::https://www.ndrc.gov.cn/xwdt/202605/t20260520_1405314.html: null value in column "id" of relation "L1ReviewQueue" violates not-null constraint
+skip fetch_fail::https://www.ndrc.gov.cn/xwdt/202604/t20260424_1404879.html: null value in column "id" of relation "L1ReviewQueue" violates not-null constraint
+skip fetch_fail::https://gxt.hebei.gov.cn/hbgyhxxht/ztzl11/gxrsgxs/2026042909442068878/index.html: null value in column "id" of relation "L1ReviewQueue" violates not-null constraint
+skip fetch_fail::https://gxt.hebei.gov.cn/hbgyhxxht/ztzl11/gxrsgxs/2025102416012298445/index.html: null value in column "id" of relation "L1ReviewQueue" violates not-null constraint
+skip fetch_fail::http://nyj.yn.gov.cn: null value in column "id" of relation "L1ReviewQueue" violates not-null constraint
+skip fetch_fail::http://scjdglj.gxzf.gov.cn/zwgk/t27742710.shtml: null value in column "id" of relation "L1ReviewQueue" violates not-null constraint
+skip fetch_fail::http://scjdglj.gxzf.gov.cn/zwgk/t27686560.shtml: null value in column "id" of relation "L1ReviewQueue" violates not-null constraint
+skip fetch_fail::http://scjdglj.gxzf.gov.cn/zwgk/t27544920.shtml: null value in column "id" of relation "L1ReviewQueue" violates not-null constraint
+skip fetch_fail::http://scjdglj.gxzf.gov.cn/zwgk/t27542899.shtml: null value in column "id" of relation "L1ReviewQueue" violates not-null constraint
+skip fetch_fail::https://amr.hainan.gov.cn/zw/202606/t20260603_4086675.html: null value in column "id" of relation "L1ReviewQueue" violates not-null constraint
+skip fetch_fail::https://m.12371.gov.cn/app/template/displayTemplate/news/newsDetail/40/508665.html?isShare=true: null value in column "id" of relation "L1ReviewQueue" violates not-null constraint
+forward synced 0/15 rows -> PG L1ReviewQueue
+EXIT=0
+```
+
+Exit code: `0`
+
+### 3. Manual run: `poll_l1_verdicts`
+
+Command shape:
+
+```bash
+cd /root/policy-pipeline-src
+docker compose -f docker-compose.server.yml run --rm policy-producer \
+  python -m scripts.l1_review_consumer.poll_l1_verdicts
+```
+
+No env values were printed.
+
+Observed output:
+
+```text
+Container policy-pipeline-src-policy-producer-run-da235c8052d4 Creating
+Container policy-pipeline-src-policy-producer-run-da235c8052d4 Created
+reverse polled 0 verdicts -> /app/state/l1_review/verdicts.jsonl (重核 + review GC 在 applier,见 handoff)
+EXIT=0
+```
+
+Exit code: `0`
+
+### 4. Cron install and verification
+
+Installed runbook container-form lines:
+
+```cron
+5 10 * * * cd /root/policy-pipeline-src && docker compose -f docker-compose.server.yml run --rm policy-producer python -m scripts.l1_review_consumer.sync_l1_pool >> /var/log/policy-pipeline/review_consumer.log 2>&1
+*/30 8-22 * * * cd /root/policy-pipeline-src && docker compose -f docker-compose.server.yml run --rm policy-producer python -m scripts.l1_review_consumer.poll_l1_verdicts >> /var/log/policy-pipeline/review_consumer.log 2>&1
+```
+
+Verification:
+
+```text
+crontab -l | grep -c l1_review_consumer
+2
+crontab -l | wc -l
+32
+```
+
+### Gate status
+
+- Credential values remained blind.
+- Vault was not touched.
+- Both consumer modules ran inside `policy-producer`, where `heng-pg` resolves through the container network.
+- Cron mutation was limited to removing any existing `l1_review_consumer` lines and appending the two runbook container-form lines.
+- PG forward sync did not insert rows because all 15 current pool rows hit the `L1ReviewQueue.id` non-null constraint and were skipped by the script.
+
+### Recommended next step
+
+Fix the B14 PG insert contract mismatch: either `sync_l1_pool` must provide a deterministic `id`, or the `L1ReviewQueue.id` column must have the default expected by the service schema. Until then, the cron is installed but forward sync will keep skipping current pool rows.
