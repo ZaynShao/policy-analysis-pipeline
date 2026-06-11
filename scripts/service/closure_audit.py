@@ -5,6 +5,7 @@ import argparse
 import json
 import subprocess
 import time
+from datetime import datetime
 from pathlib import Path
 
 from scripts.service import notify
@@ -25,6 +26,8 @@ PRODUCT_PATH_PREFIXES = (
     "_meta/business_view/",
 )
 VPS_AUTHOR = "policy-pipeline-vps"
+# 单生产者时代分界:之前的 Mac 时代 commit 豁免作者检查。
+PURITY_CUTOFF = "2026-06-11T00:00:00+08:00"
 
 
 def _git(vault: Path, *args: str) -> str:
@@ -91,11 +94,14 @@ def check_vault_git(vault: Path) -> list[str]:
     if head != origin_main:
         violations.append(f"vault HEAD != origin/main: {head[:12]} != {origin_main[:12]}")
 
-    log = _git(vault, "log", "-n", "20", "--format=%H%x00%an")
+    purity_cutoff = datetime.fromisoformat(PURITY_CUTOFF)
+    log = _git(vault, "log", "-n", "20", "--format=%H%x00%an%x00%aI")
     for line in log.splitlines():
         if not line:
             continue
-        commit, author = line.split("\x00", 1)
+        commit, author, author_date = line.split("\x00", 2)
+        if datetime.fromisoformat(author_date) < purity_cutoff:
+            continue
         product_paths = [
             path
             for path in _changed_paths(vault, commit)
