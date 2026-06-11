@@ -41,6 +41,7 @@ def _empty_relation_summary() -> dict:
         "superseded_by_count": 0,
         "clarifies_out": 0,
         "clarified_by_count": 0,
+        "other_rel_counts": {},
     }
 
 
@@ -70,6 +71,13 @@ def _require_relation_field(row: dict, field: str) -> str:
     return value
 
 
+def _relation_candidate_id(row: dict) -> str:
+    value = str(row.get("candidate_id") or row.get("source") or "")
+    if not value:
+        raise ValueError("relation row missing required field: candidate_id")
+    return value
+
+
 def _aggregate_relations(rows: list[dict]) -> tuple[dict[str, dict], dict[str, set[str]]]:
     relation_by_policy: dict[str, dict] = {}
     refs_by_policy: dict[str, set[str]] = {}
@@ -79,12 +87,10 @@ def _aggregate_relations(rows: list[dict]) -> tuple[dict[str, dict], dict[str, s
         refs_by_policy.setdefault(policy_id, set())
 
     for row in rows:
-        candidate_id = _require_relation_field(row, "candidate_id")
+        candidate_id = _relation_candidate_id(row)
         source = _require_relation_field(row, "from")
         target = _require_relation_field(row, "to")
         rel = _require_relation_field(row, "rel")
-        if rel not in RELATIONS:
-            raise ValueError(f"unsupported relation type for analysis_context preview: {rel}")
 
         ensure(source)
         ensure(target)
@@ -103,6 +109,13 @@ def _aggregate_relations(rows: list[dict]) -> tuple[dict[str, dict], dict[str, s
         elif rel == "clarifies":
             relation_by_policy[source]["clarifies_out"] += 1
             relation_by_policy[target]["clarified_by_count"] += 1
+        else:
+            relation_by_policy[source]["other_rel_counts"][rel] = (
+                relation_by_policy[source]["other_rel_counts"].get(rel, 0) + 1
+            )
+            relation_by_policy[target]["other_rel_counts"][rel] = (
+                relation_by_policy[target]["other_rel_counts"].get(rel, 0) + 1
+            )
 
     return relation_by_policy, refs_by_policy
 
@@ -196,6 +209,7 @@ def _build_rows(relations: list[dict], policy_context_rows: list[dict]) -> list[
 
 def _summary(relations: list[dict], policy_context_rows: list[dict], rows: list[dict]) -> dict:
     flag_counter = Counter(flag for row in rows for flag in row.get("analysis_flags") or [])
+    rel_counter = Counter(str(row.get("rel") or "") for row in relations if row.get("rel"))
     rows_with_relation = sum(1 for row in rows if row["audit_refs"]["relation_candidate_ids"])
     rows_with_signal = sum(
         1
@@ -218,6 +232,7 @@ def _summary(relations: list[dict], policy_context_rows: list[dict], rows: list[
             )
         ),
         "rows_by_flag": dict(sorted(flag_counter.items())),
+        "rel_vocabulary_seen": dict(sorted(rel_counter.items())),
         "notes": [
             "preview_only_no_vault_write",
             "raw_unchanged",
