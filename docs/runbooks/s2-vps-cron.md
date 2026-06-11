@@ -31,6 +31,9 @@
 SHELL=/bin/bash
 # ───────── S2 单生产者编排(时刻=CST;UTC 机器全部 -8h)─────────
 
+# 02:00 ③关系增量(容器 LLM judge;增量=新pid×存量;produce_and_push 白名单只放 relations)
+0 2 * * * ( /usr/bin/flock -w 7200 9 || { set -a; . /etc/policy-pipeline/notify.env; set +a; /usr/bin/python3 -m scripts.service.notify "[S2] producer 锁等待超时(7200s),本轮跳过"; exit 1; }; set -a; . /etc/policy-pipeline/notify.env; set +a; cd /root/policy-pipeline-src && docker compose -f docker-compose.server.yml run --rm policy-producer python -m scripts.service.relations_increment run --vault /vault --state-dir /state --judge-model deepseek-v4-flash --judge-provider openai && /usr/bin/python3 -m scripts.service.produce_and_push --vault-dir /root/policy-vault --whitelist 1_extracted/relations/ --message "l2(relations): nightly increment" || /usr/bin/python3 -m scripts.service.notify "[S2] 02:00 关系增量失败,查 relations.log" ) 9>/var/lock/policy-pipeline-producer.lock >> /var/log/policy-pipeline/relations.log 2>&1
+
 # 07:30 评论 ingest(容器,经 platform-net 访问 wewe-rss)→ vault → push
 30 7 * * * ( /usr/bin/flock -w 7200 9 || { set -a; . /etc/policy-pipeline/notify.env; set +a; /usr/bin/python3 -m scripts.service.notify "[S2] producer 锁等待超时(7200s),本轮跳过"; exit 1; }; set -a; . /etc/policy-pipeline/notify.env; . /etc/policy-pipeline/commentary.env; set +a; cd /root/policy-pipeline-src && docker compose -f docker-compose.server.yml run --rm -e WEWE_FEED_URL -e WEWE_AUTH_CODE policy-producer python -m scripts.l1_collect.commentary_ingest.run --feed-url "$WEWE_FEED_URL" --auth-code "$WEWE_AUTH_CODE" --vault-dir /vault --state-dir /state --since 2026-06-06 --feed-timeout 600 && /usr/bin/python3 -m scripts.service.produce_and_push --vault-dir /root/policy-vault --whitelist 0_raw/commentaries/ --message "l1(commentary): daily ingest" || /usr/bin/python3 -m scripts.service.notify "[S2] 07:30 评论 ingest 失败,查 ingest.log" ) 9>/var/lock/policy-pipeline-producer.lock >> /var/log/policy-pipeline/ingest.log 2>&1
 
@@ -94,3 +97,4 @@ cat /root/policy-pipeline-state/last_sync_run.json | head -3
 - **文件名控制字符缺口**:sanitize 未滤 \x00-\x1f,若标题携带会让 produce_and_push 的 quotepath 处理失效(概率极低);出现即修 sanitize 正则。
 - **重复 pid 双文件 wart**(同 pid 重入库产生 `__1` 同 id 文件)= 既有行为,S3 cleanup 项。
 - run_incremental 容器路径拓扑:运行时 state(队列/ledger)在 `/state`,仓内 state(catalog/staging)在 `/app/state`(compose 挂载,见 docker-compose.server.yml policy-producer 注释)。
+- **③关系增量三状态文件**:`relations_pid_ledger.json` 记录已覆盖 pid 集;`sem_accepted_cumulative.jsonl` 是累积语义 accepted(部署时由 `state/node3c/sem_accepted_20260606_seed.jsonl` 初始化);`relations_judged_ledger.jsonl` 是 append-only 判定账本,用于防重判。若需全量重判兜底,手动清这三件再跑;这会回到约 1019 对量级的昂贵判定,必须人工决策。
