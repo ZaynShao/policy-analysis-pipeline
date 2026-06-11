@@ -14,7 +14,7 @@
 | 4 | `/etc/policy-pipeline/commentary.env`(0600):WEWE_AUTH_CODE / WEWE_FEED_URL=`http://wewe-rss:4000/feeds/all.json?limit=400`(容器视角)/ WEWE_BASE_URL=`http://127.0.0.1:4000`(host 哨兵视角)/ WEWE_DB_PATH=`/root/wewe-rss/data/wewe-rss.db` | — |
 | 5 | wewe-rss 容器已加入 `safety-platform_platform-net`(plan Task 0.5) | 容器互通 curl 200 |
 | 6 | vault git 身份 + 可写 remote(github-vault-rw) | `git -C /root/policy-vault config user.name` 非空 |
-| 7 | 哨兵 venv:`python3 -m venv /root/policy-sentinel-venv && /root/policy-sentinel-venv/bin/pip install requests qrcode trafilatura beautifulsoup4 pyyaml`(trafilatura/yaml 是 `--check-token` 经 run.py 顶层 import 连带需要) | venv python `-c "import requests, qrcode, trafilatura"` |
+| 7 | 哨兵 venv:`python3 -m venv /root/policy-sentinel-venv && /root/policy-sentinel-venv/bin/pip install requests qrcode pillow trafilatura beautifulsoup4 pyyaml`(trafilatura/yaml 是 `--check-token` 经 run.py 顶层 import 连带需要;**pillow 是 qrcode 出 PNG 必需**——2026-06-11 实锤:漏装则推码在 render_qr_png 处 ModuleNotFoundError,QR 永远到不了 IM) | venv python `-c "import requests, qrcode, trafilatura; from PIL import Image"` |
 | 8 | **TZ 确认**:`timedatectl` 看服务器时区。下方时刻按 **CST** 写;若系统是 UTC,全部 -8h 换算后再进 crontab | — |
 | 9 | channel catalog 已随 git 到位:`ls /root/policy-pipeline-src/state/T1_channels/channel_catalog.yaml`(它是 git-tracked,容器经 `/app/state` 挂载可见) | — |
 
