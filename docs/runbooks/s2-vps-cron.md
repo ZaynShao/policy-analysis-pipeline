@@ -64,10 +64,11 @@ SHELL=/bin/bash
 # 10:00 投影 heng-pg(消费侧 ro 服务;持锁防读到产线写一半的 vault)
 0 10 * * * ( /usr/bin/flock -w 7200 9 || { set -a; . /etc/policy-pipeline/notify.env; set +a; /usr/bin/python3 -m scripts.service.notify "[S2] producer 锁等待超时(7200s),本轮跳过"; exit 1; }; cd /root/policy-pipeline-src && docker compose -f docker-compose.server.yml run --rm policy-pipeline python -m scripts.sync.run_sync --vault /vault --state-dir /state --pipeline-version 1 || { set -a; . /etc/policy-pipeline/notify.env; set +a; /usr/bin/python3 -m scripts.service.notify "[S2] 10:00 投影失败"; } ) 9>/var/lock/policy-pipeline-producer.lock >> /var/log/policy-pipeline/sync_tick.log 2>&1
 
+# (host /usr/bin/python3 不可达 heng-pg——它是 platform-net 容器网络名;consumer 必须容器跑,policy-producer 挂载 src/state→/app/state 恰合 POOL 仓内相对路径)
 # 10:05 L1 review 池前送(state pool→heng PG;池空=no-op)
-5 10 * * * cd /root/policy-pipeline-src && (set -a; . /etc/policy-pipeline/pipeline.env; . /etc/policy-pipeline/notify.env; set +a; /usr/bin/python3 -m scripts.l1_review_consumer.sync_l1_pool) >> /var/log/policy-pipeline/review_consumer.log 2>&1
+5 10 * * * cd /root/policy-pipeline-src && docker compose -f docker-compose.server.yml run --rm policy-producer python -m scripts.l1_review_consumer.sync_l1_pool >> /var/log/policy-pipeline/review_consumer.log 2>&1
 # 每 30 分钟(08-22 时)拉回裁决(PG→state/l1_review/verdicts.jsonl;无裁决=no-op)
-*/30 8-22 * * * cd /root/policy-pipeline-src && (set -a; . /etc/policy-pipeline/pipeline.env; . /etc/policy-pipeline/notify.env; set +a; /usr/bin/python3 -m scripts.l1_review_consumer.poll_l1_verdicts) >> /var/log/policy-pipeline/review_consumer.log 2>&1
+*/30 8-22 * * * cd /root/policy-pipeline-src && docker compose -f docker-compose.server.yml run --rm policy-producer python -m scripts.l1_review_consumer.poll_l1_verdicts >> /var/log/policy-pipeline/review_consumer.log 2>&1
 
 45 10 * * * cd /root/policy-pipeline-src && (set -a; . /etc/policy-pipeline/notify.env; set +a; /usr/bin/python3 -m scripts.service.closure_audit --vault /root/policy-vault --state-dir /root/policy-pipeline-state) >> /var/log/policy-pipeline/closure_audit.log 2>&1
 
