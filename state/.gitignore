@@ -27,3 +27,6 @@
 # commentary_ingest:仅放行目录占位;台账/last_run/正文均为运行态,不进 git
 !commentary_ingest/
 !commentary_ingest/.gitkeep
+# source_ready:market_intel manifest 是审定种子(23 行),入 git 分发到服务器(WP-3b)
+!source_ready/
+!source_ready/market_intel_manifest.jsonl
