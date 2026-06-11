@@ -149,6 +149,7 @@ L3 地基依赖产物全集在场，四族进闭环范围，每族 mini-spec →
 |---|---|---|
 | 1 | opinions 去留 | ✅ 用户裁决（2026-06-11）：**放弃**。commentary_signals 正式接替，76 页冻结归档，不进闭环判据 |
 | 2 | classification 去留 | ✅ 查证后废弃（2026-06-11）：**它不是产物族**，是 T2a 清理把建设期 B7_subagent 倒灌 raw 的标签搬出来的残渣（每行 source=`policy_raw_frontmatter_pre_t2a_migration`），零生产者零消费者；其职能由 L1 policy_gate 承担。51 行留档作 S3 垃圾清理线索 |
+| 5 | L1 verdict applier 时机 | ✅ Claude 处置（2026-06-11，对用户透明可推翻）：**推迟**。侦察实据：B14 三模块代码+单测齐，但 applier 未实现且裁决流量为零（pool 空、verdicts.jsonl 无一条）。WP-6c 只接两条 cron（forward sync_l1_pool + reverse poll_l1_verdicts），verdict 安全积累于 `state/l1_review/verdicts.jsonl`；**applier 触发条件=第一条真实 verdict 落地**，届时按 `docs/B14-applier-handoff-2026-06-08.md` 建。与 summaries 同款原则：零流量管道不预建泵 |
 | 4 | policy_summaries 去留 | ✅ 用户裁决（2026-06-11）："hengguan 侧阅读辅助，不在四层主干"。**划归 L3 规范侧**，移出闭环判据：不装 cron、不回填；`summaries_increment.py`/`summaries_nightly.sh` 留仓库存，启用前提=L3 规范定义摘要形态。SCHEMA §5.1 注记排 WP-6 文档重写。已落的存量清洗保留（934→816 行，118 行坏 id 检疫，vault `a48e1a0e`）。佐证：run_sync/policy_mapper 零消费、历史生产者=旧 bv 派生器副产品、现行 ②-B 不出此物 |
 | 3 | manifest 登记的人工裁决位形态（B1 spec 已有人工池设计，确认即可）| ✅ 用户裁决（2026-06-11）：**market_intel 增长线放弃**（"略有价值的尾巴，不在意"）。保留 23 行存量 manifest 每晚确定性再生产（derived_signals 链输入需要，零成本）；**不建** staging→manifest 登记器、**不设计** raw 域、**不加**积压提醒。staging 命中静默积存 /state，无害。事实佐证：路由过滤器上线至今零命中（服务器+Mac staging 均空）|
 
