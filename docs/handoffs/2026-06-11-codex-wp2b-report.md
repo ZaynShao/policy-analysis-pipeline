@@ -325,3 +325,209 @@ git -C /root/policy-vault status --short
 推荐路径：先修复 Docker build 的 Python 依赖可解析性，再重新执行本 resume 包的 Step 0。
 
 理由：本次失败发生在镜像构建阶段的 `pip install --no-cache-dir -e .`，尚未进入关系 dry-run、judge、apply 或投影。当前 `pyproject.toml` 使用无上界依赖 `anthropic>=0.40`，构建时 pip 在解析 `anthropic` / `httpx` / `httpcore` 时失败；应在源码侧沉淀可重复构建的依赖约束后合 main，不建议在服务器上临时绕过。
+
+## 续跑 2
+
+时间：2026-06-11 15:37-16:12 CST  
+服务器：`root@8.216.59.173`  
+结论：**完成 Step 0'→5。镜像重建成功；dry-run 三数门通过；真跑 apply+push 成功；投影 `relation_count=1649`；02:00 关系增量 cron 已安装。**
+
+### 红线状态
+
+- 未打印 `/etc/policy-pipeline/*.env` 凭据值；只在命令内 `source notify.env`。
+- 未手工 `git add/commit` vault；vault 写入只经 `relations_increment` apply 和 `produce_and_push`。
+- 真跑 apply/push 与投影验证均持 `/var/lock/policy-pipeline-producer.lock`。
+- 未触碰 `/root/safety-platform`、`platform-*`、tyo-prod、Mac wewe 容器。
+- 执行时间为 15:37-16:12 CST，不在 07:00-10:30 CST 产线窗口。
+
+### Step 0' · 重试构建
+
+执行：
+
+```bash
+cd /root/policy-pipeline-src
+git rev-parse --short HEAD
+docker compose -f docker-compose.server.yml build policy-pipeline
+docker run --rm policy-pipeline:latest git --version
+docker run --rm policy-pipeline:latest sh -c "grep -c check_apply_gates /app/scripts/service/relations_increment.py"
+```
+
+关键输出：
+
+```text
+2026-06-11 15:37:18 CST +0800
+SRC_HEAD_SHORT=9f78512
+Successfully installed ... anthropic-0.109.1 ... httpcore-1.0.9 httpx-0.28.1 ... zce-pipeline-0.1.0
+Image policy-pipeline:latest Built
+git version 2.47.3
+2
+```
+
+判定：通过。第一次重试即成功，无需等 60 秒或进入第 2/3 次重试；两个镜像闸均通过。
+
+### Step 1 · 状态校验
+
+按修订要求只验不做，未重跑 `init-ledger`。
+
+执行：
+
+```bash
+wc -l /root/policy-pipeline-state/sem_accepted_cumulative.jsonl
+python3 - <<'PY'
+import json
+with open("/root/policy-pipeline-state/relations_pid_ledger.json") as f:
+    print(len(json.load(f)["covered"]))
+PY
+```
+
+关键输出：
+
+```text
+537 /root/policy-pipeline-state/sem_accepted_cumulative.jsonl
+873
+```
+
+备注：首次只读 Python 命令本地引号拼错，远端只返回 `SyntaxError`，未改状态；随后用 heredoc 更正并得到 `873`。
+
+判定：通过。`537 / 873` 均符合修订要求。
+
+### Step 2 · 监督 dry-run
+
+执行：
+
+```bash
+set -a; . /etc/policy-pipeline/notify.env; set +a
+cd /root/policy-pipeline-src
+flock /var/lock/policy-pipeline-producer.lock docker compose -f docker-compose.server.yml run --rm policy-producer \
+  python -m scripts.service.relations_increment run --vault /vault --state-dir /state \
+  --judge-model deepseek-v4-flash --judge-provider openai --dry-run
+```
+
+关键输出：
+
+```text
+{"new_pids": 361, "judged": 431, "accepted": 131, "canonical_edges": 1669, "applied": false}
+```
+
+判定：通过。`new_pids=361` 命中 361±30；`judged=431` 为数百量级且在 WP-0 估值 ±50% 内；`canonical_edges=1669` ≥ 967 且 ≥ 1138；`applied=false`。
+
+### Step 3 · 真跑 apply + push
+
+执行：
+
+```bash
+set -a; . /etc/policy-pipeline/notify.env; set +a
+cd /root/policy-pipeline-src
+flock /var/lock/policy-pipeline-producer.lock bash -c '
+  set -e
+  docker compose -f docker-compose.server.yml run --rm policy-producer \
+    python -m scripts.service.relations_increment run --vault /vault --state-dir /state \
+    --judge-model deepseek-v4-flash --judge-provider openai
+  /usr/bin/python3 -m scripts.service.produce_and_push --vault-dir /root/policy-vault \
+    --whitelist 1_extracted/relations/ --message "l2(relations): catch-up increment (361 pids since 6/6)"
+'
+```
+
+关键输出：
+
+```text
+{"new_pids": 361, "judged": 0, "accepted": 0, "canonical_edges": 1669, "applied": true}
+[2026-06-11T08:10:24+00:00] pushed 551 paths: l2(relations): catch-up increment (361 pids since 6/6)
+VAULT_HEAD=69eb62e42d20049fcdbc11ea7094ec5f179a511e
+VAULT_ORIGIN=69eb62e42d20049fcdbc11ea7094ec5f179a511e
+git -C /root/policy-vault status --short
+<empty>
+```
+
+判定：通过。dry-run 已落 judged ledger，真跑 `judged=0`、`accepted=0` 符合复用判定账本预期；`applied=true`；`produce_and_push` exit 0；vault 干净且 HEAD==origin/main。
+
+### Step 4 · 投影验证
+
+执行：
+
+```bash
+cd /root/policy-pipeline-src
+flock /var/lock/policy-pipeline-producer.lock docker compose -f docker-compose.server.yml run --rm \
+  policy-pipeline python -m scripts.sync.run_sync --vault /vault --state-dir /state --pipeline-version 1
+head -c 400 /root/policy-pipeline-state/last_sync_run.json; echo
+```
+
+关键输出：
+
+```text
+{"synced_count": 1176, "skipped_override_count": 0, "relation_count": 1649, "errors": [], "skipped_invalid_count": 15, "commentary_count": 171}
+{
+  "synced_count": 1176,
+  "skipped_override_count": 0,
+  "relation_count": 1649,
+  "errors": [],
+  "skipped_invalid_count": 15,
+  "commentary_count": 171
+}
+```
+
+判定：通过。`errors=[]`，`relation_count=1649` > 1123。
+
+### Step 5 · 装 02:00 cron
+
+执行：从 `/root/policy-pipeline-src/docs/runbooks/s2-vps-cron.md` §1 复制 02:00 ③关系增量单行，追加进 root crontab；其余行不动。
+
+安装前：
+
+```text
+CRON_RELATIONS_BEFORE=0
+CRON_POLICY_BEFORE=10
+```
+
+安装输出：
+
+```text
+RELATIONS_CRON_INSTALLED
+```
+
+安装后：
+
+```text
+CRON_RELATIONS_AFTER=1
+CRON_POLICY_AFTER=11
+```
+
+判定：通过。`relations_increment` 行恰为 1；`policy` 总数比之前 +1。
+
+### 结束状态
+
+远端源码：
+
+```text
+2026-06-11 16:12:00 CST +0800
+SRC_HEAD=9f78512e88723bbddbf8f83280d1945fd74fb601
+```
+
+远端源码工作树仍只有此前运行产生的未跟踪 `__pycache__/`，未处理：
+
+```text
+?? scripts/__pycache__/
+?? scripts/analysis_high_precision_relations/__pycache__/
+?? scripts/analysis_relation_views/__pycache__/
+?? scripts/analysis_semantic_relations/__pycache__/
+?? scripts/l1_audit/__pycache__/
+?? scripts/l1_collect/__pycache__/
+?? scripts/l1_collect/commentary_ingest/__pycache__/
+?? scripts/l1_collect/commentary_ingest/qr_relay/__pycache__/
+?? scripts/service/__pycache__/
+```
+
+vault：
+
+```text
+VAULT_HEAD=69eb62e42d20049fcdbc11ea7094ec5f179a511e
+VAULT_ORIGIN=69eb62e42d20049fcdbc11ea7094ec5f179a511e
+git -C /root/policy-vault status --short
+<empty>
+```
+
+### 建议下一步
+
+推荐路径：进入次日 02:00 首个 cron 自运行观察；次日查看 `/var/log/policy-pipeline/relations.log`、vault 最新机器 commit、`last_sync_run.json`，确认 cron 环境与手跑一致。
+
+理由：本次监督手跑已完成 build、dry-run、apply、push、projection、cron 接线全链路；剩余风险主要在定时环境与夜间网络/API 可用性，而不是当前关系增量逻辑。
