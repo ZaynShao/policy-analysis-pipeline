@@ -27,6 +27,17 @@ def _relation(candidate_id, source, target, rel):
     }
 
 
+def _canonical_relation(edge_id, source, target, rel):
+    return {
+        "from": source,
+        "to": target,
+        "rel": rel,
+        "confidence": 0.9,
+        "evidence": {"snippet": "edge evidence"},
+        "source": edge_id,
+    }
+
+
 def _signal_row(policy_id):
     return {
         "policy_id": policy_id,
@@ -104,6 +115,48 @@ def test_analysis_context_keeps_relation_only_and_signal_only_rows(tmp_path):
     assert result["summary"]["rows_with_signal_context"] == 1
 
 
+def test_analysis_context_accepts_canonical_relation_source_as_candidate_id(tmp_path):
+    relations = tmp_path / "relations.jsonl"
+    policy_context = tmp_path / "policy_context.jsonl"
+    state = tmp_path / "state"
+    _write_jsonl(
+        relations,
+        [
+            _canonical_relation("SRC_aligns", "P_A", "P_B", "aligns_with"),
+            _canonical_relation("SRC_derives", "P_B", "P_C", "derives_from"),
+        ],
+    )
+    _write_jsonl(policy_context, [])
+
+    result = run_preview(relations, policy_context, state)
+
+    rows = _rows_by_policy(state / "analysis_context.jsonl")
+    assert rows["P_A"]["relation_summary"]["other_rel_counts"] == {"aligns_with": 1}
+    assert rows["P_B"]["relation_summary"]["other_rel_counts"] == {
+        "aligns_with": 1,
+        "derives_from": 1,
+    }
+    assert rows["P_C"]["relation_summary"]["other_rel_counts"] == {"derives_from": 1}
+    assert rows["P_A"]["audit_refs"]["relation_candidate_ids"] == ["SRC_aligns"]
+    assert rows["P_B"]["audit_refs"]["relation_candidate_ids"] == ["SRC_aligns", "SRC_derives"]
+    assert result["summary"]["rel_vocabulary_seen"] == {"aligns_with": 1, "derives_from": 1}
+
+
+def test_analysis_context_keeps_legacy_relation_counts_unchanged(tmp_path):
+    relations = tmp_path / "relations.jsonl"
+    policy_context = tmp_path / "policy_context.jsonl"
+    state = tmp_path / "state"
+    _write_jsonl(relations, [_relation("HPR_ref", "P_A", "P_B", "references")])
+    _write_jsonl(policy_context, [])
+
+    run_preview(relations, policy_context, state)
+
+    rows = _rows_by_policy(state / "analysis_context.jsonl")
+    assert rows["P_A"]["relation_summary"]["references_out"] == 1
+    assert rows["P_B"]["relation_summary"]["references_in"] == 1
+    assert rows["P_A"]["audit_refs"]["relation_candidate_ids"] == ["HPR_ref"]
+
+
 def test_analysis_context_rejects_relation_rows_without_required_fields(tmp_path):
     relations = tmp_path / "relations.jsonl"
     policy_context = tmp_path / "policy_context.jsonl"
@@ -113,6 +166,22 @@ def test_analysis_context_rejects_relation_rows_without_required_fields(tmp_path
 
     with pytest.raises(ValueError, match="candidate_id"):
         run_preview(relations, policy_context, state)
+
+
+def test_analysis_context_keeps_unknown_relation_types_visible_without_raising(tmp_path):
+    relations = tmp_path / "relations.jsonl"
+    policy_context = tmp_path / "policy_context.jsonl"
+    state = tmp_path / "state"
+    _write_jsonl(relations, [_canonical_relation("SRC_future", "P_A", "P_B", "future_rel")])
+    _write_jsonl(policy_context, [])
+
+    result = run_preview(relations, policy_context, state)
+
+    rows = _rows_by_policy(state / "analysis_context.jsonl")
+    assert rows["P_A"]["relation_summary"]["other_rel_counts"] == {"future_rel": 1}
+    assert rows["P_B"]["relation_summary"]["other_rel_counts"] == {"future_rel": 1}
+    assert rows["P_A"]["audit_refs"]["relation_candidate_ids"] == ["SRC_future"]
+    assert result["summary"]["rel_vocabulary_seen"] == {"future_rel": 1}
 
 
 def test_preview_outputs_files_and_boundary_html(tmp_path):
