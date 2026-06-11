@@ -64,6 +64,8 @@ SHELL=/bin/bash
 # 10:00 投影 heng-pg(消费侧 ro 服务;持锁防读到产线写一半的 vault)
 0 10 * * * ( /usr/bin/flock -w 7200 9 || { set -a; . /etc/policy-pipeline/notify.env; set +a; /usr/bin/python3 -m scripts.service.notify "[S2] producer 锁等待超时(7200s),本轮跳过"; exit 1; }; cd /root/policy-pipeline-src && docker compose -f docker-compose.server.yml run --rm policy-pipeline python -m scripts.sync.run_sync --vault /vault --state-dir /state --pipeline-version 1 || { set -a; . /etc/policy-pipeline/notify.env; set +a; /usr/bin/python3 -m scripts.service.notify "[S2] 10:00 投影失败"; } ) 9>/var/lock/policy-pipeline-producer.lock >> /var/log/policy-pipeline/sync_tick.log 2>&1
 
+45 10 * * * cd /root/policy-pipeline-src && (set -a; . /etc/policy-pipeline/notify.env; set +a; /usr/bin/python3 -m scripts.service.closure_audit --vault /root/policy-vault --state-dir /root/policy-pipeline-state) >> /var/log/policy-pipeline/closure_audit.log 2>&1
+
 # 09:30 QR relay 哨兵(host venv;token 失效→openclaw 推码→扫后 account.add 自动落库)
 30 9 * * * set -a; . /etc/policy-pipeline/notify.env; . /etc/policy-pipeline/commentary.env; set +a; cd /root/policy-pipeline-src && /root/policy-sentinel-venv/bin/python -m scripts.l1_collect.commentary_ingest.qr_relay.daily_check --db-path "$WEWE_DB_PATH" --qr-dir /root/policy-pipeline-state/wewe_qr --target "$OPENCLAW_IM_TARGET" >> /var/log/policy-pipeline/qr_relay.log 2>&1
 
