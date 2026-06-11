@@ -12,6 +12,7 @@ from .report import render_html
 
 
 DEFAULT_VAULT = Path.home() / "Documents" / "Zayn Main" / "政策分析"
+DEFAULT_MANIFEST = Path("state/source_ready/market_intel_manifest.jsonl")
 
 
 def load_theme_registry(path: Path) -> tuple[dict[str, list[str]], dict[str, str]]:
@@ -126,7 +127,7 @@ def main(argv=None) -> int:
     sub = parser.add_subparsers(dest="mode", required=True)
     dry = sub.add_parser("dry-run")
     dry.add_argument("--vault", type=Path, default=DEFAULT_VAULT)
-    dry.add_argument("--manifest", type=Path, required=True)
+    dry.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
     dry.add_argument("--state", type=Path, required=True)
     args = parser.parse_args(argv)
 

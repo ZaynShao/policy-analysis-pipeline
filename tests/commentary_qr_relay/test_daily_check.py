@@ -43,6 +43,7 @@ def test_daily_check_does_not_relay_when_feed_valid(tmp_path):
         target="target-1",
         wewe_base_url="http://localhost:4000",
         auth_code="auth-code",
+        token_checker=lambda db_path: TokenStatus(True, "account", "token ok"),
         feed_checker=lambda base_url, auth_code: TokenStatus(True, "account", "ok"),
         relay=lambda *_args, **_kwargs: calls.append("relay"),
     )
@@ -164,6 +165,7 @@ def test_outage_cleared_on_valid(tmp_path):
         target="target-1",
         wewe_base_url="http://localhost:4000",
         auth_code="auth-code",
+        token_checker=lambda db_path: TokenStatus(True, "account", "token ok"),
         feed_checker=lambda base_url, auth_code: TokenStatus(True, "account", "ok"),
         relay=lambda *_args, **_kwargs: calls.append("relay"),
     )

@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Callable
 
-from .detector import TokenStatus
+from .detector import TokenStatus, token_needs_relay
 from .feed_health import feed_token_status
 from .qr_render import render_qr_png
 from .run import QRRelayConfig, RelayResult, relay_once
@@ -55,6 +55,7 @@ def run_daily_check(
     poll_interval_seconds: int = 5,
     confirm_checks: int = 3,
     confirm_interval_seconds: int = 10,
+    token_checker: Callable[[Path], TokenStatus] = token_needs_relay,
     feed_checker: Callable[[str, str], TokenStatus] = feed_token_status,
     relay: Any = relay_once,
     login_client: Any | None = None,
@@ -64,10 +65,14 @@ def run_daily_check(
     now: datetime | None = None,
 ) -> RelayResult:
     now = now or datetime.now(CST)
-    status = feed_checker(wewe_base_url, auth_code)
+    status = token_checker(Path(db_path))
+    feed_status = feed_checker(wewe_base_url, auth_code)
+    detail = status.detail
+    if feed_status.detail:
+        detail = f"{detail}; feed_check={feed_status.detail}" if detail else f"feed_check={feed_status.detail}"
     if status.valid:
         _clear_outage(qr_dir)
-        return RelayResult(True, False, True, status.detail)
+        return RelayResult(True, False, True, detail)
 
     prev = _load_outage(qr_dir)
     first_down = datetime.fromisoformat(prev["first_down_at"]) if prev else now
@@ -91,7 +96,7 @@ def run_daily_check(
     )
 
     def detector(_db_path: Path) -> TokenStatus:
-        return feed_checker(wewe_base_url, auth_code)
+        return token_checker(Path(_db_path))
 
     kwargs: dict[str, Any] = {
         "detector": detector,
