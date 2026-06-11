@@ -312,3 +312,76 @@ crontab -l | wc -l
 ### Recommended next step
 
 Fix the B14 PG insert contract mismatch: either `sync_l1_pool` must provide a deterministic `id`, or the `L1ReviewQueue.id` column must have the default expected by the service schema. Until then, the cron is installed but forward sync will keep skipping current pool rows.
+
+## 续跑 4
+
+Date: 2026-06-11
+Executor: Codex
+Target: `root@8.216.59.173`, repo `/root/policy-pipeline-src`
+
+### Result
+
+Stopped after the forward rerun.
+
+Reason: the server checkout was reset to the expected deterministic-id fix commit `db10dc2`, but the container-form forward rerun still skipped all current pool rows.
+
+### 1. Sync server repo to main
+
+Command shape:
+
+```bash
+cd /root/policy-pipeline-src
+git fetch --depth=1 origin main
+git reset --hard origin/main
+git rev-parse --short HEAD
+```
+
+Observed output:
+
+```text
+From github-pipeline:ZaynShao/policy-analysis-pipeline
+ * branch            main       -> FETCH_HEAD
+ + 397b719...db10dc2 main       -> origin/main  (forced update)
+HEAD is now at db10dc2 fix(l1): generate deterministic review queue ids
+db10dc2
+```
+
+Exit code: `0`
+
+### 2. Manual run: `sync_l1_pool`
+
+Command shape:
+
+```bash
+cd /root/policy-pipeline-src
+docker compose -f docker-compose.server.yml run --rm policy-producer \
+  python -m scripts.l1_review_consumer.sync_l1_pool
+```
+
+The command output was summarized without printing skipped row details.
+
+Observed sanitized output:
+
+```text
+forward synced 0/15 rows -> PG L1ReviewQueue
+skip_count=15
+```
+
+Exit code: `0`
+
+### Not run
+
+- The two read-only `L1ReviewQueue` count queries were not run because the handoff says to stop if forward still has skips.
+- `scripts.l1_review_consumer.poll_l1_verdicts` was not run because forward still had skips.
+- Cron was not touched; the two container-form cron lines were already in place per handoff.
+
+### Gate status
+
+- Credential values remained blind.
+- Vault was not touched.
+- PG row contents were not printed in the handoff; forward output was reduced to summary count and skip count.
+- No reverse/applier path was run after the forward skip condition.
+
+### Recommended next step
+
+Investigate why the container-form `policy-producer` run is still executing an insert shape that skips all 15 rows after the server checkout reached `db10dc2`. A likely first check is whether the running container uses the freshly reset source tree or a stale image layer, then rerun forward with the same sanitized-output wrapper.
