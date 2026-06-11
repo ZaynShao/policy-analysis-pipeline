@@ -149,6 +149,7 @@ L3 地基依赖产物全集在场，四族进闭环范围，每族 mini-spec →
 |---|---|---|
 | 1 | opinions 去留 | ✅ 用户裁决（2026-06-11）：**放弃**。commentary_signals 正式接替，76 页冻结归档，不进闭环判据 |
 | 2 | classification 去留 | ✅ 查证后废弃（2026-06-11）：**它不是产物族**，是 T2a 清理把建设期 B7_subagent 倒灌 raw 的标签搬出来的残渣（每行 source=`policy_raw_frontmatter_pre_t2a_migration`），零生产者零消费者；其职能由 L1 policy_gate 承担。51 行留档作 S3 垃圾清理线索 |
+| 4 | policy_summaries 去留 | ✅ 用户裁决（2026-06-11）："hengguan 侧阅读辅助，不在四层主干"。**划归 L3 规范侧**，移出闭环判据：不装 cron、不回填；`summaries_increment.py`/`summaries_nightly.sh` 留仓库存，启用前提=L3 规范定义摘要形态。SCHEMA §5.1 注记排 WP-6 文档重写。已落的存量清洗保留（934→816 行，118 行坏 id 检疫，vault `a48e1a0e`）。佐证：run_sync/policy_mapper 零消费、历史生产者=旧 bv 派生器副产品、现行 ②-B 不出此物 |
 | 3 | manifest 登记的人工裁决位形态（B1 spec 已有人工池设计，确认即可）| ✅ 用户裁决（2026-06-11）：**market_intel 增长线放弃**（"略有价值的尾巴，不在意"）。保留 23 行存量 manifest 每晚确定性再生产（derived_signals 链输入需要，零成本）；**不建** staging→manifest 登记器、**不设计** raw 域、**不加**积压提醒。staging 命中静默积存 /state，无害。事实佐证：路由过滤器上线至今零命中（服务器+Mac staging 均空）|
 
 ⇒ **WP-5 范围收敛为两族**：policy_summaries 重建（契约 SCHEMA §5.1 在、生产者缺位）+ entities/_extractions 处置（registry 已活在 ②-B）。

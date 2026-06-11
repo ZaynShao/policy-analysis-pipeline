@@ -43,8 +43,7 @@ SHELL=/bin/bash
 # 03:30 ④上下文链(signal context + analysis context + relation inventory;只写 /state,无 push)
 30 3 * * * /root/policy-pipeline-src/scripts/service/contexts_nightly.sh >> /var/log/policy-pipeline/contexts.log 2>&1
 
-# 04:00 policy_summaries 摘要增量(容器 LLM;produce_and_push 白名单只放 summaries)
-0 4 * * * /root/policy-pipeline-src/scripts/service/summaries_nightly.sh >> /var/log/policy-pipeline/summaries.log 2>&1
+# (已撤)04:00 摘要增量:summaries 划归 L3 规范侧(用户裁决 2026-06-11),不装 cron 不回填;summaries_nightly.sh/summaries_increment.py 留仓库存,启用前提=L3 规范定义其形态
 
 # 07:30 评论 ingest(容器,经 platform-net 访问 wewe-rss)→ vault → push
 30 7 * * * ( /usr/bin/flock -w 7200 9 || { set -a; . /etc/policy-pipeline/notify.env; set +a; /usr/bin/python3 -m scripts.service.notify "[S2] producer 锁等待超时(7200s),本轮跳过"; exit 1; }; set -a; . /etc/policy-pipeline/notify.env; . /etc/policy-pipeline/commentary.env; set +a; cd /root/policy-pipeline-src && docker compose -f docker-compose.server.yml run --rm -e WEWE_FEED_URL -e WEWE_AUTH_CODE policy-producer python -m scripts.l1_collect.commentary_ingest.run --feed-url "$WEWE_FEED_URL" --auth-code "$WEWE_AUTH_CODE" --vault-dir /vault --state-dir /state --since 2026-06-06 --feed-timeout 600 && /usr/bin/python3 -m scripts.service.produce_and_push --vault-dir /root/policy-vault --whitelist 0_raw/commentaries/ --message "l1(commentary): daily ingest" || /usr/bin/python3 -m scripts.service.notify "[S2] 07:30 评论 ingest 失败,查 ingest.log" ) 9>/var/lock/policy-pipeline-producer.lock >> /var/log/policy-pipeline/ingest.log 2>&1
