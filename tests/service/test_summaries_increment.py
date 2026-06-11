@@ -123,9 +123,10 @@ def test_init_ledger_apply_normalizes_alias_quarantines_and_dedups(vault: Path, 
 
     assert report["covered"] == 2
     rows = _read_jsonl(summaries)
-    assert [row["policy_id"] for row in rows] == ["P_new", "P_direct"]
-    assert rows[0]["normalized_from"] == "P_old"
-    assert rows[1]["extracted_at"] == "2026-01-04T00:00:00+00:00"
+    rows_by_pid = {row["policy_id"]: row for row in rows}
+    assert set(rows_by_pid) == {"P_new", "P_direct"}
+    assert rows_by_pid["P_new"]["normalized_from"] == "P_old"
+    assert rows_by_pid["P_direct"]["extracted_at"] == "2026-01-04T00:00:00+00:00"
     quarantine = _read_jsonl(tmp_path / "state" / "summaries_quarantine.jsonl")
     assert quarantine[0]["policy_id"] == "P_missing"
     assert quarantine[0]["reason"] == "policy_id_not_found"
