@@ -3,6 +3,7 @@ import os
 import subprocess
 import time
 from pathlib import Path
+from typing import Optional
 
 from scripts.service import closure_audit
 
@@ -18,7 +19,12 @@ def _run_git(repo: Path, *args: str) -> str:
     return subprocess.check_output(["git", *args], cwd=repo, text=True).strip()
 
 
-def _commit(repo: Path, path: str, author: str = "policy-pipeline-vps") -> str:
+def _commit(
+    repo: Path,
+    path: str,
+    author: str = "policy-pipeline-vps",
+    date: Optional[str] = None,
+) -> str:
     target = repo / path
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(f"{path}\n{time.time()}\n", encoding="utf-8")
@@ -30,6 +36,9 @@ def _commit(repo: Path, path: str, author: str = "policy-pipeline-vps") -> str:
         "GIT_COMMITTER_NAME": author,
         "GIT_COMMITTER_EMAIL": f"{author}@example.test",
     }
+    if date is not None:
+        env["GIT_AUTHOR_DATE"] = date
+        env["GIT_COMMITTER_DATE"] = date
     subprocess.check_call(["git", "commit", "-m", f"add {path}"], cwd=repo, env=env)
     return _run_git(repo, "rev-parse", "--short", "HEAD")
 
@@ -102,13 +111,33 @@ def test_vault_git_flags_dirty_tree_and_head_drift(tmp_path):
 
 def test_vault_git_flags_non_vps_author_touching_product_path(tmp_path):
     _state_dir, vault = _healthy_fixture(tmp_path)
-    bad_hash = _commit(vault, "_meta/business_view/item.json", author="human-user")
+    bad_hash = _commit(
+        vault,
+        "_meta/business_view/item.json",
+        author="human-user",
+        date="2026-06-11T00:00:01+08:00",
+    )
     _run_git(vault, "push", "origin", "main")
 
     violations = closure_audit.check_vault_git(vault)
 
     assert any(bad_hash in item and "human-user" in item for item in violations)
     assert any("_meta/business_view/item.json" in item for item in violations)
+
+
+def test_vault_git_allows_pre_cutoff_non_vps_author_touching_product_path(tmp_path):
+    _state_dir, vault = _healthy_fixture(tmp_path)
+    _commit(
+        vault,
+        "_meta/business_view/pre_cutoff.json",
+        author="human-user",
+        date="2026-06-10T23:59:59+08:00",
+    )
+    _run_git(vault, "push", "origin", "main")
+
+    violations = closure_audit.check_vault_git(vault)
+
+    assert violations == []
 
 
 def test_vault_git_allows_non_vps_author_touching_non_product_path(tmp_path):
