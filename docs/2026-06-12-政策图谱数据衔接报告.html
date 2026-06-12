@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>政策图谱数据衔接报告 · 2026-06-12</title>
+<style>
+  :root {
+    --ink: #1a1f2e; --sub: #5a6275; --line: #e4e7ee; --bg: #f7f8fb;
+    --ok: #1a7f4e; --ok-bg: #e8f5ee; --warn: #b45309; --warn-bg: #fdf3e3;
+    --bad: #b3322e; --bad-bg: #fbeaea; --code-bg: #f1f3f8; --accent: #2b4ea2;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+         color: var(--ink); background: var(--bg); margin: 0; line-height: 1.75; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 48px 28px 80px; }
+  header { border-bottom: 3px solid var(--ink); padding-bottom: 18px; margin-bottom: 36px; }
+  h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: 1px; }
+  .meta { color: var(--sub); font-size: 13.5px; }
+  h2 { font-size: 19px; margin: 44px 0 14px; padding-left: 12px; border-left: 4px solid var(--accent); }
+  h3 { font-size: 15.5px; margin: 24px 0 8px; }
+  p { margin: 10px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 14px 0; font-size: 14px; background: #fff; }
+  th, td { border: 1px solid var(--line); padding: 9px 12px; text-align: left; vertical-align: top; }
+  th { background: #eef1f7; font-weight: 600; white-space: nowrap; }
+  code { background: var(--code-bg); padding: 2px 6px; border-radius: 4px; font-size: 13px;
+         font-family: "SF Mono", Menlo, Consolas, monospace; }
+  pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 6px;
+        padding: 14px 16px; overflow-x: auto; font-size: 13px; line-height: 1.6;
+        font-family: "SF Mono", Menlo, Consolas, monospace; }
+  .badge { display: inline-block; padding: 1px 10px; border-radius: 20px; font-size: 12.5px; font-weight: 600; }
+  .b-ok   { color: var(--ok);   background: var(--ok-bg); }
+  .b-warn { color: var(--warn); background: var(--warn-bg); }
+  .b-bad  { color: var(--bad);  background: var(--bad-bg); }
+  .callout { border-radius: 8px; padding: 14px 18px; margin: 16px 0; font-size: 14.5px; }
+  .c-ok   { background: var(--ok-bg);   border-left: 4px solid var(--ok); }
+  .c-warn { background: var(--warn-bg); border-left: 4px solid var(--warn); }
+  .c-bad  { background: var(--bad-bg);  border-left: 4px solid var(--bad); }
+  .flow { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 18px 20px; margin: 16px 0; }
+  .flow .step { display: flex; align-items: baseline; gap: 10px; padding: 7px 0; border-bottom: 1px dashed var(--line); font-size: 14px; }
+  .flow .step:last-child { border-bottom: none; }
+  .flow .no { color: var(--accent); font-weight: 700; min-width: 22px; }
+  footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line);
+           color: var(--sub); font-size: 12.5px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>政策图谱数据衔接报告</h1>
+  <div class="meta">2026-06-12 · 范围：政策情报管线产物 → 衡观「政策知识库 / 政策图谱」视图 · 性质：故障定位 + 已验证修复方案（当前未实施，环境已回退至原始状态）</div>
+</header>
+
+<h2>1. 现象</h2>
+<p>衡观前端于 2026-06-12 凌晨上线「在线政策知识库 + 政策图谱 + 自动同步」功能（含工作台政策图谱速览卡）后，相关视图<strong>无数据显示</strong>。</p>
+
+<h2>2. 结论（先行）</h2>
+<div class="callout c-bad">
+<strong>根因：部署配置缺失，非数据缺失、非代码缺陷。</strong>知识库同步服务（KnowledgeSyncService）设计为直接读取 vault 文件目录，目录位置由环境变量 <code>KNOWLEDGE_VAULT_DIR</code> 指定；当前 heng-backend 容器既未配置该环境变量、也未挂载 vault 目录，服务启动时按设计自我停用（日志有明确 WARN），知识库三张数据表为空，视图因此无料可显。
+</div>
+<div class="callout c-ok">
+修复方案已经过一次<strong>临时接通实测</strong>：挂载 vault（只读）+ 配置环境变量后，手动触发同步 <strong>4 秒成功</strong>，产出 <strong>1184 条目 / 1649 关系 / 13 主题</strong>，与上游产物数量逐项吻合。验证完成后已将环境完整回退（配置、挂载、数据表均恢复原始状态），等待按正式发布流程落地。
+</div>
+
+<h2>3. 数据链路全景与断点定位</h2>
+<div class="flow">
+  <div class="step"><span class="no">①</span><span>政策情报管线（policy-pipeline，VPS cron）每日生产 L1/L2 产物，经白名单机制提交至 vault 仓（服务器本地路径 <code>/root/policy-vault</code>）</span><span class="badge b-ok">正常</span></div>
+  <div class="step"><span class="no">②</span><span>投影通道：run_sync 将 vault 产物投影至 heng-pg（Policy / PolicySemanticRelation / CommentarySignal 等表），供衡观既有视图消费</span><span class="badge b-ok">正常</span></div>
+  <div class="step"><span class="no">③</span><span>知识库同步通道（新增）：KnowledgeSyncService 按 cron（每日 11:30）读取 <code>KNOWLEDGE_VAULT_DIR</code> 指向的 vault 目录，经 vault-parser 解析后写入 KnowledgeEntry / KnowledgeRelation / KnowledgeTheme 表</span><span class="badge b-bad">断点</span></div>
+  <div class="step"><span class="no">④</span><span>政策知识库 / 政策图谱 / 速览卡视图读取上述三张表渲染</span><span class="badge b-warn">表空 → 无显示</span></div>
+</div>
+
+<h3>3.1 断点证据（2026-06-12 上午实测）</h3>
+<table>
+  <tr><th>检查项</th><th>实测结果</th><th>判定</th></tr>
+  <tr><td>上游 vault 产物（① 输出）</td><td>政策原文 1224 · canonical 关系 1649 · 摘要 816 · business_view 1192 · 主题注册表在位，目录结构与 vault-parser 期望完全一致</td><td><span class="badge b-ok">齐全</span></td></tr>
+  <tr><td>heng-pg 投影（② 输出）</td><td>Policy 1176 · PolicySemanticRelation 1649 · CommentarySignal 186</td><td><span class="badge b-ok">齐全</span></td></tr>
+  <tr><td>heng-backend 容器挂载</td><td><code>mounts: []</code>（零挂载，无法触及 vault 文件）</td><td><span class="badge b-bad">缺失</span></td></tr>
+  <tr><td>容器环境变量</td><td><code>KNOWLEDGE_VAULT_DIR</code> 未配置（0 个 KNOWLEDGE 前缀变量）</td><td><span class="badge b-bad">缺失</span></td></tr>
+  <tr><td>同步服务启动日志</td><td><code>WARN KNOWLEDGE_VAULT_DIR 未配置,知识库定时同步停用</code></td><td><span class="badge b-bad">自停用</span></td></tr>
+  <tr><td>知识库数据表</td><td>KnowledgeEntry / KnowledgeRelation / KnowledgeTheme / KnowledgeSyncRun 全部 0 行（同步从未执行）</td><td><span class="badge b-bad">空表</span></td></tr>
+  <tr><td>heng-backend 错误日志</td><td>无 error / exception（不是运行时故障）</td><td><span class="badge b-ok">干净</span></td></tr>
+</table>
+
+<h2>4. 接口契约：vault-parser 的输入期望</h2>
+<p>知识库同步模块期望的目录结构，与 vault 现行布局<strong>零适配差异</strong>（字段级直接可用）：</p>
+<table>
+  <tr><th>vault 路径</th><th>承载内容</th><th>当前状态</th></tr>
+  <tr><td><code>0_raw/policies/*.md</code></td><td>政策原文 + YAML frontmatter（title / issuer / region / 官方文号）</td><td>1224 个文件</td></tr>
+  <tr><td><code>1_extracted/policy_summaries.jsonl</code></td><td>摘要 / 一句话精髓 / 阅读价值</td><td>816 行（2026-06-11 已完成历史 id 规范化清洗）</td></tr>
+  <tr><td><code>1_extracted/relations/relations_canonical.jsonl</code></td><td>8 类语义关系边（references / aligns_with / cites_basis / clarifies / derives_from / extends / iterates / supersedes）</td><td>1669 行</td></tr>
+  <tr><td><code>_meta/business_view/*.yaml</code></td><td>业务视图（重要性 / 行动分类 / 价值标签 / 主题）——知识库条目的主驱动，有业务视图的政策才进知识库</td><td>1192 个文件</td></tr>
+  <tr><td><code>_meta/themes_registry.yaml</code></td><td>主题注册表</td><td>13 个主题</td></tr>
+</table>
+
+<h2>5. 已验证的修复方案（待按正式流程实施）</h2>
+<p>改动集中在部署编排一处（safety-platform 仓的 docker-compose，heng-backend 服务块），共两行：</p>
+<pre>services:
+  heng-backend:
+    environment:
+      KNOWLEDGE_VAULT_DIR: /vault-mirror        # ← 新增
+    volumes:
+      - /root/policy-vault:/vault-mirror:ro     # ← 新增（务必只读）</pre>
+<p>随后重建 heng-backend 容器即可。生效路径：启动日志出现 <code>知识库定时同步已注册: 0 30 11 * * * Asia/Shanghai</code>；首次数据可等每日 11:30 定时同步，或经 <code>POST /api/v1/knowledge/sync/run</code> 手动触发（需 MANAGER 角色）。</p>
+
+<h3>5.1 实测记录（已回退）</h3>
+<table>
+  <tr><th>项</th><th>实测值</th></tr>
+  <tr><td>同步耗时</td><td>4 秒（startedAt 00:51:32 → finishedAt 00:51:36 UTC）</td></tr>
+  <tr><td>同步结果</td><td>SUCCESS · entryCount <strong>1184</strong> · relationCount <strong>1649</strong> · themeCount <strong>13</strong></td></tr>
+  <tr><td>数量对账</td><td>关系 1649 与 vault canonical 完全一致；条目 1184 与 business_view 驱动口径吻合；主题 13 与注册表一致</td></tr>
+  <tr><td>回退确认</td><td>compose 两行已移除 · 容器重建后 <code>mounts: []</code> · 启动日志回到原始 WARN · 四张知识库表 truncate 归零</td></tr>
+</table>
+
+<h2>6. 时序与运行约束</h2>
+<table>
+  <tr><th>时刻（CST）</th><th>环节</th><th>说明</th></tr>
+  <tr><td>02:00 / 03:00 / 03:30</td><td>夜间产线：关系增量 → 信号链 → 上下文链</td><td>共持一把锁串行，失败各自告警</td></tr>
+  <tr><td>07:30 – 10:00</td><td>白天产线：评论摄入 → L1 → L2 → heng-pg 投影</td><td>既有节奏不变</td></tr>
+  <tr><td>10:45</td><td>闭环巡检（产物新鲜度 + vault 纯净性，异常飞书告警）</td><td>2026-06-11 上线</td></tr>
+  <tr><td><strong>11:30</strong></td><td><strong>知识库同步（接通后）</strong></td><td>默认 cron，恰在产线收尾之后，<strong>时序无需调整</strong></td></tr>
+</table>
+<div class="callout c-warn">
+<strong>约束提示：</strong>① vault 挂载必须 <code>:ro</code> —— vault 写入纪律为白名单单通道（produce_and_push），任何旁路写入会触发闭环巡检的纯净性告警；② 知识库同步通道与 heng-pg 投影通道并存后，衡观消费面存在两条数据通路，长期宜在消费规范（L3）定义时收敛为一条。
+</div>
+
+<h2>7. 当前状态与待办</h2>
+<table>
+  <tr><th>事项</th><th>状态</th></tr>
+  <tr><td>环境回退（配置 / 挂载 / 数据表）</td><td><span class="badge b-ok">已完成，与功能上线前一致</span></td></tr>
+  <tr><td>修复方案落地（compose 两行 + 容器重建）</td><td><span class="badge b-warn">待 safety-platform 仓正式流程实施</span></td></tr>
+  <tr><td>部署 checkout 上的本地补丁上游化（L1 审核账号白名单等）</td><td><span class="badge b-warn">建议随本次修复一并提 PR 固化</span></td></tr>
+</table>
+
+<footer>
+  报告生成：2026-06-12 · 数据来源：服务器实测（容器 inspect / 启动日志 / PG 计数 / vault 文件统计），全部为只读取证 · 临时验证已于当日完整回退
+</footer>
+
+</div>
+</body>
+</html>
