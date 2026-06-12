@@ -31,7 +31,7 @@ def _render_with_qrcode(scan_url: str, output_path: Path) -> bool:
     )
     qr.add_data(scan_url)
     qr.make(fit=True)
-    img = qr.make_image(fill_color="black", back_color="white")
+    img = qr.make_image(fill_color="black", back_color="white").convert("RGB")
     img.save(output_path, format="PNG")
     return True
 
