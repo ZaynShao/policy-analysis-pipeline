@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from pathlib import Path
+import sys
 
 from scripts.l1_collect.commentary_ingest.qr_relay.resend import (
     _spawn_relay,
@@ -62,7 +62,7 @@ def test_default_spawn_starts_existing_relay_detached(monkeypatch, tmp_path):
 
     args, kwargs = popen_calls[0]
     assert args[0] == [
-        Path(__import__("sys").executable),
+        sys.executable,
         "-m",
         "scripts.l1_collect.commentary_ingest.qr_relay.run",
     ]

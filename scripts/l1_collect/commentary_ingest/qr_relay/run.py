@@ -64,6 +64,7 @@ def relay_once(
         "[policy-pipeline] 微信读书 token 失效,请用微信扫码恢复 wewe-rss 登录。"
         f"账号:{status.account_name or 'unknown'} uuid:{login.uuid}"
     )
+    caption = caption + "\n(过期/扫不上 → 回我『重发码』即可重新推送)"
     caption = caption + (f"\n{config.note}" if config.note else "")
     if not _push_qr(adapter, qr_path, caption, config.target):
         _fallback_notice(caption, config, qr_path)
