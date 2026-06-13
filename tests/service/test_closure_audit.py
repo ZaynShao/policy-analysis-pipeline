@@ -15,6 +15,11 @@ def _touch(path: Path, age_hours: float = 0) -> None:
     os.utime(path, (ts, ts))
 
 
+def _set_mtime(path: Path, age_hours: float) -> None:
+    ts = time.time() - age_hours * 3600
+    os.utime(path, (ts, ts))
+
+
 def _run_git(repo: Path, *args: str) -> str:
     return subprocess.check_output(["git", *args], cwd=repo, text=True).strip()
 
@@ -81,6 +86,61 @@ def test_state_mtime_flags_missing_and_stale_files(tmp_path):
     assert any("derived_signals/nightly" in item and "缺失" in item for item in violations)
     assert any("relations_increment/hpr" in item and "超龄" in item for item in violations)
     assert not any("commentary_ingest/last_run.json" in item for item in violations)
+
+
+def test_state_activity_uses_newest_file_mtime_for_directories(tmp_path):
+    state_dir = _make_state_dir(tmp_path)
+    target = state_dir / "relations_increment/hpr"
+    target.unlink()
+    (target / "nested").mkdir(parents=True)
+    _touch(target / "nested/latest.json", age_hours=1)
+    _set_mtime(target / "nested", age_hours=27)
+    _set_mtime(target, age_hours=27)
+
+    violations = closure_audit.check_state_activity(state_dir, now=time.time())
+
+    assert not any("relations_increment/hpr" in item for item in violations)
+
+
+def test_state_activity_flags_directories_when_all_files_are_stale(tmp_path):
+    state_dir = _make_state_dir(tmp_path)
+    target = state_dir / "relations_increment/hpr"
+    target.unlink()
+    target.mkdir(parents=True)
+    _touch(target / "old.json", age_hours=27)
+    _set_mtime(target, age_hours=1)
+
+    violations = closure_audit.check_state_activity(state_dir, now=time.time())
+
+    assert any("relations_increment/hpr" in item and "超龄" in item for item in violations)
+
+
+def test_state_activity_falls_back_to_directory_mtime_when_empty(tmp_path):
+    state_dir = _make_state_dir(tmp_path)
+    target = state_dir / "derived_signals/nightly"
+    target.unlink()
+    target.mkdir(parents=True)
+    _set_mtime(target, age_hours=27)
+
+    violations = closure_audit.check_state_activity(state_dir, now=time.time())
+
+    assert any("derived_signals/nightly" in item and "超龄" in item for item in violations)
+
+
+def test_state_activity_preserves_file_mtime_behavior(tmp_path):
+    state_dir = _make_state_dir(tmp_path)
+    _touch(state_dir / "commentary_ingest/last_run.json", age_hours=27)
+    _touch(state_dir / "last_sync_run.json", age_hours=1)
+
+    violations = closure_audit.check_state_activity(state_dir, now=time.time())
+
+    assert any(
+        "commentary_ingest/last_run.json" in item and "超龄" in item
+        for item in violations
+    )
+    assert not any(
+        item.startswith("state last_sync_run.json 超龄") for item in violations
+    )
 
 
 def test_state_activity_flags_last_sync_errors(tmp_path):
