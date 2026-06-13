@@ -39,6 +39,15 @@ def _git(vault: Path, *args: str) -> str:
     ).strip()
 
 
+def _freshness_mtime(path: Path) -> float | None:
+    if not path.exists():
+        return None
+    if path.is_file():
+        return path.stat().st_mtime
+    mtimes = [item.stat().st_mtime for item in path.rglob("*") if item.is_file()]
+    return max(mtimes) if mtimes else path.stat().st_mtime
+
+
 def check_state_activity(state_dir: Path, *, now: float | None = None) -> list[str]:
     state_dir = Path(state_dir)
     now = time.time() if now is None else now
@@ -46,10 +55,11 @@ def check_state_activity(state_dir: Path, *, now: float | None = None) -> list[s
 
     for rel, threshold_hours in STATE_THRESHOLDS_HOURS:
         path = state_dir / rel
-        if not path.exists():
+        mtime = _freshness_mtime(path)
+        if mtime is None:
             violations.append(f"state {rel} 缺失")
             continue
-        age_hours = (now - path.stat().st_mtime) / 3600
+        age_hours = (now - mtime) / 3600
         if age_hours > threshold_hours:
             violations.append(
                 f"state {rel} 超龄 {age_hours:.1f}h > {threshold_hours}h"
