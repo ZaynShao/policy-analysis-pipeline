@@ -21,22 +21,29 @@ def _git(args: list, cwd) -> str:
 
 
 def classify_changes(porcelain: str, whitelist: list) -> tuple:
-    """git status --porcelain 输出 → (白名单内路径, 白名单外路径)。"""
+    """git status --porcelain -z 输出 → (白名单内路径, 白名单外路径)。
+    -z:NUL 分隔、文件名原样不转义(内嵌换行/制表符等控制字符不会拆条目或被转义,
+    否则 git add 拿到转义名找不到真文件会退 128 崩管线);R/C 条目后随一个 NUL 终止的原路径字段。"""
     to_add, violations = [], []
-    for line in porcelain.splitlines():
-        if not line.strip():
+    records = porcelain.split("\0")
+    i = 0
+    while i < len(records):
+        rec = records[i]
+        if not rec:
+            i += 1
             continue
-        path = line[3:].strip().strip('"')
-        if " -> " in path:                     # rename: 取新路径
-            path = path.split(" -> ", 1)[1].strip('"')
+        status, path = rec[:2], rec[3:]        # "XY " 前缀:2 状态位 + 空格
+        if "R" in status or "C" in status:     # rename/copy:原路径在随后一条,跳过,只按新路径分类
+            i += 1
         (to_add if any(path.startswith(w) for w in whitelist) else violations).append(path)
+        i += 1
     return to_add, violations
 
 
 def run(vault_dir, whitelist: list, message: str) -> int:
     vault_dir = Path(vault_dir)
     porcelain = subprocess.run(
-        ["git", "-c", "core.quotepath=false", "status", "--porcelain", "-u"],
+        ["git", "-c", "core.quotepath=false", "status", "--porcelain", "-u", "-z"],
         cwd=str(vault_dir), check=True, capture_output=True, text=True).stdout
     to_add, violations = classify_changes(porcelain, whitelist)
     ts = datetime.now(timezone.utc).isoformat(timespec="seconds")

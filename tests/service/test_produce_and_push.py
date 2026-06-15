@@ -7,10 +7,10 @@ from scripts.service.produce_and_push import classify_changes, run
 
 
 def test_classify_splits_whitelisted_and_violations():
-    porcelain = (
-        "?? 0_raw/commentaries/a.md\n"
-        " M 1_extracted/relations/r.jsonl\n"
-        "?? 0_raw/policies/p.md\n"
+    porcelain = (                              # -z:NUL 分隔
+        "?? 0_raw/commentaries/a.md\0"
+        " M 1_extracted/relations/r.jsonl\0"
+        "?? 0_raw/policies/p.md\0"
     )
     to_add, violations = classify_changes(porcelain, ["0_raw/commentaries/"])
     assert to_add == ["0_raw/commentaries/a.md"]
@@ -19,6 +19,14 @@ def test_classify_splits_whitelisted_and_violations():
 
 def test_classify_empty_porcelain_is_noop():
     assert classify_changes("", ["0_raw/commentaries/"]) == ([], [])
+
+
+def test_classify_z_handles_control_char_filename():
+    # git status --porcelain -z:NUL 分隔、文件名不转义;名内真实换行/制表符不得拆条目
+    porcelain = "?? 0_raw/policies/a\nb\t(26).md\0?? 0_raw/commentaries/c.md\0"
+    to_add, violations = classify_changes(porcelain, ["0_raw/policies/"])
+    assert to_add == ["0_raw/policies/a\nb\t(26).md"]
+    assert violations == ["0_raw/commentaries/c.md"]
 
 
 def _git(args, cwd):
@@ -94,6 +102,20 @@ def test_run_handles_chinese_and_space_filenames(vault_with_remote):
     (vault / "0_raw" / "commentaries").mkdir(parents=True)
     (vault / "0_raw" / "commentaries" / "储能价值 最大化—难在哪.md").write_text("c", encoding="utf-8")
     rc = run(vault, ["0_raw/commentaries/"], "test: chinese filename")
+    assert rc == 0
+    remote = subprocess.run(["git", "rev-parse", "origin/main"], cwd=vault,
+                            capture_output=True, text=True, check=True).stdout
+    local = subprocess.run(["git", "rev-parse", "HEAD"], cwd=vault,
+                           capture_output=True, text=True, check=True).stdout
+    assert local == remote
+
+
+def test_run_commits_control_char_filename_without_crash(vault_with_remote):
+    vault = vault_with_remote
+    (vault / "0_raw" / "policies").mkdir(parents=True)
+    # 文件名内嵌真实换行/制表符(市监 backfill 误抓那类)→ 旧实现 git add 退 128 崩
+    (vault / "0_raw" / "policies" / "x\n\ty.md").write_text("p", encoding="utf-8")
+    rc = run(vault, ["0_raw/policies/"], "test: control-char filename")
     assert rc == 0
     remote = subprocess.run(["git", "rev-parse", "origin/main"], cwd=vault,
                             capture_output=True, text=True, check=True).stdout
