@@ -101,6 +101,7 @@ def _same_domain(url: str, root_domain: str) -> bool:
 _INST_DOMAIN_MARKERS = {
     "商务": ("swt", "sww", "swj", "commerce", "mofcom"),
     "市监": ("scjg", "scjgj", "amr", "samr", "scjgdj"),
+    "能源监管": ("nea", "dpc"),
 }
 
 # 省 → gov 域拼音段(缩写+全拼);host 按 "." 分段做相等匹配,避免子串误命中
@@ -149,6 +150,8 @@ def _institution_match(domain: str, target: dict) -> bool:
         return True
     h = (domain or "").lower()
     marker_ok = any(m in h for m in markers)
+    if ctype == "能源监管":
+        return marker_ok
     return _area_match(domain, target) or marker_ok
 
 
@@ -229,6 +232,50 @@ def commerce_market_targets(registry_path: Optional[Path] = None) -> list:
                     "level": "市",
                     "city_code": city_code, "channel_type": "商务",
                     "root_domain": warm.get(f"{city}商务局")})
+    return out
+
+
+def province_energy_targets() -> list:
+    """31 省 × {发改委, 能源局} 无条件目标,绕开 registry 冷启动循环。"""
+    out = []
+    for prov, code in _PROV_CODE.items():
+        for ctype in ("发改委", "能源局"):
+            out.append({
+                "city": prov, "province": prov, "level": "省",
+                "city_code": f"{code}0000",
+                "channel_type": ctype, "root_domain": None,
+            })
+    return out
+
+
+NEA_REGIONAL = [
+    "国家能源局华北能源监管局",
+    "国家能源局东北能源监管局",
+    "国家能源局西北能源监管局",
+    "国家能源局华东能源监管局",
+    "国家能源局华中能源监管局",
+    "国家能源局南方能源监管局",
+]
+
+NEA_PROVINCE_OFFICES = [
+    ("山西省", "国家能源局山西监管办公室"),
+    ("山东省", "国家能源局山东监管办公室"),
+]
+
+
+def nea_regulatory_targets() -> list:
+    """国家能源局派出监管机构目标。域名由发现解析,命中后回填 catalog。"""
+    out = [{
+        "city": name, "province": "国家", "level": "国家",
+        "city_code": "000000", "channel_type": "能源监管",
+        "root_domain": None,
+    } for name in NEA_REGIONAL]
+    for prov, office in NEA_PROVINCE_OFFICES:
+        out.append({
+            "city": office, "province": prov, "level": "省",
+            "city_code": f"{_PROV_CODE[prov]}0000",
+            "channel_type": "能源监管", "root_domain": None,
+        })
     return out
 
 

@@ -12,23 +12,43 @@ from pathlib import Path
 from collections import Counter
 
 from scripts.l1_collect.channel_discovery import (
-    NATIONAL_TARGETS, province_targets_from_registry, commerce_market_targets, discover_one)
+    NATIONAL_TARGETS, province_targets_from_registry, province_energy_targets,
+    commerce_market_targets, nea_regulatory_targets, discover_one)
 from scripts.l1_collect.channel_catalog import load_catalog, save_catalog, ChannelStatus
 
 CAT = Path("state/T1_channels/channel_catalog.yaml")
 REG = Path.home() / "Documents/Zayn Main/政策分析/_meta/channel_registry.yaml"
-LEVEL_CN = {"national": "国家", "province": "省"}
+LEVEL_CN = {"national": "国家", "province": "省", "nea_regulatory": "能源监管"}
 
 
-def main() -> None:
-    levels = [l.strip() for l in os.environ.get("DISCOVER_LEVELS", "national").split(",") if l.strip()]
+def _merge_province_targets(targets: list) -> list:
+    by_key = {}
+    for t in targets:
+        key = (t.get("province"), t.get("channel_type"))
+        old = by_key.get(key)
+        if old is None or (not old.get("root_domain") and t.get("root_domain")):
+            by_key[key] = t
+    return list(by_key.values())
+
+
+def targets_for_levels(levels: list[str]) -> list:
     targets = []
     if "national" in levels:
         targets += NATIONAL_TARGETS
     if "province" in levels:
-        targets += province_targets_from_registry(REG)
+        targets += _merge_province_targets(
+            province_targets_from_registry(REG) + province_energy_targets()
+        )
     if "commerce_market" in levels:
         targets += commerce_market_targets(registry_path=REG)
+    if "nea_regulatory" in levels:
+        targets += nea_regulatory_targets()
+    return targets
+
+
+def main() -> None:
+    levels = [l.strip() for l in os.environ.get("DISCOVER_LEVELS", "national").split(",") if l.strip()]
+    targets = targets_for_levels(levels)
 
     existing = load_catalog(CAT) if CAT.exists() else []
     have = {c.root_domain for c in existing}
