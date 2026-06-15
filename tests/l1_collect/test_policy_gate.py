@@ -68,3 +68,45 @@ def test_gate_one_llm_commentary_label_maps_to_action():
         return json.dumps({"label": "commentary", "confidence": 0.9, "evidence": "解读口径"})
     gr = gate_one("p2", "https://fgw.gd.gov.cn/zcjd/a.html", "某栏目介绍", "", llm_fn=fake)
     assert gr.action == "commentary"
+
+
+def test_procurement_announcement_not_policy_no_llm():
+    """采购中标公告:gov 域 + 含'公告',旧逻辑 heuristic 直通 policy;
+    现应确定性 reject(非政策标题黑名单),不浪费 LLM。"""
+    from scripts.l1_collect.policy_gate import gate_one
+    called = []
+    r = gate_one(ref="proc",
+                 url="https://amr.hainan.gov.cn/x.html",
+                 title="海南省市场监督管理局采购项目中标公告",
+                 body_head="一、项目名称……二、中标供应商……",
+                 llm_fn=lambda s, u, **k: called.append(1) or "{}")
+    assert r.action == "reject"
+    assert not called
+
+
+def test_party_activity_not_autopassed_by_body_signal():
+    """党建活动:正文含'根据'(旧 body 信号直通);现不得 auto-pass 为 policy。"""
+    from scripts.l1_collect.policy_gate import gate_one
+    r = gate_one(ref="party",
+                 url="https://scjgj.nc.gov.cn/x.html",
+                 title="南昌市市场监管局开展大学习大讨论大提升活动",
+                 body_head="根据上级部署,我局组织开展……",
+                 llm_fn=None)
+    assert r.action != "pass"
+
+
+def test_gov_body_signal_alone_no_heuristic_autopass():
+    """gov 域 + 标题无政策信号词 + 正文含'现将':不得 heuristic 直通,应交 LLM 裁决。"""
+    import json
+    from scripts.l1_collect.policy_gate import gate_one
+    called = []
+    def llm(s, u, **k):
+        called.append(1)
+        return json.dumps({"label": "non_policy_news", "confidence": 0.9, "evidence": "新闻"})
+    r = gate_one(ref="body",
+                 url="https://samr.gov.cn/x.html",
+                 title="市场监管总局发布反垄断执法年度报告",
+                 body_head="为加强监管,现将有关情况通报如下:",
+                 llm_fn=llm)
+    assert called
+    assert r.used_llm is True
