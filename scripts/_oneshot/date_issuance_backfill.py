@@ -251,6 +251,8 @@ def main():
     ap.add_argument("--vault", required=True, type=Path)
     ap.add_argument("--state", default="state/date_backfill")
     ap.add_argument("--apply", action="store_true")
+    ap.add_argument("--same-year-only", action="store_true",
+                    help="只 apply 不改 id 的同年修复(跨年 id 改需配套派生重指,默认 defer)")
     ap.add_argument("--show-diff", action="store_true")
     args = ap.parse_args()
 
@@ -292,9 +294,12 @@ def main():
                   + (f"\n  id: {fm.get('id')} → {d.new_id}" if d.new_id else ""))
 
     if args.apply:
+        to_apply = [x for x in fixes if not x[3].new_id] if args.same_year_only else fixes
+        if args.same_year_only:
+            print(f"\n--same-year-only:仅 apply {len(to_apply)} 篇同年(跳过 {len(fix_id)} 篇跨年)")
         now_iso = datetime.datetime.now().astimezone().isoformat(timespec="seconds")
         log = []
-        for p, fm, b, d in fixes:
+        for p, fm, b, d in to_apply:
             written = apply_to_file(str(p), d, now_iso)
             log.append({"id": fm.get("id"), "new_id": d.new_id,
                         "old_date": fm.get("date"), "new_date": d.new_date,
@@ -302,10 +307,13 @@ def main():
         with (state / "apply_log.jsonl").open("w", encoding="utf-8") as f:
             for e in log:
                 f.write(json.dumps(e, ensure_ascii=False) + "\n")
+        applied_id_changes = sum(1 for *_, d in to_apply if d.new_id)
         print(f"\n✓ 写回 {len(log)} 篇 raw。日志: {state / 'apply_log.jsonl'}")
-        print("⚠ commit/push 经 produce_and_push(白名单 0_raw/policies/)由操作者执行。")
-        if fix_id:
-            print(f"⚠ {len(fix_id)} 篇 id 变 → 需另跑派生层重指(§C),不与本次同 commit。")
+        print("⚠ commit/push 经 produce_and_push(白名单 0_raw/policies/)。")
+        if applied_id_changes:
+            print(f"⚠ 本次含 {applied_id_changes} 篇 id 变 → 需另跑派生层重指(§C),不与本次同 commit。")
+        if args.same_year_only and fix_id:
+            print(f"ℹ 跳过 {len(fix_id)} 篇跨年 id 改(defer,待配套派生重指单独排)。")
     else:
         print("\ndry-run 完成。--show-diff 看变更,--apply 真写(仍需操作者 push)。")
 
