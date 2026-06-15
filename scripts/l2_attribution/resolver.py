@@ -7,6 +7,7 @@ from scripts.l2_attribution.channel_registry import lookup
 from scripts.l2_attribution.extractors import (
     extract_issuer_from_title, extract_luokuan_date,
 )
+from scripts.l1_collect.cn_dates import is_effective_or_deadline_date
 
 _PLACE_RE = re.compile(r"(北京|天津|上海|重庆|[一-龥]{2,6}?[省市区县])")
 _DATE_OK = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -122,11 +123,11 @@ def resolve_identity(rec, registry, body_tail: str, existing_ids: set) -> Resolv
                                          "domain_region": entry.region.get("name", "")})
         # 标题抽不出机关 -> 不写不冲突(保守:无信号无动作)
 
-    # date:仅当当前 date 破损才修(合理年份的 date 不动)
+    # date:破损 → 修;貌似合理但实为正文里的生效/截止日(误标)→ 保守修;否则不动。
     final_date = cur_date
     date_changed = False
+    luokuan = extract_luokuan_date(body_tail)
     if not _existing_date_ok(cur_date):
-        luokuan = extract_luokuan_date(body_tail)
         if luokuan:
             ri.set_field("date", luokuan, method="body_chinese_date",
                          confidence=0.92, from_val=str(cur_date))
@@ -135,6 +136,13 @@ def resolve_identity(rec, registry, body_tail: str, existing_ids: set) -> Resolv
         else:
             ri.add_conflict("date", reason="date破损且落款抽不到",
                             signals={"frontmatter": cur_date, "luokuan": None})
+    elif (luokuan and luokuan != cur_date
+          and is_effective_or_deadline_date(body_tail, cur_date)):
+        # 实锤误标:存量 date 对得上正文某句生效/截止日,落款是另一个发文日。
+        ri.set_field("date", luokuan, method="body_chinese_date",
+                     confidence=0.9, from_val=str(cur_date))
+        final_date = luokuan
+        date_changed = True
 
     # id:仅当 前缀∈{GO,SC} / 畸形 / 因 date 修复年份可能变
     if _id_prefix(rec.pid) in ("GO", "SC") or _id_malformed(rec.pid) or date_changed:

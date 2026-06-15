@@ -31,9 +31,16 @@ def test_extract_date_compact_rejects_invalid_month_day():
     assert extract_date("https://x.gov.cn/202513/t20251340_1") == ""
 
 
-def test_extract_date_from_body_chinese():
+def test_extract_date_body_effective_only_returns_empty():
+    """正文只有生效句、无落款 → 不得把生效日当 date(契约:绝不取生效/截止日)。"""
     body = "...本通知自2025年3月1日起施行..."
-    assert extract_date("", body=body) == "2025-03-01"
+    assert extract_date("", body=body) == ""
+
+
+def test_extract_date_body_picks_luokuan():
+    """正文有生效句 + 落款 → 取落款发文日。"""
+    body = "本通知自2025年3月1日起施行。\n\n济南市人民政府\n2025年1月20日"
+    assert extract_date("", body=body) == "2025-01-20"
 
 
 def test_extract_issuer_from_url_ndrc():

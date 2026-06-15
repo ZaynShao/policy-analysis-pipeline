@@ -5,16 +5,18 @@ from dataclasses import dataclass
 from urllib.parse import urlparse
 from typing import Optional
 
+from scripts.l1_collect.cn_dates import pick_issuance_date
+
 # 文号 regex(支持〔〕 / [] / () 三种括号)
 _OFFNUM_RE = re.compile(r"[一-龥]{2,8}[〔\[(]\s*(?:19|20)\d{2}\s*[〕\])]\s*\d+\s*号")
 _OFFNUM_RE_LOOSE = re.compile(r"[一-龥]{0,8}[〔\[(]\s*(?:19|20)\d{2}\s*[〕\])]\s*\d+\s*号")
+# 被废止/失效旧件号上下文:这些词附近的文号不是本件文号
+_REPEAL_NEAR = re.compile(r"废止|失效|停止执行|不再执行")
 
 _DATE_URL_RE = re.compile(r"/((?:19|20)\d{2})[-_/](\d{1,2})[-_/](\d{1,2})/")
 # 政府站极常见紧凑格式 /YYYYMM/tYYYYMMDD_id（年月目录 + 文件名带 8 位无分隔日期），
 # 原 delimited 正则抓不到 → date 空 → pid 落 P_1900 占位。带范围校验防 20251340 这类越界。
 _DATE_URL_COMPACT = re.compile(r"[t/_]((?:19|20)\d{2})(\d{2})(\d{2})(?:\D|$)")
-_DATE_BODY_CN = re.compile(r"((?:19|20)\d{2})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})")
-_DATE_BODY_ISO = re.compile(r"((?:19|20)\d{2})[-/](\d{1,2})[-/](\d{1,2})")
 
 # 中央部委 issuer canonical 表(市级补由 channel_catalog 反查时补)
 ISSUER_DOMAIN_TABLE = {
@@ -38,18 +40,25 @@ class ExtractedMeta:
     url: str = ""
 
 
+def _is_repealed_context(text: str, start: int, end: int) -> bool:
+    """文号前后窗口出现废止/失效语义 → 是被废止旧件号,非本件文号。"""
+    return bool(_REPEAL_NEAR.search(text[max(0, start - 12):end + 16]))
+
+
 def extract_official_number(text: str) -> str:
+    """取本件文号:跳过出现在废止/失效上下文里的旧件号。无 -> ''。"""
     if not text:
         return ""
-    m = _OFFNUM_RE.search(text)
-    if m:
-        return m.group(0).replace(" ", "")
-    m = _OFFNUM_RE_LOOSE.search(text)
-    return m.group(0).replace(" ", "") if m else ""
+    for rx in (_OFFNUM_RE, _OFFNUM_RE_LOOSE):
+        for m in rx.finditer(text):
+            if _is_repealed_context(text, m.start(), m.end()):
+                continue
+            return m.group(0).replace(" ", "")
+    return ""
 
 
 def extract_date(url: str, body: str = "") -> str:
-    """优先 URL path,其次正文中文/ISO 日期。返回 YYYY-MM-DD 或 ''。"""
+    """优先 URL path(发布日);其次正文落款/发文日。绝不取生效/截止日。返回 YYYY-MM-DD 或 ''。"""
     if url:
         m = _DATE_URL_RE.search(url)
         if m:
@@ -61,10 +70,9 @@ def extract_date(url: str, body: str = "") -> str:
             if 1 <= int(mo) <= 12 and 1 <= int(d) <= 31:
                 return f"{int(y):04d}-{int(mo):02d}-{int(d):02d}"
     if body:
-        m = _DATE_BODY_CN.search(body) or _DATE_BODY_ISO.search(body)
-        if m:
-            y, mo, d = m.groups()
-            return f"{int(y):04d}-{int(mo):02d}-{int(d):02d}"
+        d = pick_issuance_date(body)
+        if d:
+            return d
     return ""
 
 
