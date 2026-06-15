@@ -161,6 +161,7 @@ def test_broken_region_still_fixed():
 
 
 def test_valid_date_not_overwritten():
+    # 合理 date 且无法证明它是生效/截止日 -> 信任,不被落款覆盖(保守:无实锤不动)
     reg = {"www.jinan.gov.cn": _entry()}
     rec = FakeRec("P_2024_SD_x", "济南市人民政府办公厅关于X的通知",
                   "https://www.jinan.gov.cn/x.html", date="2024-05-01",
@@ -168,3 +169,15 @@ def test_valid_date_not_overwritten():
                   issuer=["济南市人民政府办公厅"])
     ri = resolve_identity(rec, reg, body_tail="落款 2016年3月17日", existing_ids=set())
     assert "date" not in ri.fields              # 合理 date 不被落款覆盖
+
+
+def test_mislabeled_effective_date_conservatively_fixed():
+    # 实锤误标:date=2026-07-01 实为正文生效日,落款发文日 2026-05-28 -> 保守修
+    reg = {"www.jinan.gov.cn": _entry()}
+    tail = "本通知自2026年7月1日起执行。\n\n济南市人民政府办公厅\n2026年5月28日"
+    rec = FakeRec("P_2026_SD_21", "济南市人民政府办公厅关于分时电价的通知",
+                  "https://www.jinan.gov.cn/x.html", date="2026-07-01",
+                  raw_fm={"region":{"level":"市","code":"370100","name":"济南市"}},
+                  issuer=["济南市人民政府办公厅"])
+    ri = resolve_identity(rec, reg, body_tail=tail, existing_ids={"P_2026_SD_21"})
+    assert ri.fields["date"].value == "2026-05-28"
