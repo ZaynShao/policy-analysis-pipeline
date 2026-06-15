@@ -77,9 +77,29 @@ def extract_policy_refs(md_text: str, source: str) -> list[PolicyRef]:
     fm, body = _front_body(md_text)
     business_tag = str(fm.get("business_tag") or "cross")
     refs: list[PolicyRef] = []
-    for m in TITLE_RE.finditer(body):
+    seen_titles: set[str] = set()
+    front_title = str(fm.get("title") or "")
+    for m in TITLE_RE.finditer(front_title):
+        title = m.group(1).strip()
+        key = _normalize(title)
+        if key in seen_titles:
+            continue
+        seen_titles.add(key)
         refs.append(PolicyRef(
-            title=m.group(1).strip(),
+            title=title,
+            url=None,
+            source_commentary=source,
+            business_tag=business_tag,
+            context=front_title,
+        ))
+    for m in TITLE_RE.finditer(body):
+        title = m.group(1).strip()
+        key = _normalize(title)
+        if key in seen_titles:
+            continue
+        seen_titles.add(key)
+        refs.append(PolicyRef(
+            title=title,
             url=None,
             source_commentary=source,
             business_tag=business_tag,
@@ -143,27 +163,6 @@ def find_backfill_candidates(commentaries_dir: Path, dedup, title_index) -> list
             seen.add(key)
             out.append(ref)
     return out
-
-
-def _discovery_stats(commentaries_dir: Path, dedup, title_index) -> tuple[list[PolicyRef], dict]:
-    candidates: list[PolicyRef] = []
-    seen: set[str] = set()
-    dropped_irrelevant = 0
-    files = _iter_commentary_files(commentaries_dir)
-    for path in files:
-        refs = extract_policy_refs(path.read_text(encoding="utf-8", errors="ignore"), path.name)
-        for ref in refs:
-            if is_already_collected(ref, dedup, title_index):
-                continue
-            if not is_in_scope(ref):
-                dropped_irrelevant += 1
-                continue
-            key = _candidate_key(ref)
-            if not key or key in seen:
-                continue
-            seen.add(key)
-            candidates.append(ref)
-    return candidates, {"scanned_commentaries": len(files), "dropped_irrelevant": dropped_irrelevant}
 
 
 def _count_dropped_irrelevant(commentaries_dir: Path, dedup, title_index) -> int:
