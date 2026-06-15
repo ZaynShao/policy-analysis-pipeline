@@ -37,6 +37,38 @@ def test_extract_policy_refs_finds_title_and_gov_url_with_context_and_tag():
     assert all("电力" in r.context or "光伏" in r.context for r in refs)
 
 
+def test_extract_policy_refs_finds_policy_title_from_frontmatter_title():
+    from scripts.l1_collect.commentary_backfill import extract_policy_refs
+
+    md = """---
+title: 解读《关于推进新型储能发展的通知》
+business_tag: power
+---
+正文只讨论新型储能发展影响,没有重复政策全称。
+"""
+
+    refs = extract_policy_refs(md, source="title.md")
+
+    assert len(refs) == 1
+    assert refs[0].title == "关于推进新型储能发展的通知"
+    assert refs[0].context == "解读《关于推进新型储能发展的通知》"
+
+
+def test_extract_policy_refs_dedups_same_policy_title_from_frontmatter_and_body():
+    from scripts.l1_collect.commentary_backfill import extract_policy_refs
+
+    md = """---
+title: 解读《关于推进新型储能发展的通知》
+business_tag: power
+---
+正文再次提到《关于推进新型储能发展的通知》。
+"""
+
+    refs = extract_policy_refs(md, source="dup.md")
+
+    assert [r.title for r in refs] == ["关于推进新型储能发展的通知"]
+
+
 def test_is_in_scope_blocks_finance_title_and_accepts_energy_terms():
     from scripts.l1_collect.commentary_backfill import PolicyRef, is_in_scope
 
