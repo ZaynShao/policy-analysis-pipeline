@@ -20,8 +20,14 @@ def extract_all(in_dir: Path, out_dir: Path, quarantine_jsonl: Path) -> tuple:
         meta = extract_meta(url=row["url"], title=row["title"], body=row["body"])
         # 二轮 news_filter(此时有 issuer)
         check = is_news_or_press(url=meta.url, title=meta.title, issuer=meta.issuer)
-        # issuer_unknown 直接拒(此时已经抓正文了,issuer 该有却没有)
-        if check.is_filtered and "issuer_unknown" in check.reasons:
+        # 入库前最后拦截:issuer_unknown(已抓正文 issuer 该有却没有)+
+        # 非政策类型标题(采购/党建/列表行)。后者在 Step 3 多已拦下,这里兜底
+        # run_pipeline 批量 backfill——它不过 policy_gate,Step 3/4.5 是唯一防线。
+        hard = [r for r in check.reasons
+                if r == "issuer_unknown"
+                or r.startswith("non_policy_title")
+                or r == "non_policy_list_row"]
+        if hard:
             quar_lines.append(json.dumps({
                 "url": meta.url, "title": meta.title,
                 "drop_reasons": check.reasons,

@@ -9,11 +9,12 @@ from typing import Callable, Optional
 from .news_filter import is_news_or_press, GOV_DOMAIN_SUFFIXES
 
 REVIEW_THRESHOLD = 0.7
-POLICY_TITLE_SIGNALS = ("通知", "意见", "规定", "办法", "方案", "决定", "公告",
+# 注:'公告' 已移出自动直通信号——它精度太低,会让"中标公告/采购公告"等
+# 采购通告在 gov 域直通为政策。真规范性公告(标准/海关/税务公告)改由 LLM 裁决。
+POLICY_TITLE_SIGNALS = ("通知", "意见", "规定", "办法", "方案", "决定",
                         "批复", "措施", "规划", "细则", "标准", "条例", "暂行", "导则")
 COMMENTARY_MARKERS = ("政策解读", "解读材料", "文字解读", "答记者问",
                       "一图读懂", "图解", "图读", "问答")
-BODY_POLICY_SIGNALS = ("根据", "现就", "现将", "特此通知", "有关规定", "现通知如下")
 FAST_REJECT_DOMAINS = {
     "xinhuanet.com", "people.com.cn", "cctv.com", "thepaper.cn", "sohu.com",
     "sina.com.cn", "163.com", "qq.com", "ifeng.com", "escn.com.cn",
@@ -69,16 +70,19 @@ def _is_gov(url: str) -> bool:
 
 
 def _heuristic(url: str, title: str, body_head: str) -> str:
+    # body_head 保留在签名里供调用方传参;不再用正文弱信号(如"根据""现将")直通——
+    # 那些词在新闻/党建/通告里同样高频,会让非政策内容 auto-pass。仅标题政策信号词直通。
     if _blacklisted(url):
         return "non_policy"
     if any(m in title for m in COMMENTARY_MARKERS):
         return "commentary"
-    if _is_gov(url) and (any(s in title for s in POLICY_TITLE_SIGNALS)
-                         or any(s in body_head for s in BODY_POLICY_SIGNALS)):
-        return "policy"
     fr = is_news_or_press(url=url, title=title, issuer=None)
     hard = [r for r in fr.reasons if r != "issuer_unknown_but_gov_domain"]
-    return "non_policy" if hard else "gray"
+    if hard:
+        return "non_policy"
+    if _is_gov(url) and any(s in title for s in POLICY_TITLE_SIGNALS):
+        return "policy"
+    return "gray"
 
 
 def gate_one(ref: str, url: str, title: str, body_head: str,
