@@ -62,6 +62,12 @@ def test_sanitize_filename_replaces_illegal_chars():
     assert sanitize_filename("   ") == "untitled"
 
 
+def test_sanitize_filename_strips_all_control_chars():
+    # \n\r\t 已滤,但须覆盖整段 \x00-\x1f(如垂直制表 \x0b / 换页 \x0c)
+    out = sanitize_filename("标题\x0b\x0c正文")
+    assert all(ord(c) >= 0x20 for c in out)
+
+
 def test_stage_market_intel_writes_json_not_vault(tmp_path):
     path = stage_market_intel(_item("河北200MW储能中标公示"), "正文。",
                               tmp_path, "2026-04-28", ["采购招标+容量"])

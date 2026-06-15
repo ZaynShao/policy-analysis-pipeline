@@ -1,5 +1,11 @@
 """ingester region 推断:省级渠道(city=省名/code末尾0000)不能被误标 level=市。"""
-from scripts.l1_collect.ingester import _infer_region
+from scripts.l1_collect.ingester import _infer_region, _sanitize_filename
+
+
+def test_sanitize_filename_strips_control_chars():
+    # 标题内嵌换行/制表符不得进文件名(否则 produce_and_push git add 退 128 崩管线)
+    out = _sanitize_filename("网络交易和合同监管\n\t\t\t(26)")
+    assert all(ord(c) >= 0x20 for c in out)
 
 
 def test_infer_region_province_from_code():

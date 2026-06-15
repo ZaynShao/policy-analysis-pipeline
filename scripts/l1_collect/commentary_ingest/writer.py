@@ -19,7 +19,7 @@ CST = timezone(timedelta(hours=8))
 
 
 def sanitize_filename(title: str) -> str:
-    t = re.sub(r'[\\/:*?"<>|\n\r\t]', "_", title)[:80]
+    t = re.sub(r'[\\/:*?"<>|\x00-\x1f]', "_", title)[:80]   # \x00-\x1f 覆盖 \n\r\t 及全部控制字符
     return t.strip() or "untitled"
 
 
