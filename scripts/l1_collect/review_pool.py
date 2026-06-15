@@ -17,6 +17,7 @@ VERDICTS = {
     "checkpoint": ("promote", "drop"),
     "sweep": ("confirm", "keep"),
     "fetch_fail": ("retry", "unfetchable", "drop"),
+    "reverse_discovery": ("collect", "drop"),
 }
 
 _KEYS = ("kind", "ref", "reason", "suggested_action", "confidence",
