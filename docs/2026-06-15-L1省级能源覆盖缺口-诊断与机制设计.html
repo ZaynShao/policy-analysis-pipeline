@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L1 省级能源政策覆盖缺口 · 诊断与机制设计</title>
+<style>
+  :root{
+    --ink:#1a1d24; --muted:#5b6472; --line:#e4e7ec; --bg:#fbfcfd;
+    --accent:#0b6b5e; --warn:#b4451f; --warnbg:#fdf1ec; --okbg:#eef7f3;
+    --code:#f4f5f7; --chip:#eef2f7;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.7 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;}
+  .wrap{max-width:880px;margin:0 auto;padding:48px 28px 96px}
+  h1{font-size:28px;line-height:1.3;margin:0 0 6px;letter-spacing:-.01em}
+  .sub{color:var(--muted);font-size:14px;margin-bottom:32px}
+  h2{font-size:20px;margin:44px 0 14px;padding-bottom:8px;border-bottom:2px solid var(--accent);display:inline-block}
+  h3{font-size:16px;margin:26px 0 8px}
+  p{margin:10px 0}
+  code{background:var(--code);padding:1px 6px;border-radius:5px;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+  .tldr{background:#fff;border:1px solid var(--line);border-left:4px solid var(--accent);
+    border-radius:10px;padding:18px 22px;margin:8px 0 8px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+  .tldr b{color:var(--accent)}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#f3f5f8;font-weight:600;color:#3a414c}
+  tr:last-child td{border-bottom:none}
+  .tag{display:inline-block;padding:1px 9px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap}
+  .t-cand{background:var(--warnbg);color:var(--warn)}
+  .t-absent{background:#efe6f7;color:#6b3fa0}
+  .t-ok{background:var(--okbg);color:var(--accent)}
+  .funnel{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:18px 0;font-size:13px}
+  .step{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 12px;text-align:center;min-width:96px}
+  .step small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+  .step.kill{border-color:var(--warn);background:var(--warnbg)}
+  .arrow{color:var(--muted)}
+  .layer{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin:14px 0}
+  .layer h3{margin-top:0}
+  .badge{font-size:12px;font-weight:700;color:#fff;background:var(--accent);border-radius:6px;padding:2px 8px;margin-right:8px}
+  .badge.b{background:#3d6fb4}.badge.c{background:#6b3fa0}
+  .rule{background:var(--okbg);border:1px solid #cfe6dd;border-radius:8px;padding:10px 16px;margin:10px 0;font-size:14px}
+  .rule b{color:var(--accent)}
+  ul{margin:8px 0;padding-left:22px}li{margin:4px 0}
+  .dec{display:flex;gap:14px;flex-wrap:wrap;margin:10px 0}
+  .deccard{flex:1 1 320px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 18px}
+  .deccard .q{font-size:13px;color:var(--muted)}
+  .deccard .a{font-size:15px;font-weight:600;color:var(--accent);margin-top:4px}
+  .foot{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+  .mono{font:13px/1.6 ui-monospace,Menlo,monospace;background:var(--code);border-radius:8px;padding:14px 16px;overflow:auto;white-space:pre}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>L1 省级能源政策覆盖缺口</h1>
+  <div class="sub">漏因诊断 + 统一补采机制设计 · 2026-06-15 · 触发:2026-05 能源月刊交叉核对发现 3 条省级能源政策 ABSENT</div>
+
+  <div class="tldr">
+    <p style="margin-top:0"><b>一句话结论：</b>这 3 条政策<b>不是被关键词或相关性过滤误杀</b>，而是<b>它们的发文渠道根本没被扫描</b>。
+    渠道层有两类硬伤：(1) 渠道生命周期<b>没有闭环</b>——发现是手动 oneshot、验证是单次首探、候选→验证晋升是写死的一次性快照，
+    常驻增量只扫已验证渠道，于是首探失败的渠道<b>永久变暗</b>；(2) <b>省级能源局</b>从未升为一等发现目标（31 省验证过的能源局 = <b>0</b>），
+    <b>国家能源局派出监管机构</b>（发电力市场细则的那一类）整个没建模。</p>
+  </div>
+
+  <h2>管道在哪一级把它们丢了</h2>
+  <p>把任一条政策放进 L1 漏斗逐级追踪，<b>红框是真正的死点</b>，它在最上游：</p>
+  <div class="funnel">
+    <div class="step kill">渠道目录<small>缺验证渠道 ✗</small></div>
+    <span class="arrow">→</span>
+    <div class="step">Step2 扫描<small>关键词宽，会过</small></div>
+    <span class="arrow">→</span>
+    <div class="step">Step3 过滤<small>gov 域，会过</small></div>
+    <span class="arrow">→</span>
+    <div class="step">policy_gate<small>公文词，会过</small></div>
+    <span class="arrow">→</span>
+    <div class="step">入库</div>
+  </div>
+  <p>这 3 条标题都带教科书式公文词（<code>实施意见 / 实施方案 / 实施细则</code>）、都在 <code>.gov.cn</code> 域。
+  只要渠道被扫到，它们能轻松通过下游三道闸。问题是<b>渠道这一关就没让它们进场</b>。</p>
+
+  <table>
+    <thead><tr><th>政策</th><th>发文机构</th><th>渠道在 catalog？</th><th>状态</th><th>真正漏因</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>山东《促进光伏发电高质量发展实施意见》</td>
+        <td>山东发改委 + 能源局</td>
+        <td><code>fgw.shandong.gov.cn</code><br><code>nyj.shandong.gov.cn</code><br>都在</td>
+        <td><span class="tag t-cand">候选</span><br><small>probe=structure_unknown / http_error<br>2026-06-07 探过</small></td>
+        <td>已发现但首探失败 → 卡候选 → 无复探/晋升 → 永不扫</td>
+      </tr>
+      <tr>
+        <td>吉林《加快促进新能源集成融合发展实施方案》</td>
+        <td>吉林发改委 + 能源局</td>
+        <td>吉林省发改委/能源局候选<br>在（jl.gov.cn 族）</td>
+        <td><span class="tag t-cand">候选</span><br><small>structure_unknown</small></td>
+        <td>同上</td>
+      </tr>
+      <tr>
+        <td>山西《电力中长期市场实施细则》</td>
+        <td><b>国能山西监管办</b><br>（国家能源局派出机构）</td>
+        <td><span class="tag t-absent">完全缺位</span><br><small>只有山西发改委已验证，<br>机构对不上</small></td>
+        <td>—</td>
+        <td>NEA 派出监管机构这一<b>机构大类没被建模成渠道目标</b></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>排除掉的几个怀疑方向</h2>
+  <p>你列的另外两个假设，逐一查实<b>都不成立</b>，这很关键——它说明不该往关键词/频率/过滤方向修：</p>
+  <table>
+    <thead><tr><th>怀疑</th><th>结论</th><th>证据</th></tr></thead>
+    <tbody>
+      <tr><td>关键词漏配</td><td><span class="tag t-ok">排除</span></td>
+        <td>真正生效的标题过滤在 <code>step2_scan.py</code> 的 <code>KEYWORDS</code>，已含 <code>光伏 / 新能源 / 电力 / 现货市场</code>，3 条标题全命中。
+        （<code>渠道目录.md</code> 里那张"搜索主线关键词表"是<b>过期文档</b>，未被代码引用。）</td></tr>
+      <tr><td>频率/分页静默截断<br>（类 wewe-rss limit）</td><td><span class="tag t-ok">排除</span></td>
+        <td>扫描翻页 <code>MAX_PAGES=5</code> + 新增比阈值停，对月度节奏的省厅列表页足够；且这 3 条<b>根本没走到扫描</b>，分页无从谈起。</td></tr>
+      <tr><td>相关性/政策门误杀</td><td><span class="tag t-ok">排除</span></td>
+        <td><code>news_filter</code>（域名黑名单/标题坏模式/issuer-gov）与 <code>policy_gate</code>（gov 域 + 公文词直通）都会放行这类标准省级公文。</td></tr>
+    </tbody>
+  </table>
+
+  <h2>三层机制根因（从主到次）</h2>
+
+  <div class="layer">
+    <h3><span class="badge">A</span>渠道生命周期没有闭环 —— 主因</h3>
+    <ul>
+      <li><b>发现</b>是手动 oneshot（<code>scripts/_oneshot/expand_channels_l1.py</code>），不在任何 cron。</li>
+      <li><b>验证</b>是单次首探：<code>channel_discovery.py</code> 仅 <code>probe.verdict=="ok"</code> 才置"验证"，否则落"候选"。
+        政府站首探失败是<b>常态</b>（JS 空壳、GBK、403、猜错的 list_url）。</li>
+      <li><b>候选→验证晋升</b>无常驻机制：<code>promote_checkpoint_channels.py</code> 是<b>写死的 8 个商务/市监域名快照</b>（手工核过那一次），不是循环。</li>
+      <li><b>常驻增量</b> <code>run_incremental.py</code> <b>只扫 status=验证</b>。</li>
+    </ul>
+    <p style="margin-bottom:0">→ 验证前沿冻结在 ~165 条，首探失败的渠道永久变暗。量化后果：
+    <b>919 渠道里 754 是候选</b>；<b>31 个省，验证过的省级能源局 = 0</b>（仅 3 条"能源局 验证"是福州/南昌的<b>市级模板首页</b>，非真实列表页）。
+    山东光伏、吉林新能源就死在这里——渠道明明在表里，只差一次复探/晋升。</p>
+  </div>
+
+  <div class="layer">
+    <h3><span class="badge b">B</span>省级能源局冷启动循环依赖</h3>
+    <p style="margin-bottom:0"><code>province_targets_from_registry</code> 只有当 registry 里该省已有"能源"机构条目时，才生成能源局目标。
+    而 registry 里"能源"条目只有 3 条（内蒙古能源局 + 2×国家能源局）。
+    <b>要先采到能源政策才能发现能源渠道——死循环。</b>商务/市监走 <code>commerce_market_targets</code> 无条件 31 省铺开，能源局没这待遇。
+    （旁证：真实域名 <code>nyj.shandong.gov.cn</code> 甚至被误标成 <code>channel_type: 政府网</code>，说明省能源局根本没被当一等目标生成。）</p>
+  </div>
+
+  <div class="layer">
+    <h3><span class="badge c">C</span>NEA 派出监管机构没建模 —— 山西案专属根因</h3>
+    <p style="margin-bottom:0">国家能源局有派出机构（6 区域监管局 + ~30 省监管办），它们发<b>电力中长期 / 现货 / 并网 / 辅助服务</b>细则，
+    域名在 <code>nea.gov.cn</code> 族、不在省 <code>gov.cn</code>。<code>NATIONAL_TARGETS</code> 只有 <code>www.nea.gov.cn</code>，
+    没有任何 channel_type / 目标生成器 / 域名匹配支持这一类。这是<b>电力交易业务线一整条高价值供给</b>被结构性漏掉，山西细则只是其中一例。</p>
+  </div>
+
+  <h2>统一补采机制（补三层，不补 3 条）</h2>
+  <p>原则延续本仓"统一机制修复、不打补丁"：让<b>任一</b>省级能源局 + <b>任一</b> NEA 监管机构成为常态可采，且首探失败能自愈。</p>
+
+  <div class="rule"><b>① 闭合渠道生命周期（治 A，主修）：</b>新增常驻"候选自愈复探 + 自动晋升"步骤。
+  对候选渠道<b>重跑 <code>discover_one</code></b>（已自带 firecrawl 渲染兜底 + Tavily/LLM 重找真实列表页 + 机构核验）；
+  probe <code>ok</code> 且机构核验过 → <b>自动晋升验证、进扫描</b>；机构核验有歧义 → 留候选 + 写 review pool 交人（B14）。
+  首跑即把 754 候选全量自愈（一次性回收山东/吉林），此后稳态保鲜。</div>
+
+  <div class="rule"><b>② 省级能源局升一等目标（治 B）：</b>仿 <code>commerce_market_targets</code>，<b>无条件给 31 省生成 发改委+能源局 目标</b>，
+  域名交给发现解析，绕开 registry 冷启动循环。</div>
+
+  <div class="rule"><b>③ NEA 派出监管机构建模（治 C）：</b>新增 <code>能源监管</code> channel_type + 6 区域监管局/省监管办目标生成器，
+  扩 <code>_institution_match</code> 让 <code>nea.gov.cn</code> 子域绑定；同步在 <code>00 背景资料/渠道目录.md</code> 立这一段。</div>
+
+  <p>落点：<code>scripts/l1_collect/channel_discovery.py</code>（目标生成）、新 <code>channel_reprobe.py</code>（复探晋升）、
+  <code>scripts/_oneshot/expand_channels_l1.py</code>（接新 level）、<code>00 背景资料/渠道目录.md</code>（NEA 段）。
+  自动晋升的安全性由下游兜底：扫描仍按关键词过标题、policy_gate 仍逐篇 LLM 判类，错渠道只会少命中、不会灌脏数据入库。</p>
+
+  <h2>本轮已定的两个决策</h2>
+  <div class="dec">
+    <div class="deccard">
+      <div class="q">候选→验证晋升是否自动？（上一代 spec 把"晋升 drain"划给 B14 人审）</div>
+      <div class="a">probe-ok 自动晋升 ✓</div>
+      <p style="font-size:13px;color:var(--muted);margin:6px 0 0">"这 URL 是不是真列表页"是确定性 probe 信号、非人判断；机构歧义仍留池给人。不等 B14 即可闭环。</p>
+    </div>
+    <div class="deccard">
+      <div class="q">交付到哪一步？（仓内分工：Claude 设计 / Codex 实施 / Claude 审）</div>
+      <div class="a">诊断 + 设计 handoff ✓</div>
+      <p style="font-size:13px;color:var(--muted);margin:6px 0 0">本报告 + 可直接贴给 Codex 的实施 handoff（改哪些文件、TDD 用例、dry-run 步骤）。不动代码、不写生产 vault。</p>
+    </div>
+  </div>
+
+  <div class="foot">
+    实施 handoff：<code>docs/handoffs/2026-06-15-codex-l1-channel-lifecycle.md</code><br>
+    凭据（TAVILY / FIRECRAWL / LLM）由操作者经手；发现/复探在国内或东京节点均可（无微信地理风控约束）；改动走仓内白名单 + dry-run，不写生产 vault。
+  </div>
+
+</div>
+</body>
+</html>
