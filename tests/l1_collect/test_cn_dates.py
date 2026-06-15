@@ -6,6 +6,7 @@
 from __future__ import annotations
 from scripts.l1_collect.cn_dates import (
     cn_year_to_int, cn_md_to_int, pick_issuance_date, is_effective_or_deadline_date,
+    appears_as_issuance, pick_luokuan_strict,
 )
 
 
@@ -71,3 +72,50 @@ def test_is_deadline_true_for_deadline_date():
 def test_is_effective_false_for_absent_date():
     text = "落款 2016年3月17日"
     assert is_effective_or_deadline_date(text, "2024-05-01") is False
+
+
+# ── 真实 vault 失败模式回归 ─────────────────────────────────
+def test_pick_excludes_scrape_footer():
+    # trafilatura 采集页脚 `_采集于 YYYY-MM-DD` 不是落款,必须剔除
+    text = ("上海市发展和改革委员会\n二○一二年六月十五日\n\n"
+            "打印本页关闭窗口\n\n---\n\n_采集于 2026-04-25T11:07:53.123")
+    assert pick_issuance_date(text) == "2012-06-15"
+
+
+def test_x_qian_is_deadline_not_issuance():
+    # "YYYY年MM月DD日前" = 任务截止,不是发文日
+    text = "2026年12月31日前，重点碳排放单位应报送。\n北京市生态环境局\n2026年3月18日"
+    assert is_effective_or_deadline_date(text, "2026-12-31") is True
+    assert pick_issuance_date(text) == "2026-03-18"
+
+
+def test_appears_as_issuance():
+    # 同一日期既出现在生效句又出现在落款 → 算 issuance(发文日==生效日,常见)
+    text = "本实施细则自2024年9月27日起施行。\n上海市公安局\n2024年9月27日"
+    assert appears_as_issuance(text, "2024-09-27") is True
+    assert appears_as_issuance(text, "2024-09-28") is False
+
+
+# ── pick_luokuan_strict:高置信落款(回填覆盖存量用)─────────────
+def test_strict_accepts_org_adjacent():
+    assert pick_luokuan_strict("重庆市发展和改革委员会\n2022年6月1日") == "2022-06-01"
+
+
+def test_strict_accepts_chinese_numeral():
+    assert pick_luokuan_strict("国家发展改革委 国家能源局\n二〇二三年九月") == "2023-09-01"
+
+
+def test_strict_accepts_publish_label():
+    assert pick_luokuan_strict("## 政策原文\n\n日期：2024-08-29 来源：北京市") == "2024-08-29"
+
+
+def test_strict_rejects_interaction_timestamp():
+    # 咨询互动表格的"回复时间/提交时间"不是落款 → 不采信
+    text = "| 提交时间 | 2025-11-09 |\n| 回复时间 | 2025-11-13 |"
+    assert pick_luokuan_strict(text) == ""
+
+
+def test_strict_rejects_eligibility_range_date():
+    # 申报条件里的范围日期,无机关/标签背书 → 不采信
+    text = "购买日期应介于2024年1月1日至2024年12月31日之间。"
+    assert pick_luokuan_strict(text) == ""

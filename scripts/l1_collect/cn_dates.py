@@ -23,6 +23,12 @@ _EFFECTIVE_AFTER = re.compile(r"^\s*起?(?:施行|执行|生效|实施)")
 # 截止:日期前出现 有效期至/有效期到/截止/截至
 _DEADLINE_BEFORE = re.compile(r"(?:有效期至|有效期到|截止|截至)\s*$")
 
+# 高置信落款背书:机关名结尾 / 发布-成文-印发日期标签
+_ORG_BEFORE = re.compile(
+    r"(?:委员会|管委会|发展改革委|能源局|办公厅|办公室|人民政府|政府|管理局|监管办|委|局|厅|部|院)"
+    r"[\s　]*$")
+_ISSUANCE_LABEL = re.compile(r"(?:发布日期|成文日期|印发日期|发文日期|日期\s*[:：])\s*$")
+
 
 def cn_year_to_int(s: str):
     """'二〇二三' -> 2023;非 4 位中文数字 -> None。"""
@@ -58,7 +64,8 @@ class DateCand:
     has_day: bool
     start: int
     end: int
-    kind: str        # effective | deadline | neutral
+    kind: str        # effective | deadline | neutral | meta
+    is_cn: bool = False   # 中文数字日期(成文日期惯例)
 
 
 def _norm(y, mo, d) -> str:
@@ -66,13 +73,13 @@ def _norm(y, mo, d) -> str:
 
 
 def _classify(text: str, start: int, end: int) -> str:
-    before = text[max(0, start - 10):start]
+    before = text[max(0, start - 12):start]
     after = text[end:end + 8]
-    if _EFFECTIVE_AFTER.match(after):
+    if "采集" in before:                       # trafilatura 采集页脚时间戳,非内容日期
+        return "meta"
+    if _EFFECTIVE_AFTER.match(after) or before.endswith("自"):
         return "effective"
-    if before.endswith("自"):
-        return "effective"
-    if _DEADLINE_BEFORE.search(before):
+    if after.startswith("前") or _DEADLINE_BEFORE.search(before):  # "X日前"=任务截止
         return "deadline"
     return "neutral"
 
@@ -103,7 +110,7 @@ def find_date_candidates(text: str):
         if di is not None and not 1 <= di <= 31:
             continue
         cands.append(DateCand(_norm(yi, mi, di), di is not None, m.start(), m.end(),
-                              _classify(text, m.start(), m.end())))
+                              _classify(text, m.start(), m.end()), is_cn=True))
     cands.sort(key=lambda c: c.start)
     return cands
 
@@ -116,9 +123,33 @@ def pick_issuance_date(text: str) -> str:
     return neutral[-1].date if neutral else ""
 
 
+def pick_luokuan_strict(text: str) -> str:
+    """高置信落款发文日(回填覆盖存量用):中性日期且有机关名/日期标签/中文数字背书。
+    取最末一个合格者(落款贴文末);无 -> ''。比 pick_issuance_date 严,剔互动时间戳/范围日期。"""
+    if not text:
+        return ""
+    best = ""
+    for c in find_date_candidates(text):
+        if c.kind != "neutral":
+            continue
+        before = text[max(0, c.start - 30):c.start]
+        if c.is_cn or _ORG_BEFORE.search(before) or _ISSUANCE_LABEL.search(before):
+            best = c.date
+    return best
+
+
 def is_effective_or_deadline_date(text: str, date_str: str) -> bool:
     """text 中 date_str 是否以生效/截止语义出现(resolver 判定存量 date 误标用)。"""
     if not text or not date_str:
         return False
     return any(c.date == date_str and c.kind in ("effective", "deadline")
+               for c in find_date_candidates(text))
+
+
+def appears_as_issuance(text: str, date_str: str) -> bool:
+    """text 中 date_str 是否以落款/中性(发文日)语义出现。
+    用于区分"发文日恰好==生效日"(同日同时出现在落款与生效句)与纯生效/截止误标。"""
+    if not text or not date_str:
+        return False
+    return any(c.date == date_str and c.kind == "neutral"
                for c in find_date_candidates(text))
