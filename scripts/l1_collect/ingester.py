@@ -77,7 +77,7 @@ def compute_pid(date: str, issuer: Optional[str], official_number: str,
 
 
 def _sanitize_filename(title: str) -> str:
-    t = re.sub(r"[\\/:*?\"<>|]", "_", title)[:80]
+    t = re.sub(r"[\\/:*?\"<>|\x00-\x1f]", "_", title)[:80]   # 含控制字符:内嵌换行/制表符会崩 produce_and_push
     return t.strip() or "untitled"
 
 
