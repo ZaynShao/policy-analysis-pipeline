@@ -171,11 +171,11 @@ docker rmi policy-pipeline:movetest
 ```
 预期:`build OK` + `imports OK`。
 
-### Task A7:CI job 提案(self-contained,标注待平台对齐)
+### Task A7:落地 CI(子文件 + 主文件 include · 平台已默认接受)
 
-monorepo 是 GitLab CI(`.gitlab-ci.yml`),用 uv;pipeline 自包含用 pip+constraints。**不强行并进 uv**,给独立 job 提案,MR 里请平台团队定接法。
+接法已定(用户拍:默认平台接受推进):pipeline 自维护一个子 CI 文件,主 `.gitlab-ci.yml` 加一行 `include`,**不并进 uv**,默认 shared runner(无 tag)。
 
-- [ ] **Step 1**:在 MR 描述里附 job 草案(不直接改 `.gitlab-ci.yml` 主体,除非平台同意),例如:
+- [ ] **Step 1**:写 `services/policy-pipeline/.gitlab-ci.yml`
 
 ```yaml
 policy-pipeline:test:
@@ -191,25 +191,41 @@ policy-pipeline:test:
     - pytest -q
 ```
 
+- [ ] **Step 2**:主 `.gitlab-ci.yml` 顶部 `include:` 加一项(无 `include:` 块就新建)
+
+```yaml
+include:
+  - local: services/policy-pipeline/.gitlab-ci.yml
+```
+
+- [ ] **Step 3**:核对改动面
+
+```bash
+cd /Users/shaoziyuan/Documents/战略大盘/safety-platform
+git diff --stat   # 应见 services/policy-pipeline/.gitlab-ci.yml 新增 + .gitlab-ci.yml 改一行
+```
+(若平台后续给指定 runner tag,在子文件 job 里加 `tags: [<串>]`;默认 shared runner 不加。)
+
 ### Task A8:commit + push + 开 draft MR
 
 - [ ] **Step 1**:commit
 
 ```bash
 cd /Users/shaoziyuan/Documents/战略大盘/safety-platform
-git add services/policy-pipeline
+git add services/policy-pipeline .gitlab-ci.yml
 git commit -m "feat(policy-pipeline): 政策分析 pipeline 作为 service 并入(代码搬运,零行为变化)"
 ```
 
-- [ ] **Step 2**:push + 开 draft MR(glab 有就用,无则 push 后 web 开)
+- [ ] **Step 2**:push + 开 MR(glab 有就用,无则 push 后 web 开)
 
 ```bash
 DEF=$(git symbolic-ref --short refs/remotes/origin/HEAD | sed 's#origin/##')   # 新 shell 也能重取
 git push -u origin feat/add-policy-pipeline-service
-glab mr create --draft --title "feat: add policy-pipeline service" \
-  --description "政策分析 pipeline 代码并入 services/policy-pipeline/。干净拷贝,零行为变化。vault 维持独立数据仓不进仓。CI job 见描述附草案,接法待平台定。" \
-  --target-branch "$DEF" 2>/dev/null || echo "无 glab → push 已完成,去 GitLab web 开 draft MR"
+glab mr create --title "feat: add policy-pipeline service" \
+  --description "政策分析 pipeline 代码并入 services/policy-pipeline/。干净拷贝,零行为变化。vault 维持独立数据仓不进仓。CI:子文件 services/policy-pipeline/.gitlab-ci.yml + 主文件 include,独立 pytest job。" \
+  --target-branch "$DEF" 2>/dev/null || echo "无 glab → push 已完成,去 GitLab web 开 MR"
 ```
+CI 绿后由用户(有合并权)点合(平台已默认接受)。
 
 - [ ] **Step 3**:清理临时 worktree
 
@@ -296,12 +312,14 @@ flock -w 7200 /var/lock/policy-pipeline-producer.lock \
 
 ---
 
-## 待平台团队确认(MR 阶段对齐)
+## 平台对齐(用户拍 2026-06-15:默认平台接受,推进 —— 不阻塞)
 
-1. `services/policy-pipeline/` 落位 + 服务自包含(pip+constraints,不并 root uv)平台是否接受。
-2. CI job 接法(Task A7 草案 vs 平台既有 `.gitlab-ci.yml` 约定)。
-3. monorepo 默认分支 + MR 合并流程(谁批)。
-4. VPS `/root/safety-platform` pull 节奏:pipeline cutover 时的 pull 与平台部署节奏是否冲突(git pull FF 安全,知会即可)。
+已按"默认接受"定死,无需等回复:
+1. 落位 `services/policy-pipeline/` + 服务自包含(pip+constraints,不并 root uv)—— 照做。
+2. CI:子文件 `services/policy-pipeline/.gitlab-ci.yml` + 主文件 `include`,独立 pytest job,默认 shared runner —— 已在 Task A7 落地。
+3. 合并:CI 绿后用户(有合并权)点合。
+4. VPS `git pull` + cron 路径切换:cutover 前给平台**报备一声**(FF 安全,不动其服务/ root compose),非阻塞。
+> 若平台事后提异议(如指定 runner tag / 换落位),回到对应 Task 局部调整即可,不影响整体路径。
 
 ## 回滚总览
 
