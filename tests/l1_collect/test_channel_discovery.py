@@ -153,6 +153,34 @@ def test_commerce_market_targets_shape():
     dg = [t for t in by_type["商务"] if t["city"] == "东莞市商务局"][0]
     assert dg["province"] == "广东省"
 
+
+def test_province_energy_targets_shape():
+    from scripts.l1_collect.channel_discovery import province_energy_targets
+    targets = province_energy_targets()
+    assert len(targets) == 31 * 2
+    by_prov = {}
+    for t in targets:
+        by_prov.setdefault(t["province"], set()).add(t["channel_type"])
+        assert t["root_domain"] is None
+        assert t["level"] == "省"
+    assert by_prov["山东省"] == {"发改委", "能源局"}
+    assert by_prov["吉林省"] == {"发改委", "能源局"}
+
+
+def test_nea_regulatory_targets_shape():
+    from scripts.l1_collect.channel_discovery import nea_regulatory_targets
+    targets = nea_regulatory_targets()
+    national = [t for t in targets if t["level"] == "国家"]
+    assert len(national) == 6
+    assert {t["channel_type"] for t in national} == {"能源监管"}
+    assert "国家能源局华北能源监管局" in {t["city"] for t in national}
+    shanxi = [t for t in targets if t["city"] == "国家能源局山西监管办公室"][0]
+    assert shanxi["province"] == "山西省"
+    assert shanxi["level"] == "省"
+    assert shanxi["city_code"] == "140000"
+    assert shanxi["channel_type"] == "能源监管"
+
+
 def test_commerce_warmstart_from_registry(tmp_path):
     """registry 已有的商务域名 → root_domain 预填(暖启动)。"""
     from scripts.l1_collect.channel_discovery import commerce_market_targets
@@ -179,6 +207,18 @@ def test_institution_match_by_domain():
                               {"province": "四川省", "channel_type": "商务", "level": "省", "city_code": ""}) is False
     assert _institution_match("nea.gov.cn",
                               {"province": "海南省", "channel_type": "市监", "level": "省", "city_code": ""}) is False
+
+
+def test_institution_match_energy_regulatory_domain_marker():
+    from scripts.l1_collect.channel_discovery import _institution_match
+    assert _institution_match(
+        "shanxi.nea.gov.cn",
+        {"province": "山西省", "channel_type": "能源监管", "level": "省", "city_code": "140000"},
+    ) is True
+    assert _institution_match(
+        "fgw.shandong.gov.cn",
+        {"province": "山东省", "channel_type": "能源监管", "level": "省", "city_code": "370000"},
+    ) is False
 
 
 def test_discover_domain_agnostic_derives_domain(monkeypatch):
