@@ -15,6 +15,21 @@
 
 ---
 
+## 起步索引(新 session 先读这里,免得用户每次重述)
+
+本文件只放**稳定约定 + 指针**,不存易腐的进度快照。**当前工作状态以下面这些"活文档"为真相源:**
+
+- **进展 / 决策 / 运维细节**:memory(每个 session 自动加载,见 MEMORY.md 索引)。迁移与产线现状 → `migration-s2-single-producer-nas-exit`;分工纪律 → `codex-division-of-labor`;服务器/SSH/凭据/生产写红线 → `server-ops-*`(**这些细节不入本仓**)。
+- **最近交接**:`docs/handoffs/` 里**日期最新**的 `*-handoff.md`(`ls -t docs/handoffs/`)——每段大工作的状态快照 + 对话链 + 下一步。
+- **数据契约** SCHEMA.md · **运营 SOP / cron** OPERATIONS.md + `docs/runbooks/` · **踩坑原则** LESSONS.md。
+
+**架构现状一句话(2026-06,会动;细节以上面活文档为准;若本文件他处与此矛盾[如下方 §评论 RSS 旧部署纪律],以活文档为准)**:
+S2 单生产者——L1(评论 + 政策)采集、L2 归属派生、vault 写、DB 投影全在**东京 VPS** cron 自动跑,Mac 退为只读热备。在建:L2 全派生栈(③关系 / 信号 / 实体观点 / 分类摘要 / 结晶)整栈上云。
+
+**分工纪律(重要)**:完整任务(代码实现、多步运维序列)= **Claude 出设计 / handoff → Codex 执行 → Claude 审收**;handoff 全文直接贴聊天给用户转交,文件版同时存 `docs/handoffs/`。Claude 只做侦察 / 单点查证 / 审收 / 手册本身。代码改走 TDD,diff 必经 Claude 审过再合。凭据绝不进 git / 不打印。
+
+---
+
 ## 反污染纪律(本仓建立的初衷之一)
 
 历史项目积累了大量"屎山":27 个 oneshot 脚本、11 个 staging 目录、30+ 散文件、过期文档。
